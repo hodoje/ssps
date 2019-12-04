@@ -41,12 +41,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Command\Command.cs" />
+    <Compile Include="Command\CommandEnumerations.cs" />
+    <Compile Include="Command\CommandNotification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceInterfaces\IAdminService.cs" />
     <Compile Include="ServiceInterfaces\IAuditService.cs" />
     <Compile Include="ServiceInterfaces\ISectorService.cs" />
     <Compile Include="ServiceInterfaces\IUserNotificationsService.cs" />
     <Compile Include="ServiceInterfaces\IUserService.cs" />
+    <Compile Include="SymmetricEncryptionAlgorithms\AESAlgorithmProvider.cs" />
+    <Compile Include="SymmetricEncryptionAlgorithms\ISymmetricAlgorithmProvider.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
