@@ -15,10 +15,12 @@
 			CommandId = commandId;
 			CommandType = commandType;
 		}
+
 		/// <summary>
 		/// Unique command id.
 		/// </summary>
 		public long CommandId { get; private set; }
+
 		/// <summary>
 		/// Command type.
 		/// </summary>
