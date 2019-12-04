@@ -9,7 +9,7 @@ namespace Common.SymmetricEncryptionAlgorithms
 	public class AESAlgorithmProvider : ISymmetricAlgorithmProvider
 	{
 		/// <inheritdoc/>
-		public byte[] Decrypt(CBCEncriptionInformation decryptionInfo, byte[] encryptedData)
+		public byte[] Decrypt(CBCEncryptionInformation decryptionInfo, byte[] encryptedData)
 		{
 			byte[] decryptedData;
 			AesCryptoServiceProvider aesCrypto = new AesCryptoServiceProvider()
@@ -32,7 +32,7 @@ namespace Common.SymmetricEncryptionAlgorithms
 		}
 
 		/// <inheritdoc/>
-		public byte[] Encrypt(CBCEncriptionInformation encryptionInfo, byte[] rawData)
+		public byte[] Encrypt(CBCEncryptionInformation encryptionInfo, byte[] rawData)
 		{
 			byte[] encryptedData;
 			AesCryptoServiceProvider aesCrypto = new AesCryptoServiceProvider()
