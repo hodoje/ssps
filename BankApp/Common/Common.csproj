@@ -33,6 +33,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,6 +46,8 @@
     <Compile Include="Command\Command.cs" />
     <Compile Include="Command\CommandEnumerations.cs" />
     <Compile Include="Command\CommandNotification.cs" />
+    <Compile Include="DataContracts\Dtos\EventLogData.cs" />
+    <Compile Include="DataContracts\Exceptions\InvalidEventLogTypeException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceInterfaces\IAdminService.cs" />
     <Compile Include="ServiceInterfaces\IAuditService.cs" />
