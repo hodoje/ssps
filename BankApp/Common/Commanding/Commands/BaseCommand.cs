@@ -34,5 +34,24 @@ namespace Common.Commanding
 		/// </summary>
 		[DataMember]
 		public long CommandId { get; private set; }
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			BaseCommand command = obj as BaseCommand;
+
+			if (obj == null)
+			{
+				return false;
+			}
+
+			return CreationTime == command.CreationTime && CommandId == command.CommandId;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
 	}
 }

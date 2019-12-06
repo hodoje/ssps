@@ -31,5 +31,23 @@ namespace Common.Commanding
 		/// </summary>
 		[DataMember]
 		public string Username { get; private set; }
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			RequestLoanCommand requestLoanCommand = obj as RequestLoanCommand;
+			if (requestLoanCommand == null)
+			{
+				return false;
+			}
+
+			return base.Equals(obj) && Amount == requestLoanCommand.Amount && Username == requestLoanCommand.Username;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
 	}
 }

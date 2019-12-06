@@ -31,5 +31,23 @@ namespace Common.Commanding
 		/// </summary>
 		[DataMember]
 		public string Password { get; private set; }
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			RegistrationCommand registraionCommand = obj as RegistrationCommand;
+			if (registraionCommand == null)
+			{
+				return false;
+			}
+
+			return base.Equals(obj) && Username == registraionCommand.Username && Password == registraionCommand.Password;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
 	}
 }

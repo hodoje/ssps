@@ -31,5 +31,23 @@ namespace Common.Commanding
 		/// </summary>
 		[DataMember]
 		public string Username { get; private set; }
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			WithdrawCommand withdrawCommand = obj as WithdrawCommand;
+			if (withdrawCommand == null)
+			{
+				return false;
+			}
+
+			return base.Equals(obj) && Amount == withdrawCommand.Amount && Username == withdrawCommand.Username;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
 	}
 }
