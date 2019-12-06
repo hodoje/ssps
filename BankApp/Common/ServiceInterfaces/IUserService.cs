@@ -1,12 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ServiceModel;
 
 namespace Common.ServiceInterfaces
 {
+	[ServiceContract]
 	public interface IUserService
 	{
+		[OperationContract]
+		void Register(string username, string password);
+
+		[OperationContract]
+		void Withdraw(double amount);
+
+		[OperationContract]
+		void Deposit(double amount);
+
+		[OperationContract]
+		void RequestLoan(double amount);
 	}
 }
