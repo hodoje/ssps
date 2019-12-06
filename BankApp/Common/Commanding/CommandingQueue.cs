@@ -62,8 +62,11 @@ namespace Common.Commanding
 
 			lock (locker)
 			{
-				returnCommand = commandingQueue[0];
-				commandingQueue.RemoveAt(0);
+				if (commandingQueue.Count > 0)
+				{
+					returnCommand = commandingQueue[0];
+					commandingQueue.RemoveAt(0);
+				}
 			}
 
 			return returnCommand;
@@ -140,6 +143,7 @@ namespace Common.Commanding
 		public void Dispose()
 		{
 			commandingQueue.Clear();
+			collectionSynchronication.Set();
 		}
 	}
 }
