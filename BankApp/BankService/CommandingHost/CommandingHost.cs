@@ -15,8 +15,11 @@ namespace BankService.CommandingHost
 		private ConcurrentQueue<CommandNotification> responseQueue;
 		private AutoResetEvent sendingSynchronization = new AutoResetEvent(false);
 
-		public CommandingHost(CommandingQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue)
+		public CommandingHost(CommandingQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo)
 		{
+			// todo create Clinet for Sector with connecitonInfo
+
+
 			commandHandler = new CommandHandler.CommandHandler(this);
 
 			this.responseQueue = responseQueue;

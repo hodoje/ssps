@@ -21,7 +21,7 @@ namespace BankService.CommandingManager
 
 		static CommandingManager()
 		{
-			//TODO read from configuration
+			// TODO read from configuration
 			queueSize = 5;
 			timeoutPeriod = 3;
 		}
@@ -35,6 +35,8 @@ namespace BankService.CommandingManager
 			{
 				typeof(DepositCommand), typeof(WithdrawCommand), typeof(RequestLoanCommand), typeof(RegistrationCommand)
 			};
+
+			commandToQueueMapper = new Dictionary<Type, CommandingQueue>(supportedCommands.Count);
 
 			commandingHosts = new List<ICommandingHost>(supportedCommands.Count);
 
@@ -61,7 +63,7 @@ namespace BankService.CommandingManager
 		{
 			commandToQueueMapper[command.GetType()].Enqueue(command);
 
-			//log, save to db
+			// todo log, save to db
 		}
 
 		private void AddCommandingHostByCommand(Dictionary<Type, CommandingQueue> commandToQueueMapper, List<Type> commandTypes)
@@ -69,7 +71,7 @@ namespace BankService.CommandingManager
 			foreach (Type commandType in commandTypes)
 			{
 				CommandingQueue newQueue = new CommandingQueue(queueSize, timeoutPeriod);
-				CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(newQueue, responseQueue);
+				CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(newQueue, responseQueue, Configuration.Instance.Connections[commandType]);
 				commandingHosts.Add(newHost);
 
 				commandToQueueMapper.Add(commandType, newQueue);
