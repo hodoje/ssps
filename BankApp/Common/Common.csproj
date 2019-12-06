@@ -51,6 +51,7 @@
     <Compile Include="Commanding\Commands\RegistrationCommand.cs" />
     <Compile Include="Commanding\Commands\RequestLoanCommand.cs" />
     <Compile Include="Commanding\Commands\WithdrawCommand.cs" />
+    <Compile Include="Communication\CertificateClientProxy.cs" />
     <Compile Include="DataContracts\Dtos\EventLogData.cs" />
     <Compile Include="DataContracts\Exceptions\InvalidEventLogTypeException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
