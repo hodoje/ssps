@@ -8,10 +8,11 @@ namespace Common.Commanding
 	/// <summary>
 	/// Class which represents commanding queue.
 	/// </summary>
-	public class CommandingQueue
+	public class CommandingQueue : IDisposable
 	{
 		private List<BaseCommand> commandingQueue;
-		private ReaderWriterLockSlim locker;
+		private AutoResetEvent collectionSynchronication;
+		private object locker;
 		private TimeSpan timeoutPeriod;
 
 		/// <summary>
@@ -22,7 +23,8 @@ namespace Common.Commanding
 		public CommandingQueue(int queueSize, int timeoutPeriodInSeconds)
 		{
 			commandingQueue = new List<BaseCommand>(queueSize);
-			locker = new ReaderWriterLockSlim();
+			locker = new object();
+			collectionSynchronication = new AutoResetEvent(false);
 			timeoutPeriod = new TimeSpan(0, 0, timeoutPeriodInSeconds);
 		}
 
@@ -32,11 +34,11 @@ namespace Common.Commanding
 		/// <param name="command">Command to add.</param>
 		public void Enqueue(BaseCommand command)
 		{
-			locker.EnterWriteLock();
-
-			commandingQueue.Add(command);
-
-			locker.ExitWriteLock();
+			lock (locker)
+			{
+				commandingQueue.Add(command);
+				collectionSynchronication.Set();
+			}
 		}
 
 		/// <summary>
@@ -46,17 +48,23 @@ namespace Common.Commanding
 		public BaseCommand Dequeue()
 		{
 			BaseCommand returnCommand = null;
+			int commandingQueueSize = 0;
 
-			locker.EnterWriteLock();
-
-			if (commandingQueue.Count > 0)
+			lock (locker)
 			{
-				returnCommand = commandingQueue[0];
-
-				commandingQueue.RemoveAt(0);
+				commandingQueueSize = commandingQueue.Count;
 			}
 
-			locker.ExitWriteLock();
+			if (commandingQueueSize == 0)
+			{
+				collectionSynchronication.WaitOne();
+			}
+
+			lock (locker)
+			{
+				returnCommand = commandingQueue[0];
+				commandingQueue.RemoveAt(0);
+			}
 
 			return returnCommand;
 		}
@@ -68,13 +76,40 @@ namespace Common.Commanding
 		/// <returns>Command if command exists in the queue, otherwise null.</returns>
 		public BaseCommand GetCommandById(long commandId)
 		{
-			locker.EnterReadLock();
+			BaseCommand command;
 
-			BaseCommand command = commandingQueue.FirstOrDefault(x => x.CommandId == commandId);
-
-			locker.ExitReadLock();
+			lock (locker)
+			{
+				command = commandingQueue.FirstOrDefault(x => x.CommandId == commandId);
+			}
 
 			return command;
+		}
+
+		/// <summary>
+		/// Removes command if it exists in the queue.
+		/// </summary>
+		/// <param name="commandId">Command id of the command to be removed.</param>
+		/// <returns>Returns <b>true</b> if command is removed, otherwise <b>false</b>.</returns>
+		public bool RemoveCommandById(long commandId)
+		{
+			BaseCommand command;
+			lock (locker)
+			{
+				command = commandingQueue.FirstOrDefault(x => x.CommandId == commandId);
+			}
+
+			if (command == null)
+			{
+				return false;
+			}
+
+			lock (locker)
+			{
+				commandingQueue.Remove(command);
+			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -84,21 +119,27 @@ namespace Common.Commanding
 		public List<BaseCommand> ExpiredCommands()
 		{
 			List<BaseCommand> expiredCommands = new List<BaseCommand>();
-			locker.EnterReadLock();
 
-			DateTime dateTimeNow = DateTime.Now;
-
-			foreach (BaseCommand command in commandingQueue)
+			lock (locker)
 			{
-				if (command.CreationTime + timeoutPeriod <= dateTimeNow)
+				DateTime dateTimeNow = DateTime.Now;
+
+				foreach (BaseCommand command in commandingQueue)
 				{
-					expiredCommands.Add(command);
+					if (command.CreationTime + timeoutPeriod <= dateTimeNow)
+					{
+						expiredCommands.Add(command);
+					}
 				}
 			}
 
-			locker.ExitReadLock();
-
 			return expiredCommands;
+		}
+
+		/// <inheritdoc/>
+		public void Dispose()
+		{
+			commandingQueue.Clear();
 		}
 	}
 }
