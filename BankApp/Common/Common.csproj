@@ -51,6 +51,8 @@
     <Compile Include="Commanding\Commands\RegistrationCommand.cs" />
     <Compile Include="Commanding\Commands\RequestLoanCommand.cs" />
     <Compile Include="Commanding\Commands\WithdrawCommand.cs" />
+    <Compile Include="DataContracts\Dtos\EventLogData.cs" />
+    <Compile Include="DataContracts\Exceptions\InvalidEventLogTypeException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceInterfaces\IAdminService.cs" />
     <Compile Include="ServiceInterfaces\IAuditService.cs" />
