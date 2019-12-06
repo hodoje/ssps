@@ -1,7 +1,7 @@
 ﻿using Common.Command;
 using System.Collections.Generic;
 
-namespace BankService
+namespace BankService.CommandingManager
 {
 	/// <summary>
 	/// Unit responsible for sending commands and response handling.
