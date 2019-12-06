@@ -1,4 +1,4 @@
-﻿namespace Common.Command
+﻿namespace Common.Commanding
 {
 	/// <summary>
 	/// Represents command notification.
@@ -28,5 +28,10 @@
 		/// Represents the current command status.
 		/// </summary>
 		public CommandNotificationStatus CommandStatus { get; set; }
+
+		/// <summary>
+		/// Any kind of additional information or message why command is rejected or accepted. 
+		/// </summary>
+		public string Information { get; set; }
 	}
 }

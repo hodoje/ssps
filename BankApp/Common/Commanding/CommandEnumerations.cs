@@ -1,4 +1,4 @@
-﻿namespace Common.Command
+﻿namespace Common.Commanding
 {
 	/// <summary>
 	/// Command types.

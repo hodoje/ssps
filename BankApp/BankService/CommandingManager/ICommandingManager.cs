@@ -1,4 +1,4 @@
-﻿using Common.Command;
+﻿using Common.Commanding;
 using System.Collections.Generic;
 
 namespace BankService.CommandingManager
@@ -12,7 +12,7 @@ namespace BankService.CommandingManager
 		/// Enqueues command on the specific commanding queue.
 		/// </summary>
 		/// <param name="command"></param>
-		void EnqueueCommand(Command command);
+		void EnqueueCommand(BaseCommand command);
 
 		/// <summary>
 		/// Handles received command response.
@@ -23,7 +23,7 @@ namespace BankService.CommandingManager
 		/// <summary>
 		/// Gets command which are in queue and ready to be sent.
 		/// </summary>
-		IEnumerable<Command> CommandsToSend { get; }
+		IEnumerable<BaseCommand> CommandsToSend { get; }
 
 		/// <summary>
 		/// Finds command in the queue and removes it from the queue.
