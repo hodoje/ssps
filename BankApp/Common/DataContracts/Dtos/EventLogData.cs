@@ -21,18 +21,30 @@ namespace Common.DataContracts.Dtos
 
 		public EventLogData(string bankName, string accountName, string logMessage, EventLogEntryType eventLogEntryType)
 		{
-			BankName = !string.IsNullOrWhiteSpace(bankName)
-				? bankName
-				: throw new ArgumentNullException(nameof(bankName));
-			AccountName = !string.IsNullOrWhiteSpace(accountName)
-				? accountName
-				: throw new ArgumentNullException(nameof(accountName));
-			LogMessage = !string.IsNullOrWhiteSpace(logMessage)
-				? logMessage
-				: throw new ArgumentNullException(nameof(logMessage));
-			EventLogType = Enum.IsDefined(typeof(EventLogEntryType), eventLogEntryType)
-				? eventLogEntryType
-				: throw new InvalidEventLogTypeException();
+			if (string.IsNullOrWhiteSpace(bankName))
+			{
+				throw new ArgumentNullException(nameof(bankName));
+			}
+
+			if (string.IsNullOrWhiteSpace(accountName))
+			{
+				throw new ArgumentNullException(nameof(accountName));
+			}
+
+			if (string.IsNullOrWhiteSpace(logMessage))
+			{
+				throw new ArgumentNullException(nameof(logMessage));
+			}
+
+			if (Enum.IsDefined(typeof(EventLogEntryType), eventLogEntryType))
+			{
+				throw new InvalidEventLogTypeException();
+			}
+
+			BankName = bankName;
+			AccountName = accountName;
+			LogMessage = logMessage;
+			EventLogType = eventLogEntryType;
 		}
 
 		[DataMember]
