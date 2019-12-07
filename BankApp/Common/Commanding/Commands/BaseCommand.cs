@@ -53,5 +53,11 @@ namespace Common.Commanding
 		{
 			return base.GetHashCode();
 		}
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			return $"{this.GetType().Name} : {CommandId}";
+		}
 	}
 }

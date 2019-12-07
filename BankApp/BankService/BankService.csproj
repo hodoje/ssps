@@ -52,6 +52,10 @@
     <Compile Include="CommandingManager\CommandingManager.cs" />
     <Compile Include="CommandingManager\ICommandingManager.cs" />
     <Compile Include="Configuration.cs" />
+    <Compile Include="DatabaseManagement\DatabaseManager.cs" />
+    <Compile Include="DatabaseManagement\IDatabaseManager.cs" />
+    <Compile Include="DatabaseManagement\IDataPersistence.cs" />
+    <Compile Include="DatabaseManagement\XmlDataPersistence.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
