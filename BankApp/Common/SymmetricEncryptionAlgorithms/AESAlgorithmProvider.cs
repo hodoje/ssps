@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Common.SymmetricEncryptionAlgorithms
@@ -9,7 +10,7 @@ namespace Common.SymmetricEncryptionAlgorithms
 	public class AESAlgorithmProvider : ISymmetricAlgorithmProvider
 	{
 		/// <inheritdoc/>
-		public byte[] Decrypt(CBCEncryptionInformation decryptionInfo, byte[] encryptedData)
+		public byte[] Decrypt(EncryptionInformation decryptionInfo, byte[] encryptedData)
 		{
 			byte[] decryptedData;
 			AesCryptoServiceProvider aesCrypto = new AesCryptoServiceProvider()
@@ -21,20 +22,21 @@ namespace Common.SymmetricEncryptionAlgorithms
 
 			if (decryptionInfo.CipherMode == CipherMode.CBC)
 			{
-				aesCrypto.IV = decryptionInfo.InitialVector;
+				aesCrypto.IV = encryptedData.Take(aesCrypto.BlockSize / 8).ToArray();
 			}
 
 			ICryptoTransform aesDecrypt = aesCrypto.CreateDecryptor();
 
-			decryptedData = aesDecrypt.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
+			decryptedData = aesDecrypt.TransformFinalBlock(encryptedData, aesCrypto.IV.Length, encryptedData.Length);
 
 			return decryptedData;
 		}
 
 		/// <inheritdoc/>
-		public byte[] Encrypt(CBCEncryptionInformation encryptionInfo, byte[] rawData)
+		public byte[] Encrypt(EncryptionInformation encryptionInfo, byte[] rawData)
 		{
 			byte[] encryptedData;
+			byte[] initialVector = new byte[0];
 			AesCryptoServiceProvider aesCrypto = new AesCryptoServiceProvider()
 			{
 				Key = ASCIIEncoding.ASCII.GetBytes(encryptionInfo.Key),
@@ -45,12 +47,12 @@ namespace Common.SymmetricEncryptionAlgorithms
 			if (encryptionInfo.CipherMode == CipherMode.CBC)
 			{
 				aesCrypto.GenerateIV();
-				encryptionInfo.InitialVector = aesCrypto.IV;
+				initialVector = aesCrypto.IV;
 			}
 
 			ICryptoTransform aesEncrypt = aesCrypto.CreateEncryptor();
 
-			encryptedData = aesEncrypt.TransformFinalBlock(rawData, 0, rawData.Length);
+			encryptedData = initialVector.Concat(aesEncrypt.TransformFinalBlock(rawData, 0, rawData.Length)).ToArray();
 
 			return encryptedData;
 		}

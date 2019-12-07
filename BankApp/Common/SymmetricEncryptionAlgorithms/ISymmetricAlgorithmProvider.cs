@@ -5,17 +5,12 @@ namespace Common.SymmetricEncryptionAlgorithms
 	/// <summary>
 	/// Structure for information which is needed for encryption/decryption.
 	/// </summary>
-	public struct CBCEncryptionInformation
+	public struct EncryptionInformation
 	{
 		/// <summary>
 		/// Secret key for decryption.
 		/// </summary>
 		public string Key { get; set; }
-
-		/// <summary>
-		/// Initial vector used for encryption/decryption.
-		/// </summary>
-		public byte[] InitialVector { get; set; }
 
 		/// <summary>
 		/// Cipher mode for encryption/decryption.
@@ -34,7 +29,7 @@ namespace Common.SymmetricEncryptionAlgorithms
 		/// <param name="encryptionInfo">Information which is used for encryption.</param>
 		/// <param name="rawData">Bytes to encrypt.</param>
 		/// <returns>Encrypted data.</returns>
-		byte[] Encrypt(CBCEncryptionInformation encryptionInfo, byte[] rawData);
+		byte[] Encrypt(EncryptionInformation encryptionInfo, byte[] rawData);
 
 		/// <summary>
 		/// Performs decryption algorithm on given encrypted data.
@@ -42,6 +37,6 @@ namespace Common.SymmetricEncryptionAlgorithms
 		/// <param name="decryptionInfo">Information which is used for decryption.</param>
 		/// <param name="encryptedData">Encrypted bytes.</param>
 		/// <returns>Decrypted data.</returns>
-		byte[] Decrypt(CBCEncryptionInformation decryptionInfo, byte[] encryptedData);
+		byte[] Decrypt(EncryptionInformation decryptionInfo, byte[] encryptedData);
 	}
 }
