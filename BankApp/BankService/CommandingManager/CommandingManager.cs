@@ -16,7 +16,7 @@ namespace BankService.CommandingManager
 		private CancellationTokenSource cancellationToken;
 		private List<ICommandingHost> commandingHosts;
 
-		private Dictionary<Type, CommandingQueue> commandToQueueMapper;
+		private Dictionary<Type, CommandQueue> commandToQueueMapper;
 		private ConcurrentQueue<CommandNotification> responseQueue;
 
 		static CommandingManager()
@@ -36,7 +36,7 @@ namespace BankService.CommandingManager
 				typeof(DepositCommand), typeof(WithdrawCommand), typeof(RequestLoanCommand), typeof(RegistrationCommand)
 			};
 
-			commandToQueueMapper = new Dictionary<Type, CommandingQueue>(supportedCommands.Count);
+			commandToQueueMapper = new Dictionary<Type, CommandQueue>(supportedCommands.Count);
 
 			commandingHosts = new List<ICommandingHost>(supportedCommands.Count);
 
@@ -48,7 +48,7 @@ namespace BankService.CommandingManager
 
 		public bool CancelCommand(long commandId)
 		{
-			foreach (CommandingQueue commandingQueue in commandToQueueMapper.Values)
+			foreach (CommandQueue commandingQueue in commandToQueueMapper.Values)
 			{
 				if (commandingQueue.RemoveCommandById(commandId))
 				{
@@ -66,11 +66,11 @@ namespace BankService.CommandingManager
 			// todo log, save to db
 		}
 
-		private void AddCommandingHostByCommand(Dictionary<Type, CommandingQueue> commandToQueueMapper, List<Type> commandTypes)
+		private void AddCommandingHostByCommand(Dictionary<Type, CommandQueue> commandToQueueMapper, List<Type> commandTypes)
 		{
 			foreach (Type commandType in commandTypes)
 			{
-				CommandingQueue newQueue = new CommandingQueue(queueSize, timeoutPeriod);
+				CommandQueue newQueue = new CommandQueue(queueSize, timeoutPeriod);
 				CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(newQueue, responseQueue, Configuration.Instance.Connections[commandType]);
 				commandingHosts.Add(newHost);
 

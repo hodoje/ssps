@@ -11,11 +11,11 @@ namespace BankService.CommandingHost
 	{
 		private CancellationTokenSource cancellationToken = new CancellationTokenSource();
 		private ICommandHandler commandHandler;
-		private CommandingQueue commandingQueue;
+		private CommandQueue commandingQueue;
 		private ConcurrentQueue<CommandNotification> responseQueue;
 		private AutoResetEvent sendingSynchronization = new AutoResetEvent(false);
 
-		public CommandingHost(CommandingQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo)
+		public CommandingHost(CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo)
 		{
 			// todo create Clinet for Sector with connecitonInfo
 

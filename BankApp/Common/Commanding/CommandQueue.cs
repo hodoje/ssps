@@ -8,7 +8,7 @@ namespace Common.Commanding
 	/// <summary>
 	/// Class which represents commanding queue.
 	/// </summary>
-	public class CommandingQueue : IDisposable
+	public class CommandQueue : IDisposable
 	{
 		private List<BaseCommand> commandingQueue;
 		private AutoResetEvent collectionSynchronication;
@@ -16,11 +16,11 @@ namespace Common.Commanding
 		private TimeSpan timeoutPeriod;
 
 		/// <summary>
-		/// Initializes new instance of <see cref="CommandingQueue"/> class. 
+		/// Initializes new instance of <see cref="CommandQueue"/> class. 
 		/// </summary>
 		/// <param name="queueSize">Predefined queue size.</param>
 		/// <param name="timeoutPeriodInSeconds">Timeout period in seconds.</param>
-		public CommandingQueue(int queueSize, int timeoutPeriodInSeconds)
+		public CommandQueue(int queueSize, int timeoutPeriodInSeconds)
 		{
 			commandingQueue = new List<BaseCommand>(queueSize);
 			locker = new object();

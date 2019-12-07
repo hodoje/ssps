@@ -45,7 +45,7 @@
   <ItemGroup>
     <Compile Include="Commanding\Commands\BaseCommand.cs" />
     <Compile Include="Commanding\CommandEnumerations.cs" />
-    <Compile Include="Commanding\CommandingQueue.cs" />
+    <Compile Include="Commanding\CommandQueue.cs" />
     <Compile Include="Commanding\CommandNotification.cs" />
     <Compile Include="Commanding\Commands\DepositCommand.cs" />
     <Compile Include="Commanding\Commands\RegistrationCommand.cs" />
