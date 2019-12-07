@@ -1,11 +1,13 @@
 ﻿using Common.Commanding;
 using Common.ServiceInterfaces;
+using System.ServiceModel;
 
 namespace BankService
 {
 	/// <summary>
 	/// Class represents banking service.
 	/// </summary>
+	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
 	public class BankingService : IUserService, IAdminService
 	{
 		private CommandingManager.CommandingManager commandManager;

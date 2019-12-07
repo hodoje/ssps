@@ -9,14 +9,15 @@ namespace BankService
 		EndpointAddress EndpointAddess { get; set; }
 		NetTcpBinding NetTcpBinding { get; set; }
 	}
+
 	internal class Configuration
 	{
-		private static Configuration instance;
+		private static Configuration instance = new Configuration();
 
-		static Configuration()
+		private Configuration()
 		{
-			instance = new Configuration();
-			// todo Connections
+			// todo add connection to sectors from configuration source
+			Connections = new Dictionary<Type, ConnectionInfo>();
 		}
 
 		public static Configuration Instance
