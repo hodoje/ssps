@@ -5,6 +5,7 @@ using Common.Commanding;
 using BankService.CommandingHost;
 using System.Collections.Concurrent;
 using System.Threading;
+using BankService.DatabaseManagement;
 
 namespace BankService.CommandingManager
 {
@@ -18,6 +19,8 @@ namespace BankService.CommandingManager
 
 		private Dictionary<Type, CommandQueue> commandToQueueMapper;
 		private ConcurrentQueue<CommandNotification> responseQueue;
+
+		private DatabaseManager databaseManager;
 
 		static CommandingManager()
 		{
@@ -33,14 +36,18 @@ namespace BankService.CommandingManager
 
 			List<Type> supportedCommands = new List<Type>(4)
 			{
-				typeof(DepositCommand), typeof(WithdrawCommand), typeof(RequestLoanCommand), typeof(RegistrationCommand)
+				typeof(DepositCommand),
+				typeof(WithdrawCommand),
+				typeof(RequestLoanCommand),
+				typeof(RegistrationCommand)
 			};
 
 			commandToQueueMapper = new Dictionary<Type, CommandQueue>(supportedCommands.Count);
 
-			commandingHosts = new List<ICommandingHost>(supportedCommands.Count);
+			InitializeDatabase();
 
-			AddCommandingHostByCommand(commandToQueueMapper, supportedCommands);
+			commandingHosts = new List<ICommandingHost>(supportedCommands.Count);
+			CreateCommandingHosts(commandToQueueMapper, supportedCommands);
 
 			Task listenWorker = new Task(ListenForCommandNotifications);
 			listenWorker.Start();
@@ -62,16 +69,17 @@ namespace BankService.CommandingManager
 		public void EnqueueCommand(BaseCommand command)
 		{
 			commandToQueueMapper[command.GetType()].Enqueue(command);
+			databaseManager.SaveCommand(command);
 
-			// todo log, save to db
+			// todo log
 		}
 
-		private void AddCommandingHostByCommand(Dictionary<Type, CommandQueue> commandToQueueMapper, List<Type> commandTypes)
+		private void CreateCommandingHosts(Dictionary<Type, CommandQueue> commandToQueueMapper, List<Type> commandTypes)
 		{
 			foreach (Type commandType in commandTypes)
 			{
 				CommandQueue newQueue = new CommandQueue(queueSize, timeoutPeriod);
-				CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(newQueue, responseQueue, Configuration.Instance.Connections[commandType]);
+				CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(newQueue, responseQueue, Configuration.Instance.Connections[commandType], databaseManager, commandType.Name);
 				commandingHosts.Add(newHost);
 
 				commandToQueueMapper.Add(commandType, newQueue);
@@ -92,6 +100,12 @@ namespace BankService.CommandingManager
 
 				// todo send notification to unit responsible for user notification
 			}
+		}
+
+		private void InitializeDatabase()
+		{
+			IDataPersistence databasePersistence = new XmlDataPersistence();
+			databaseManager = new DatabaseManager(databasePersistence);
 		}
 	}
 }

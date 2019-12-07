@@ -4,31 +4,36 @@ using System.Threading;
 using Common.Commanding;
 using BankService.CommandHandler;
 using System.Collections.Concurrent;
+using BankService.DatabaseManagement;
 
 namespace BankService.CommandingHost
 {
 	public class CommandingHost : ICommandingHost, INotificationHost, IDisposable
 	{
+		private string hostName;
 		private CancellationTokenSource cancellationToken = new CancellationTokenSource();
 		private ICommandHandler commandHandler;
+		private IDatabaseManager databaseManager;
 		private CommandQueue commandingQueue;
 		private ConcurrentQueue<CommandNotification> responseQueue;
 		private AutoResetEvent sendingSynchronization = new AutoResetEvent(false);
 
-		public CommandingHost(CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo)
+		public CommandingHost(CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo, IDatabaseManager databaseManager, string hostName)
 		{
-			// todo create Clinet for Sector with connecitonInfo
-
+			// todo create Client for Sector with connecitonInfo
 
 			commandHandler = new CommandHandler.CommandHandler(this);
 
 			this.responseQueue = responseQueue;
 			this.commandingQueue = commandingQueue;
+			this.hostName = hostName;
+			this.databaseManager = databaseManager;
 		}
 
 		public void CommandNotificationReceived(CommandNotification commandNotification)
 		{
 			responseQueue.Enqueue(commandNotification);
+			databaseManager.RemoveCommand(commandNotification.CommandId);
 
 			// Awake WorkerThread because there is enough command space in Commanding Handler.
 			sendingSynchronization.Set();
@@ -42,28 +47,34 @@ namespace BankService.CommandingHost
 
 		public void Start()
 		{
-			// Get commands from commanding queue and send it to command handler
+			// Get commands from commanding queue and send it to Commanding Handler.
 			Task listenQueueTask = new Task(WorkerThread);
 			listenQueueTask.Start();
 		}
 
 		public void Stop()
 		{
+			// Cancel WorkerThread
 			cancellationToken?.Cancel();
+
+			// Wake up WorkerThread if it is waiting for Commanding Handler to get enough space.
 			sendingSynchronization?.Set();
 		}
 
 		private void WorkerThread()
 		{
+			Console.WriteLine($"[CommandingHost] {hostName} started...");
 			while (!cancellationToken.IsCancellationRequested)
 			{
 				BaseCommand commandToSend = commandingQueue.Dequeue();
 
 				if (!commandHandler.HasAvailableSpace())
 				{
+					// If there is not enough space on host (sector is full) wait for response to be received.
 					sendingSynchronization.WaitOne();
 				}
 
+				// When awoken, check if cancelation token was canceled (object disposing).
 				if (!cancellationToken.IsCancellationRequested)
 				{
 					commandHandler.SendCommand(commandToSend);
