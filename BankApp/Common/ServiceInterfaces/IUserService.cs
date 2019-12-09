@@ -1,4 +1,6 @@
-﻿using System.ServiceModel;
+﻿using Common.Commanding;
+using System.Collections.Generic;
+using System.ServiceModel;
 
 namespace Common.ServiceInterfaces
 {
@@ -16,5 +18,8 @@ namespace Common.ServiceInterfaces
 
 		[OperationContract]
 		void RequestLoan(double amount);
+
+		[OperationContract]
+		List<CommandNotification> GetPendingNotifications();
 	}
 }

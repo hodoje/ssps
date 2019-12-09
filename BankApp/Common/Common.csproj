@@ -60,7 +60,7 @@
     <Compile Include="ServiceInterfaces\IAdminService.cs" />
     <Compile Include="ServiceInterfaces\IAuditService.cs" />
     <Compile Include="ServiceInterfaces\ISectorService.cs" />
-    <Compile Include="ServiceInterfaces\IUserNotificationsService.cs" />
+    <Compile Include="ServiceInterfaces\IUserServiceCallback.cs" />
     <Compile Include="ServiceInterfaces\IUserService.cs" />
     <Compile Include="SymmetricEncryptionAlgorithms\AESAlgorithmProvider.cs" />
     <Compile Include="SymmetricEncryptionAlgorithms\ISymmetricAlgorithmProvider.cs" />
