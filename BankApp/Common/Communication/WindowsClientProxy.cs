@@ -21,7 +21,6 @@ namespace Common.Communication
 		/// <param name="address">Service endpoint.</param>
 		public WindowsClientProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
 		{
-			// TODO: set windows security usage
 			Proxy = this.CreateChannel();
 		}
 
