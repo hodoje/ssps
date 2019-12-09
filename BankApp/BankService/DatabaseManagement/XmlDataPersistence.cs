@@ -8,7 +8,7 @@ namespace BankService.DatabaseManagement
 	/// <summary>
 	/// XML data persistence class.
 	/// </summary>
-	public class XmlDataPersistence : IDataPersistence
+	public class XmlDataPersistence : IDataPersistence, IDisposable
 	{
 		private string xmlPath;
 		/// <summary>
@@ -44,6 +44,11 @@ namespace BankService.DatabaseManagement
 		public static void CreateXmlFile(string path)
 		{
 			File.Create(path);
+		}
+
+		public void Dispose()
+		{
+			// close XML file handler
 		}
 
 		/// <inheritdoc/>

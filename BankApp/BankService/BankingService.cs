@@ -1,8 +1,8 @@
 ﻿using Common.Commanding;
 using Common.ServiceInterfaces;
 using System.ServiceModel;
-using System;
 using BankService.CommandingManager;
+using System.Collections.Generic;
 
 namespace BankService
 {
@@ -29,6 +29,8 @@ namespace BankService
 
 			DepositCommand depositCommand = new DepositCommand(newId, username, amount);
 			commandManager.EnqueueCommand(depositCommand);
+
+			commandManager.RegisterClient(username, OperationContext.Current.GetCallbackChannel<IUserServiceCallback>());
 		}
 
 		public void Register(string username, string password)
@@ -38,6 +40,8 @@ namespace BankService
 
 			RegistrationCommand registrationCommand = new RegistrationCommand(newId, username, password);
 			commandManager.EnqueueCommand(registrationCommand);
+
+			commandManager.RegisterClient(username, OperationContext.Current.GetCallbackChannel<IUserServiceCallback>());
 		}
 
 		public void RequestLoan(double amount)
@@ -48,6 +52,8 @@ namespace BankService
 
 			RequestLoanCommand requestLoanCommand = new RequestLoanCommand(newId, username, amount);
 			commandManager.EnqueueCommand(requestLoanCommand);
+
+			commandManager.RegisterClient(username, OperationContext.Current.GetCallbackChannel<IUserServiceCallback>());
 		}
 
 		public void Withdraw(double amount)
@@ -58,11 +64,14 @@ namespace BankService
 
 			WithdrawCommand withdrawCommand = new WithdrawCommand(newId, username, amount);
 			commandManager.EnqueueCommand(withdrawCommand);
+
+			commandManager.RegisterClient(username, OperationContext.Current.GetCallbackChannel<IUserServiceCallback>());
 		}
 
 		public void CreateNewDatabase()
 		{
 			// authorization and authentication
+			string username = null;
 
 			commandManager.CreateDatabase();
 
@@ -70,13 +79,18 @@ namespace BankService
 			{
 				commandIdNumber = 0;
 			}
+
+			commandManager.RegisterClient(username, OperationContext.Current.GetCallbackChannel<IUserServiceCallback>());
 		}
 
 		public void DeleteStaleCommands()
 		{
 			// authorization and authentication
+			string username = null;
 
 			commandManager.ClearStaleCommands();
+
+			commandManager.RegisterClient(username, OperationContext.Current.GetCallbackChannel<IUserServiceCallback>());
 		}
 
 		private long GetUniqueId()
@@ -90,6 +104,18 @@ namespace BankService
 			}
 
 			return newId;
+		}
+
+		public List<CommandNotification> GetPendingNotifications()
+		{
+			string username = null;
+			// authentication
+
+			List<CommandNotification> userNotifications = null;
+
+			// find notifications in notifications unit
+
+			return userNotifications;
 		}
 	}
 }

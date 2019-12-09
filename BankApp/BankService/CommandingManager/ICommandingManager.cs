@@ -1,5 +1,5 @@
 ﻿using Common.Commanding;
-using System.Collections.Generic;
+using Common.ServiceInterfaces;
 
 namespace BankService.CommandingManager
 {
@@ -30,5 +30,12 @@ namespace BankService.CommandingManager
 		/// Deletes commands which are timed out.
 		/// </summary>
 		void ClearStaleCommands();
+
+		/// <summary>
+		/// Try to register new user for notifications.
+		/// </summary>
+		/// <param name="key">Key to find the client.</param>
+		/// <param name="userCallback">Users callback.</param>
+		void RegisterClient(string key, IUserServiceCallback userCallback);
 	}
 }

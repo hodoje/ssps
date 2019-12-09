@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Common.Commanding;
 using BankService.CommandingHost;
 using System.Collections.Concurrent;
-using System.Threading;
 using BankService.DatabaseManagement;
+using Common.ServiceInterfaces;
 
 namespace BankService.CommandingManager
 {
-	public class CommandingManager : ICommandingManager
+	public class CommandingManager : ICommandingManager, IDisposable
 	{
 		private static readonly int queueSize;
 		private static readonly int timeoutPeriod;
 		private static readonly string xmlFilePath;
 
-		private CancellationTokenSource cancellationToken;
 		private List<ICommandingHost> commandingHosts;
 
 		private Dictionary<Type, CommandQueue> commandToQueueMapper;
-		private DatabaseManager databaseManager;
+		private IDatabaseManager databaseManager;
+		private INotificationHandler notificationHandler;
 		private ConcurrentQueue<CommandNotification> responseQueue;
 
 		static CommandingManager()
@@ -31,7 +30,6 @@ namespace BankService.CommandingManager
 
 		public CommandingManager()
 		{
-			cancellationToken = new CancellationTokenSource();
 			responseQueue = new ConcurrentQueue<CommandNotification>();
 
 			List<Type> supportedCommands = new List<Type>(4)
@@ -49,8 +47,7 @@ namespace BankService.CommandingManager
 			commandingHosts = new List<ICommandingHost>(supportedCommands.Count);
 			CreateCommandingHosts(commandToQueueMapper, supportedCommands);
 
-			Task listenWorker = new Task(ListenForCommandNotifications);
-			listenWorker.Start();
+			InitializeNotificationHandler();
 		}
 
 		public bool CancelCommand(long commandId)
@@ -84,12 +81,31 @@ namespace BankService.CommandingManager
 			databaseManager.LoadNewDataPersitenceUnit(databasePersistence);
 		}
 
+		public void Dispose()
+		{
+			((IDisposable)databaseManager).Dispose();
+			((IDisposable)notificationHandler).Dispose();
+
+			foreach (ICommandingHost commandingHost in commandingHosts)
+			{
+				((IDisposable)commandingHost).Dispose();
+			}
+
+			commandToQueueMapper.Clear();
+			
+		}
+
 		public void EnqueueCommand(BaseCommand command)
 		{
 			commandToQueueMapper[command.GetType()].Enqueue(command);
-			databaseManager?.SaveCommand(command);
+			databaseManager.SaveCommand(command);
 
 			// todo log
+		}
+
+		public void RegisterClient(string key, IUserServiceCallback userCallback)
+		{
+			notificationHandler.TryRegisterUserForNotifications(key, userCallback);
 		}
 
 		private void CreateCommandingHosts(Dictionary<Type, CommandQueue> commandToQueueMapper, List<Type> commandTypes)
@@ -105,25 +121,16 @@ namespace BankService.CommandingManager
 			}
 		}
 
-		private void ListenForCommandNotifications()
-		{
-			while (!cancellationToken.IsCancellationRequested)
-			{
-				CommandNotification notification;
-				if (!responseQueue.TryDequeue(out notification))
-				{
-					Thread.Sleep(2000);
-					continue;
-				}
-
-				// todo send notification to unit responsible for user notification
-			}
-		}
-
 		private void InitialDatabaseLoading()
 		{
 			IDataPersistence databasePersistence = XmlDataPersistence.CreateParser(xmlFilePath);
 			databaseManager = new DatabaseManager(databasePersistence);
+		}
+
+		private void InitializeNotificationHandler()
+		{
+			notificationHandler = new NotificationHandler(responseQueue);
+			notificationHandler.Start();
 		}
 	}
 }

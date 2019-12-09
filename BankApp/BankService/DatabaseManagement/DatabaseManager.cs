@@ -9,7 +9,7 @@ namespace BankService.DatabaseManagement
 	/// <summary>
 	/// Unit responsible for database handling.
 	/// </summary>
-	internal class DatabaseManager : IDatabaseManager
+	internal class DatabaseManager : IDatabaseManager, IDisposable
 	{
 		private ReaderWriterLockSlim locker;
 		private List<BaseCommand> commandsInDatabase;
@@ -101,6 +101,13 @@ namespace BankService.DatabaseManagement
 			}
 
 			locker.ExitWriteLock();
+		}
+
+		public void Dispose()
+		{
+			locker.Dispose();
+			((IDisposable)dataPersistence).Dispose();
+			commandsInDatabase.Clear();
 		}
 	}
 }

@@ -56,6 +56,8 @@
     <Compile Include="DatabaseManagement\IDatabaseManager.cs" />
     <Compile Include="DatabaseManagement\IDataPersistence.cs" />
     <Compile Include="DatabaseManagement\XmlDataPersistence.cs" />
+    <Compile Include="NotificaionHandler\INotificationHandler.cs" />
+    <Compile Include="NotificaionHandler\NotificationHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
