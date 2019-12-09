@@ -52,6 +52,7 @@
     <Compile Include="Commanding\Commands\RequestLoanCommand.cs" />
     <Compile Include="Commanding\Commands\WithdrawCommand.cs" />
     <Compile Include="Communication\CertificateClientProxy.cs" />
+    <Compile Include="Communication\WindowsClientProxy.cs" />
     <Compile Include="DataContracts\Dtos\EventLogData.cs" />
     <Compile Include="DataContracts\Enums\UserTypeEnum.cs" />
     <Compile Include="DataContracts\Exceptions\InvalidEventLogTypeException.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="ServiceInterfaces\IAccessService.cs" />
     <Compile Include="ServiceInterfaces\IAdminService.cs" />
     <Compile Include="ServiceInterfaces\IAuditService.cs" />
+    <Compile Include="ServiceInterfaces\ISectorResponseService.cs" />
     <Compile Include="ServiceInterfaces\ISectorService.cs" />
     <Compile Include="ServiceInterfaces\IUserServiceCallback.cs" />
     <Compile Include="ServiceInterfaces\IUserService.cs" />
