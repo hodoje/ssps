@@ -1,4 +1,5 @@
 ﻿using Common.Commanding;
+using System.Collections.Generic;
 
 namespace BankService.DatabaseManagement
 {
@@ -14,9 +15,15 @@ namespace BankService.DatabaseManagement
 		void SaveItem(BaseCommand item);
 
 		/// <summary>
-		/// Removes entity from database by entities id.
+		/// Removes entity from permanent storage by entities id.
 		/// </summary>
 		/// <param name="entityId">ID of the command to be removed.</param>
 		void RemoveItem(long commandId);
+
+		/// <summary>
+		/// Read all commands from permanent storage.
+		/// </summary>
+		/// <returns>List of commands in permanent storage.</returns>
+		List<BaseCommand> ReadAllCommands();
 	}
 }

@@ -13,14 +13,14 @@ namespace BankService.CommandingManager
 	{
 		private static readonly int queueSize;
 		private static readonly int timeoutPeriod;
+		private static readonly string xmlFilePath;
 
 		private CancellationTokenSource cancellationToken;
 		private List<ICommandingHost> commandingHosts;
 
 		private Dictionary<Type, CommandQueue> commandToQueueMapper;
-		private ConcurrentQueue<CommandNotification> responseQueue;
-
 		private DatabaseManager databaseManager;
+		private ConcurrentQueue<CommandNotification> responseQueue;
 
 		static CommandingManager()
 		{
@@ -42,9 +42,9 @@ namespace BankService.CommandingManager
 				typeof(RegistrationCommand)
 			};
 
-			commandToQueueMapper = new Dictionary<Type, CommandQueue>(supportedCommands.Count);
+			InitialDatabaseLoading();
 
-			InitializeDatabase();
+			commandToQueueMapper = new Dictionary<Type, CommandQueue>(supportedCommands.Count);
 
 			commandingHosts = new List<ICommandingHost>(supportedCommands.Count);
 			CreateCommandingHosts(commandToQueueMapper, supportedCommands);
@@ -66,10 +66,28 @@ namespace BankService.CommandingManager
 			return false;
 		}
 
+		public void ClearStaleCommands()
+		{
+			foreach (CommandQueue commandingQueue in commandToQueueMapper.Values)
+			{
+				List<BaseCommand> expiredCommands = commandingQueue.ExpiredCommands();
+
+				expiredCommands.ForEach(x => commandingQueue.RemoveCommandById(x.CommandId));
+
+				expiredCommands.ForEach(x => databaseManager.RemoveCommand(x.CommandId));
+			}
+		}
+
+		public void CreateDatabase()
+		{
+			IDataPersistence databasePersistence = new XmlDataPersistence(xmlFilePath);
+			databaseManager.LoadNewDataPersitenceUnit(databasePersistence);
+		}
+
 		public void EnqueueCommand(BaseCommand command)
 		{
 			commandToQueueMapper[command.GetType()].Enqueue(command);
-			databaseManager.SaveCommand(command);
+			databaseManager?.SaveCommand(command);
 
 			// todo log
 		}
@@ -94,7 +112,7 @@ namespace BankService.CommandingManager
 				CommandNotification notification;
 				if (!responseQueue.TryDequeue(out notification))
 				{
-					Thread.Sleep(300);
+					Thread.Sleep(2000);
 					continue;
 				}
 
@@ -102,9 +120,9 @@ namespace BankService.CommandingManager
 			}
 		}
 
-		private void InitializeDatabase()
+		private void InitialDatabaseLoading()
 		{
-			IDataPersistence databasePersistence = new XmlDataPersistence();
+			IDataPersistence databasePersistence = XmlDataPersistence.CreateParser(xmlFilePath);
 			databaseManager = new DatabaseManager(databasePersistence);
 		}
 	}

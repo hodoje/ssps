@@ -13,7 +13,7 @@ namespace BankService.DatabaseManagement
 	{
 		private ReaderWriterLockSlim locker;
 		private List<BaseCommand> commandsInDatabase;
-		private IDataPersistence dataPersistance;
+		private IDataPersistence dataPersistence;
 
 		/// <summary>
 		/// Initializes new instance of <see cref="DatabaseManager"/> class. 
@@ -21,7 +21,7 @@ namespace BankService.DatabaseManagement
 		/// <param name="dataPersistence">Unit used for data persistence.</param>
 		public DatabaseManager(IDataPersistence dataPersistence)
 		{
-			this.dataPersistance = dataPersistence;
+			this.dataPersistence = dataPersistence;
 
 			locker = new ReaderWriterLockSlim();
 
@@ -60,7 +60,7 @@ namespace BankService.DatabaseManagement
 			locker.EnterWriteLock();
 
 			commandsInDatabase.Remove(commandInDB);
-			dataPersistance.RemoveItem(commandId);
+			dataPersistence?.RemoveItem(commandId);
 
 			locker.ExitWriteLock();
 
@@ -82,10 +82,25 @@ namespace BankService.DatabaseManagement
 			}
 
 			commandsInDatabase.Add(baseCommand);
-			dataPersistance.SaveItem(baseCommand);
+			dataPersistence?.SaveItem(baseCommand);
 
 			locker.ExitReadLock();
 			// log successful add to DB
+		}
+
+		/// <inheritdoc/>
+		public void LoadNewDataPersitenceUnit(IDataPersistence dataPersistence)
+		{
+			locker.EnterWriteLock();
+
+			this.dataPersistence = dataPersistence;
+
+			if (commandsInDatabase.Count > 0)
+			{
+				commandsInDatabase.ForEach(x => dataPersistence.SaveItem(x));
+			}
+
+			locker.ExitWriteLock();
 		}
 	}
 }

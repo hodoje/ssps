@@ -20,5 +20,15 @@ namespace BankService.CommandingManager
 		/// <param name="commandId">Unique commanding id.</param>
 		/// <returns><b>True</b> if command is successfully deleted from the processor, otherwise <b>false</b>.</returns>
 		bool CancelCommand(long commandId);
+
+		/// <summary>
+		/// Creates new database.
+		/// </summary>
+		void CreateDatabase();
+
+		/// <summary>
+		/// Deletes commands which are timed out.
+		/// </summary>
+		void ClearStaleCommands();
 	}
 }

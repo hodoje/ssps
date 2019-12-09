@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.ServiceInterfaces
+﻿namespace Common.ServiceInterfaces
 {
 	public interface IAdminService
 	{
+		/// <summary>
+		/// Initializes new database.
+		/// </summary>
+		void CreateNewDatabase();
+
+		/// <summary>
+		/// Deletes stale commands.
+		/// </summary>
+		void DeleteStaleCommands();
 	}
 }

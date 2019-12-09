@@ -1,9 +1,5 @@
 ﻿using Common.Commanding;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BankService.DatabaseManagement
 {
@@ -29,5 +25,11 @@ namespace BankService.DatabaseManagement
 		/// </summary>
 		/// <param name="commandId">Command id to remove from database.</param>
 		void RemoveCommand(long commandId);
+
+		/// <summary>
+		/// Set new data persistence object.
+		/// </summary>
+		/// <param name="dataPersistence">New data persistence object.</param>
+		void LoadNewDataPersitenceUnit(IDataPersistence dataPersistence);
 	}
 }

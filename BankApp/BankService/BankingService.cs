@@ -1,6 +1,8 @@
 ﻿using Common.Commanding;
 using Common.ServiceInterfaces;
 using System.ServiceModel;
+using System;
+using BankService.CommandingManager;
 
 namespace BankService
 {
@@ -10,7 +12,7 @@ namespace BankService
 	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
 	public class BankingService : IUserService, IAdminService
 	{
-		private CommandingManager.CommandingManager commandManager;
+		private ICommandingManager commandManager;
 		private object locker = new object();
 		private long commandIdNumber = 0;
 
@@ -58,8 +60,29 @@ namespace BankService
 			commandManager.EnqueueCommand(withdrawCommand);
 		}
 
+		public void CreateNewDatabase()
+		{
+			// authorization and authentication
+
+			commandManager.CreateDatabase();
+
+			lock (locker)
+			{
+				commandIdNumber = 0;
+			}
+		}
+
+		public void DeleteStaleCommands()
+		{
+			// authorization and authentication
+
+			commandManager.ClearStaleCommands();
+		}
+
 		private long GetUniqueId()
 		{
+			// TODO, get biggest ID from DB
+
 			long newId;
 			lock (locker)
 			{
