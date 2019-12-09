@@ -68,13 +68,19 @@ namespace BankService.CommandingHost
 			{
 				BaseCommand commandToSend = commandingQueue.Dequeue();
 
+				// Queue might be disposing procedure.
+				if (commandToSend == null)
+				{
+					continue;
+				}
+
 				if (!commandHandler.HasAvailableSpace())
 				{
 					// If there is not enough space on host (sector is full) wait for response to be received.
 					sendingSynchronization.WaitOne();
 				}
 
-				// When awoken, check if cancelation token was canceled (object disposing).
+				// When awoken, check if cancellation token was canceled (object disposing).
 				if (!cancellationToken.IsCancellationRequested)
 				{
 					commandHandler.SendCommand(commandToSend);
