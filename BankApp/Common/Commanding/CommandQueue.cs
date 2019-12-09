@@ -131,6 +131,7 @@ namespace Common.Commanding
 				{
 					if (command.CreationTime + timeoutPeriod <= dateTimeNow)
 					{
+						command.TimedOut = true;
 						expiredCommands.Add(command);
 					}
 				}

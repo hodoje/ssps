@@ -1,4 +1,5 @@
-﻿using Common.Commanding;
+﻿using BankService.DatabaseManagement;
+using Common.Commanding;
 
 namespace BankService.CommandingHost
 {

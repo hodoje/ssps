@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.Commanding;
+using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 
@@ -17,7 +18,13 @@ namespace BankService
 		private Configuration()
 		{
 			// todo add connection to sectors from configuration source
-			Connections = new Dictionary<Type, ConnectionInfo>();
+			Connections = new Dictionary<Type, ConnectionInfo>()
+			{
+				{ typeof(DepositCommand), new ConnectionInfo() },
+				{ typeof(WithdrawCommand), new ConnectionInfo() },
+				{ typeof(RequestLoanCommand), new ConnectionInfo() },
+				{ typeof(RegistrationCommand), new ConnectionInfo() },
+			};
 		}
 
 		public static Configuration Instance

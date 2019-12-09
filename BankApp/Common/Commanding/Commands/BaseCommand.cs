@@ -35,6 +35,11 @@ namespace Common.Commanding
 		[DataMember]
 		public long CommandId { get; private set; }
 
+		/// <summary>
+		/// Indicates if command is in timeout.
+		/// </summary>
+		public bool TimedOut { get; set; }
+
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
