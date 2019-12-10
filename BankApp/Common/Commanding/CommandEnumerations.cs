@@ -1,16 +1,6 @@
 ﻿namespace Common.Commanding
 {
 	/// <summary>
-	/// Command types.
-	/// </summary>
-	public enum CommandType
-	{
-		Register,
-		Withdrawal,
-		Deposit,
-		RequestLoan
-	}
-	/// <summary>
 	/// Indicates command state.
 	/// </summary>
 	public enum CommandState

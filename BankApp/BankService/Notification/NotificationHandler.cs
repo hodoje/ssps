@@ -5,17 +5,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using BankService.Notification;
 
 namespace BankService
 {
 	public class NotificationHandler : INotificationHandler, IDisposable
 	{
 		private CancellationTokenSource cancellationToken;
+		private INotificationContainer notificationContainer;
 		private ConcurrentQueue<CommandNotification> notificationQueue;
 
-		public NotificationHandler(ConcurrentQueue<CommandNotification> notificationQueue)
+		public NotificationHandler(ConcurrentQueue<CommandNotification> notificationQueue, INotificationContainer notificationContainer)
 		{
 			this.notificationQueue = notificationQueue;
+			this.notificationContainer = notificationContainer;
 
 			cancellationToken = new CancellationTokenSource();
 		}
@@ -30,6 +33,11 @@ namespace BankService
 			throw new NotImplementedException();
 		}
 
+		public void RegisterCommand(string username, IUserServiceCallback userCallback, long commandId)
+		{
+			notificationContainer.AddExpectingNotificationId(username, userCallback, commandId);
+		}
+
 		public void Start()
 		{
 			Task listenWorker = new Task(ListenForCommandNotifications);
@@ -39,11 +47,6 @@ namespace BankService
 		public void Stop()
 		{
 			cancellationToken.Cancel();
-		}
-
-		public void TryRegisterUserForNotifications(string key, IUserServiceCallback userCallback)
-		{
-			
 		}
 
 		private void ListenForCommandNotifications()
@@ -57,13 +60,18 @@ namespace BankService
 					continue;
 				}
 
-				// todo notification
+				notificationContainer.CommandNotificationReceived(notification);
+				
+				if (SendNotificationToClient(notification))
+				{
+					notificationContainer.DeleteReceivedCommandNotification(notification.CommandId);
+				}
 			}
 		}
 
-		public void RegisterCommand(string key, long commandId)
+		private bool SendNotificationToClient(CommandNotification commandNotification)
 		{
-			
+			return true;
 		}
 	}
 }

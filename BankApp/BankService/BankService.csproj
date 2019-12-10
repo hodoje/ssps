@@ -56,8 +56,10 @@
     <Compile Include="DatabaseManagement\IDatabaseManager.cs" />
     <Compile Include="DatabaseManagement\IDataPersistence.cs" />
     <Compile Include="DatabaseManagement\XmlDataPersistence.cs" />
-    <Compile Include="NotificaionHandler\INotificationHandler.cs" />
-    <Compile Include="NotificaionHandler\NotificationHandler.cs" />
+    <Compile Include="Notification\INotificationContainer.cs" />
+    <Compile Include="Notification\INotificationHandler.cs" />
+    <Compile Include="Notification\NotificationContainer.cs" />
+    <Compile Include="Notification\NotificationHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

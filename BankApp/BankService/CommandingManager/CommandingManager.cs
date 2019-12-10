@@ -5,6 +5,7 @@ using BankService.CommandingHost;
 using System.Collections.Concurrent;
 using BankService.DatabaseManagement;
 using Common.ServiceInterfaces;
+using BankService.Notification;
 
 namespace BankService.CommandingManager
 {
@@ -18,7 +19,6 @@ namespace BankService.CommandingManager
 
 		private Dictionary<Type, CommandQueue> commandToQueueMapper;
 		private IDatabaseManager databaseManager;
-		private INotificationHandler notificationHandler;
 		private ConcurrentQueue<CommandNotification> responseQueue;
 
 		static CommandingManager()
@@ -28,9 +28,9 @@ namespace BankService.CommandingManager
 			timeoutPeriod = 3;
 		}
 
-		public CommandingManager()
+		public CommandingManager(ConcurrentQueue<CommandNotification> responseQueue)
 		{
-			responseQueue = new ConcurrentQueue<CommandNotification>();
+			this.responseQueue = responseQueue;
 
 			List<Type> supportedCommands = new List<Type>(4)
 			{
@@ -46,8 +46,6 @@ namespace BankService.CommandingManager
 
 			commandingHosts = new List<ICommandingHost>(supportedCommands.Count);
 			CreateCommandingHosts(commandToQueueMapper, supportedCommands);
-
-			InitializeNotificationHandler();
 		}
 
 		public bool CancelCommand(long commandId)
@@ -84,7 +82,6 @@ namespace BankService.CommandingManager
 		public void Dispose()
 		{
 			((IDisposable)databaseManager).Dispose();
-			((IDisposable)notificationHandler).Dispose();
 
 			foreach (ICommandingHost commandingHost in commandingHosts)
 			{
@@ -101,11 +98,6 @@ namespace BankService.CommandingManager
 			databaseManager.SaveCommand(command);
 
 			// todo log
-		}
-
-		public void RegisterClient(string key, IUserServiceCallback userCallback)
-		{
-			notificationHandler.TryRegisterUserForNotifications(key, userCallback);
 		}
 
 		private void CreateCommandingHosts(Dictionary<Type, CommandQueue> commandToQueueMapper, List<Type> commandTypes)
@@ -125,12 +117,6 @@ namespace BankService.CommandingManager
 		{
 			IDataPersistence databasePersistence = XmlDataPersistence.CreateParser(xmlFilePath);
 			databaseManager = new DatabaseManager(databasePersistence);
-		}
-
-		private void InitializeNotificationHandler()
-		{
-			notificationHandler = new NotificationHandler(responseQueue);
-			notificationHandler.Start();
 		}
 	}
 }
