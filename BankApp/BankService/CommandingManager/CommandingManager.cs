@@ -4,8 +4,6 @@ using Common.Commanding;
 using BankService.CommandingHost;
 using System.Collections.Concurrent;
 using BankService.DatabaseManagement;
-using Common.ServiceInterfaces;
-using BankService.Notification;
 
 namespace BankService.CommandingManager
 {
@@ -18,7 +16,7 @@ namespace BankService.CommandingManager
 		private List<ICommandingHost> commandingHosts;
 
 		private Dictionary<Type, CommandQueue> commandToQueueMapper;
-		private IDatabaseManager databaseManager;
+		private IDatabaseManager<BaseCommand> databaseManager;
 		private ConcurrentQueue<CommandNotification> responseQueue;
 
 		static CommandingManager()
@@ -67,15 +65,15 @@ namespace BankService.CommandingManager
 			{
 				List<BaseCommand> expiredCommands = commandingQueue.ExpiredCommands();
 
-				expiredCommands.ForEach(x => commandingQueue.RemoveCommandById(x.CommandId));
+				expiredCommands.ForEach(x => commandingQueue.RemoveCommandById(x.ID));
 
-				expiredCommands.ForEach(x => databaseManager.RemoveCommand(x.CommandId));
+				expiredCommands.ForEach(x => databaseManager.RemoveEntity(x.ID));
 			}
 		}
 
 		public void CreateDatabase()
 		{
-			IDataPersistence databasePersistence = new XmlDataPersistence(xmlFilePath);
+			IDataPersistence<BaseCommand> databasePersistence = (IDataPersistence<BaseCommand>)new XmlDataPersistence<BaseCommand>(xmlFilePath);
 			databaseManager.LoadNewDataPersitenceUnit(databasePersistence);
 		}
 
@@ -95,7 +93,7 @@ namespace BankService.CommandingManager
 		public void EnqueueCommand(BaseCommand command)
 		{
 			commandToQueueMapper[command.GetType()].Enqueue(command);
-			databaseManager.SaveCommand(command);
+			databaseManager.SaveEntity(command);
 
 			// todo log
 		}
@@ -115,8 +113,8 @@ namespace BankService.CommandingManager
 
 		private void InitialDatabaseLoading()
 		{
-			IDataPersistence databasePersistence = XmlDataPersistence.CreateParser(xmlFilePath);
-			databaseManager = new DatabaseManager(databasePersistence);
+			IDataPersistence<BaseCommand> databasePersistence = XmlDataPersistence<BaseCommand>.CreatePersister(xmlFilePath);
+			databaseManager = new DatabaseManager<BaseCommand>(databasePersistence);
 		}
 	}
 }

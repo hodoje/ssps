@@ -1,40 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using Common.Commanding;
 using System.Threading;
 using System.Linq;
+using Common.Model;
 
 namespace BankService.DatabaseManagement
 {
 	/// <summary>
 	/// Unit responsible for database handling.
 	/// </summary>
-	internal class DatabaseManager : IDatabaseManager, IDisposable
+	internal class DatabaseManager<T> : IDatabaseManager<T>, IDisposable
+		where T : IdentifiedObject
 	{
 		private ReaderWriterLockSlim locker;
-		private List<BaseCommand> commandsInDatabase;
-		private IDataPersistence dataPersistence;
+		private List<T> commandsInDatabase;
+		private IDataPersistence<T> dataPersistence;
 
 		/// <summary>
 		/// Initializes new instance of <see cref="DatabaseManager"/> class. 
 		/// </summary>
 		/// <param name="dataPersistence">Unit used for data persistence.</param>
-		public DatabaseManager(IDataPersistence dataPersistence)
+		public DatabaseManager(IDataPersistence<T> dataPersistence)
 		{
 			this.dataPersistence = dataPersistence;
 
 			locker = new ReaderWriterLockSlim();
 
-			commandsInDatabase = new List<BaseCommand>();
+			commandsInDatabase = new List<T>();
 		}
 
 		/// <inheritdoc/>
-		public List<BaseCommand> ReadAllCommands()
+		public List<T> ReadAllEntities()
 		{
-			List<BaseCommand> commandsInDatabase;
+			List<T> commandsInDatabase;
 			locker.EnterReadLock();
 			
-			commandsInDatabase = new List<BaseCommand>(this.commandsInDatabase);
+			commandsInDatabase = new List<T>(this.commandsInDatabase);
 
 			locker.ExitReadLock();
 
@@ -42,11 +43,11 @@ namespace BankService.DatabaseManagement
 		}
 
 		/// <inheritdoc/>
-		public void RemoveCommand(long commandId)
+		public void RemoveEntity(long commandId)
 		{
 			locker.EnterReadLock();
 
-			BaseCommand commandInDB = commandsInDatabase.FirstOrDefault(x => x.CommandId == commandId);
+			T commandInDB = commandsInDatabase.FirstOrDefault(x => x.ID == commandId);
 
 			locker.ExitReadLock();
 
@@ -60,7 +61,7 @@ namespace BankService.DatabaseManagement
 			locker.EnterWriteLock();
 
 			commandsInDatabase.Remove(commandInDB);
-			dataPersistence?.RemoveItem(commandId);
+			dataPersistence?.RemoveEntity(commandId);
 
 			locker.ExitWriteLock();
 
@@ -68,28 +69,28 @@ namespace BankService.DatabaseManagement
 		}
 
 		/// <inheritdoc/>
-		public void SaveCommand(BaseCommand baseCommand)
+		public void SaveEntity(T baseCommand)
 		{
 			locker.EnterWriteLock();
 
-			if (commandsInDatabase.Exists(x => x.CommandId == baseCommand.CommandId))
+			if (commandsInDatabase.Exists(x => x.ID == baseCommand.ID))
 			{
 				locker.ExitReadLock();
 				
 				// log ERROR
-				Console.WriteLine($"[DatabaseManager] Command with {baseCommand.CommandId} already exists in the database.");
+				Console.WriteLine($"[DatabaseManager] Command with {baseCommand.ID} already exists in the database.");
 				return;
 			}
 
 			commandsInDatabase.Add(baseCommand);
-			dataPersistence?.SaveItem(baseCommand);
+			dataPersistence?.AddEntity(baseCommand);
 
 			locker.ExitReadLock();
 			// log successful add to DB
 		}
 
 		/// <inheritdoc/>
-		public void LoadNewDataPersitenceUnit(IDataPersistence dataPersistence)
+		public void LoadNewDataPersitenceUnit(IDataPersistence<T> dataPersistence)
 		{
 			locker.EnterWriteLock();
 
@@ -97,7 +98,7 @@ namespace BankService.DatabaseManagement
 
 			if (commandsInDatabase.Count > 0)
 			{
-				commandsInDatabase.ForEach(x => dataPersistence.SaveItem(x));
+				commandsInDatabase.ForEach(x => dataPersistence.AddEntity(x));
 			}
 
 			locker.ExitWriteLock();

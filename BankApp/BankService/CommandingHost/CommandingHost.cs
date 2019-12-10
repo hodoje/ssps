@@ -13,12 +13,12 @@ namespace BankService.CommandingHost
 		private string hostName;
 		private CancellationTokenSource cancellationToken = new CancellationTokenSource();
 		private ICommandHandler commandHandler;
-		private IDatabaseManager databaseManager;
+		private IDatabaseManager<BaseCommand> databaseManager;
 		private CommandQueue commandingQueue;
 		private ConcurrentQueue<CommandNotification> responseQueue;
 		private AutoResetEvent sendingSynchronization = new AutoResetEvent(false);
 
-		public CommandingHost(CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo, IDatabaseManager databaseManager, string hostName)
+		public CommandingHost(CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo, IDatabaseManager<BaseCommand> databaseManager, string hostName)
 		{
 			// todo create Client for Sector with connecitonInfo
 
@@ -33,7 +33,7 @@ namespace BankService.CommandingHost
 		public void CommandNotificationReceived(CommandNotification commandNotification)
 		{
 			responseQueue.Enqueue(commandNotification);
-			databaseManager.RemoveCommand(commandNotification.CommandId);
+			databaseManager.RemoveEntity(commandNotification.ID);
 
 			// Awake WorkerThread because there is enough command space in Commanding Handler.
 			sendingSynchronization.Set();

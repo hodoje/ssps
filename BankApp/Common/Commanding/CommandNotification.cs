@@ -1,23 +1,19 @@
-﻿namespace Common.Commanding
+﻿using Common.Model;
+
+namespace Common.Commanding
 {
 	/// <summary>
 	/// Represents command notification.
 	/// </summary>
-	public class CommandNotification
+	public class CommandNotification : IdentifiedObject
 	{
 		/// <summary>
 		/// Initializes new instance of <see cref="CommandNotification"/> class.
 		/// </summary>
 		/// <param name="commandId"></param>
-		public CommandNotification(long commandId)
+		public CommandNotification(long commandId) : base(commandId)
 		{
-			CommandId = commandId;
 		}
-
-		/// <summary>
-		/// Unique command id.
-		/// </summary>
-		public long CommandId { get; private set; }
 
 		/// <summary>
 		/// Represents the current state of the command.

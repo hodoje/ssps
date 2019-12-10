@@ -2,11 +2,6 @@
 using Common.Communication;
 using Common.ServiceInterfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Security;
-using System.ServiceModel;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SectorService
@@ -85,7 +80,7 @@ namespace SectorService
 				BaseCommand command = _requestQueue.Dequeue();
 				if (command.TimedOut)
 				{
-					command.Status = CommandNotificationStatus.Rejected;					
+					command.Status = CommandNotificationStatus.Rejected;
 				}
 				else
 				{
@@ -114,16 +109,16 @@ namespace SectorService
 				switch (command.Status)
 				{
 					case CommandNotificationStatus.Confirmed:
-						AcceptRequest(command.CommandId);
+						AcceptRequest(command.ID);
 						break;
 					case CommandNotificationStatus.Rejected:
-						RejectRequest(command.CommandId, "Request timed out.");
+						RejectRequest(command.ID, "Request timed out.");
 						break;
 					case CommandNotificationStatus.None:
-						RejectRequest(command.CommandId, "Failed to process request.");
+						RejectRequest(command.ID, "Failed to process request.");
 						break;
 					default:
-						RejectRequest(command.CommandId, "Invalid request.");
+						RejectRequest(command.ID, "Invalid request.");
 						break;
 				}
 			}

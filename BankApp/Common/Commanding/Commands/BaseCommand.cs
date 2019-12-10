@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.Model;
+using System;
 using System.Runtime.Serialization;
 
 namespace Common.Commanding
@@ -11,15 +12,14 @@ namespace Common.Commanding
 	[KnownType(typeof(WithdrawCommand))]
 	[KnownType(typeof(RequestLoanCommand))]
 	[KnownType(typeof(RegistrationCommand))]
-	public abstract class BaseCommand
+	public abstract class BaseCommand : IdentifiedObject
 	{
 		/// <summary>
 		/// Initializes new instance of <see cref="BaseCommand"/> class.
 		/// </summary>
 		/// <param name="commandId">Unique command id.</param>
-		public BaseCommand(long commandId)
+		public BaseCommand(long commandId) : base(commandId)
 		{
-			CommandId = commandId;
 			CreationTime = DateTime.Now;
 			Status = CommandNotificationStatus.None;
 		}
@@ -29,12 +29,6 @@ namespace Common.Commanding
 		/// </summary>
 		[DataMember]
 		public DateTime CreationTime { get; private set; }
-
-		/// <summary>
-		/// Unique command id.
-		/// </summary>
-		[DataMember]
-		public long CommandId { get; private set; }
 
 		/// <summary>
 		/// Indicates if command is in timeout.
@@ -51,7 +45,7 @@ namespace Common.Commanding
 				return false;
 			}
 
-			return CreationTime == command.CreationTime && CommandId == command.CommandId;
+			return base.Equals(obj) && CreationTime == command.CreationTime;
 		}
 
 		/// <inheritdoc/>
@@ -63,7 +57,7 @@ namespace Common.Commanding
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return $"{this.GetType().Name} : {CommandId}";
+			return $"{this.GetType().Name} : {ID}";
 		}
 
 		/// <summary>

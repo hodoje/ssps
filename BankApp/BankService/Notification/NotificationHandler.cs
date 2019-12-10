@@ -64,7 +64,7 @@ namespace BankService
 				
 				if (SendNotificationToClient(notification))
 				{
-					notificationContainer.DeleteReceivedCommandNotification(notification.CommandId);
+					notificationContainer.DeleteReceivedCommandNotification(notification.ID);
 				}
 			}
 		}

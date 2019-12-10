@@ -83,7 +83,7 @@ namespace Common.Commanding
 
 			lock (locker)
 			{
-				command = commandingQueue.FirstOrDefault(x => x.CommandId == commandId);
+				command = commandingQueue.FirstOrDefault(x => x.ID == commandId);
 			}
 
 			return command;
@@ -99,7 +99,7 @@ namespace Common.Commanding
 			BaseCommand command;
 			lock (locker)
 			{
-				command = commandingQueue.FirstOrDefault(x => x.CommandId == commandId);
+				command = commandingQueue.FirstOrDefault(x => x.ID == commandId);
 			}
 
 			if (command == null)

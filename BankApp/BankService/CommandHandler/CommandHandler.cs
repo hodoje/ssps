@@ -34,9 +34,9 @@ namespace BankService.CommandHandler
 		{
 			lock (locker)
 			{
-				if (commandsSent.Contains(commandNotification.CommandId))
+				if (commandsSent.Contains(commandNotification.ID))
 				{
-					commandsSent.Remove(commandNotification.CommandId);
+					commandsSent.Remove(commandNotification.ID);
 					notificationHost.CommandNotificationReceived(commandNotification);
 				}
 			}

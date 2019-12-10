@@ -1,14 +1,15 @@
 ﻿using System;
-using Common.Commanding;
 using System.IO;
 using System.Collections.Generic;
+using Common.Model;
 
 namespace BankService.DatabaseManagement
 {
 	/// <summary>
 	/// XML data persistence class.
 	/// </summary>
-	public class XmlDataPersistence : IDataPersistence, IDisposable
+	public class XmlDataPersistence<T> : IDataPersistence<IdentifiedObject>, IDisposable
+		where T : IdentifiedObject
 	{
 		private string xmlPath;
 		/// <summary>
@@ -25,16 +26,16 @@ namespace BankService.DatabaseManagement
 		/// </summary>
 		/// <param name="path">Path to XML file.</param>
 		/// <returns>Returns new instance of <see cref="XmlDataPersistence"/> if XML file exists on the path, otherwise <b>null</b>.</returns>
-		public static XmlDataPersistence CreateParser(string path)
+		public static IDataPersistence<T> CreatePersister(string path)
 		{
-			XmlDataPersistence parser = null;
+			XmlDataPersistence<T> parser = null;
 
 			if (File.Exists(path))
 			{
-				parser = new XmlDataPersistence(path);
+				parser = new XmlDataPersistence<T>(path);
 			}
 
-			return parser;
+			return (IDataPersistence<T>)parser;
 		}
 
 		/// <summary>
@@ -52,23 +53,23 @@ namespace BankService.DatabaseManagement
 		}
 
 		/// <inheritdoc/>
-		public List<BaseCommand> ReadAllCommands()
+		public List<IdentifiedObject> ReadAllEntities()
 		{
 			// todo READ FROM XML
-			Console.WriteLine($"[XMLDataPersistence] reading all commands.");
-			return new List<BaseCommand>();
+			Console.WriteLine($"[XMLDataPersistence<{typeof(T)}>] reading all entities.");
+			return new List<IdentifiedObject>();
 		}
 
 		/// <inheritdoc/>
-		public void RemoveItem(long commandId)
+		public void RemoveEntity(long commandId)
 		{
-			Console.WriteLine($"[XMLDataPersistence] removing command with id: {commandId}.");
+			Console.WriteLine($"[XMLDataPersistence<{typeof(T)}>] removing entity with id: {commandId}.");
 		}
 
 		/// <inheritdoc/>
-		public void SaveItem(BaseCommand item)
+		public void AddEntity(IdentifiedObject item)
 		{
-			Console.WriteLine($"[XMLDataPersistence] saving command: ({item}).");
+			Console.WriteLine($"[XMLDataPersistence<{typeof(T)}>] saving entity: ({item}).");
 		}
 	}
 }

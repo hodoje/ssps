@@ -3,7 +3,6 @@ using Common.ServiceInterfaces;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace BankService.Notification
 {
@@ -29,11 +28,12 @@ namespace BankService.Notification
 			foreach (NotificationInformation notificationinfo in pendingUserNotifications.Values)
 			{
 				long notificationId;
-				if (notificationinfo.PendingNotifications.TryRemove(receivedCommandNotification.CommandId, out notificationId))
+				if (notificationinfo.PendingNotifications.TryRemove(receivedCommandNotification.ID, out notificationId))
 				{
 					//todo update db
 
-					notificationinfo.ReadyNotifications.TryAdd(receivedCommandNotification.CommandId, receivedCommandNotification);
+					receivedCommandNotification.CommandState = CommandState.Executed;
+					notificationinfo.ReadyNotifications.TryAdd(receivedCommandNotification.ID, receivedCommandNotification);
 				}
 			}
 		}
