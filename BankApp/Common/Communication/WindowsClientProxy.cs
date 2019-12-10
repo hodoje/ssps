@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Security;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,33 +12,58 @@ namespace Common.Communication
 	/// Represents client proxy for given interface with windows authentication management.
 	/// </summary>
 	/// <typeparam name="T">Interface which will be used for proxy.</typeparam>
-	public class WindowsClientProxy<T> : ChannelFactory<T>, IDisposable
-		where T : class
+	public class WindowsClientProxy<T> : IDisposable where T : class
 	{
+		private T _proxy;
+		private ChannelFactory<T> _channelFactory;
+
 		/// <summary>
-		/// Initializes new instance of <see cref="CertificateClientProxy<T>> class."/> 
+		/// Initializes a new instance of <see cref="WindowsClientProxy<T> class."/>
 		/// </summary>
-		/// <param name="binding">Service binding.</param>
-		/// <param name="address">Service endpoint.</param>
-		public WindowsClientProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
+		/// <param name="serviceAddress">Service address.</param>
+		/// <param name="serviceEndpointName">Service endpoint name.</param>
+		public WindowsClientProxy(string serviceAddress, string serviceEndpointName)
 		{
-			Proxy = this.CreateChannel();
+			var binding = SetUpBinding();
+			var endpointAddress = SetUpEndpoint(serviceAddress, serviceEndpointName);
+			_channelFactory = new ChannelFactory<T>(binding, endpointAddress);
+			_proxy = _channelFactory.CreateChannel();
 		}
 
 		/// <summary>
 		/// Proxy used for communication with service.
 		/// </summary>
-		public T Proxy { get; private set; }
+		public T Proxy
+		{
+			get
+			{
+				if(_proxy == null)
+				{
+					_proxy = _channelFactory.CreateChannel();
+				}
+				return _proxy;
+			}			
+		}
 
 		/// <inheritdoc/>
 		public void Dispose()
 		{
-			if (Proxy != null)
-			{
-				Proxy = default(T);
-			}
+			_proxy = null;
+			_channelFactory = null;
+		}
 
-			this.Close();
+		private EndpointAddress SetUpEndpoint(string serviceAddress, string serviceEndpointName)
+		{
+			return new EndpointAddress($"{serviceAddress}/{serviceEndpointName}");
+		}
+
+		private NetTcpBinding SetUpBinding()
+		{
+			var binding = new NetTcpBinding(SecurityMode.Transport);
+			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;			
+			binding.Security.Transport.ProtectionLevel = ProtectionLevel.Sign;
+
+			return binding;
 		}
 	}
 }

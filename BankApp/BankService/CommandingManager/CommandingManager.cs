@@ -105,7 +105,7 @@ namespace BankService.CommandingManager
 			foreach (Type commandType in commandTypes)
 			{
 				CommandQueue newQueue = new CommandQueue(queueSize, timeoutPeriod);
-				CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(newQueue, responseQueue, Configuration.Instance.Connections[commandType], databaseManager, commandType.Name);
+				CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(newQueue, responseQueue, BankServiceConfig.Connections[commandType], databaseManager, commandType.Name);
 				commandingHosts.Add(newHost);
 
 				commandToQueueMapper.Add(commandType, newQueue);

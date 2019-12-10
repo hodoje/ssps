@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace AuditingService
 {
+	/// <summary>
+	/// Loads app settings from App.config
+	/// </summary>
 	internal static class AuditServiceConfig
 	{
 		public const string LogNameConfigName = "LogName";

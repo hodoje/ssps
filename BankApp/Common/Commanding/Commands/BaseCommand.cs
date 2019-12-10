@@ -21,6 +21,7 @@ namespace Common.Commanding
 		{
 			CommandId = commandId;
 			CreationTime = DateTime.Now;
+			Status = CommandNotificationStatus.None;
 		}
 
 		/// <summary>
@@ -64,5 +65,11 @@ namespace Common.Commanding
 		{
 			return $"{this.GetType().Name} : {CommandId}";
 		}
+
+		/// <summary>
+		/// Command status determined by Sector.
+		/// </summary>
+		[DataMember]
+		public CommandNotificationStatus Status { get; set; }
 	}
 }
