@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Common.ServiceInterfaces
 {
+	/// <summary>
+	/// Service used by Sectors that will be used to return notifications about status of executed commands.
+	/// </summary>
 	[ServiceContract]
 	public interface ISectorResponseService
 	{
@@ -17,7 +20,8 @@ namespace Common.ServiceInterfaces
 		/// <param name="commandId">ID of accepted command.</param>
 		/// <returns></returns>
 		[OperationContract]
-		CommandNotification Accept(long commandId);
+		void Accept(long commandId);
+
 		/// <summary>
 		/// Returns a reject response to bank service.
 		/// </summary>
@@ -25,6 +29,6 @@ namespace Common.ServiceInterfaces
 		/// <param name="reason">Reason why the command was rejected.</param>
 		/// <returns></returns>
 		[OperationContract]
-		CommandNotification Reject(long commandId, string reason);
+		void Reject(long commandId, string reason);
 	}
 }
