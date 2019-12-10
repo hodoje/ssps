@@ -6,3 +6,7 @@ Otvaranje racuna, zahtev kredita i uplata mora da bude asinhrono.
 Isplata je "sinhrona" operacija odnosno kada klijent "padne" ne treba da se cuva notifikacija.
 
 Zahtev za brisanjem zastarelih komandi moze SAMO admin da kreira bazu.
+
+Cuvati sve obradjene zahteve.
+
+Sektor ima view.
