@@ -33,7 +33,10 @@ namespace BankService.CommandingHost
 		public void CommandNotificationReceived(CommandNotification commandNotification)
 		{
 			responseQueue.Enqueue(commandNotification);
-			databaseManager.RemoveEntity(commandNotification.ID);
+
+			BaseCommand command = databaseManager.Get(commandNotification.ID);
+			command.State = CommandState.Executed;
+			databaseManager.Update(command);
 
 			// Awake WorkerThread because there is enough command space in Commanding Handler.
 			sendingSynchronization.Set();

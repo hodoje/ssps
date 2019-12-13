@@ -4,17 +4,20 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 
 namespace BankService.DatabaseManagement.Repositories
 {
 	public class Repository<TEntity> : IRepository<TEntity>
 		where TEntity : IdentifiedObject
 	{
+		private readonly SemaphoreSlim synchronization;
 		protected readonly DbContext dbContext;
 
-		public Repository(DbContext dbContext)
+		public Repository(DbContext dbContext, SemaphoreSlim synchronization)
 		{
 			this.dbContext = dbContext;
+			this.synchronization = synchronization;
 		}
 
 		public void AddEntity(TEntity entity)
@@ -24,8 +27,12 @@ namespace BankService.DatabaseManagement.Repositories
 				return;
 			}
 
+			synchronization.Wait();
+
 			dbContext.Set<TEntity>().Add(entity);
 			dbContext.SaveChanges();
+
+			synchronization.Release();
 		}
 
 		public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
@@ -65,8 +72,12 @@ namespace BankService.DatabaseManagement.Repositories
 				return;
 			}
 
+			synchronization.Wait();
+
 			dbContext.Set<TEntity>().Remove(Get(entityId));
 			dbContext.SaveChanges();
+
+			synchronization.Release();
 		}
 
 		public void Update(TEntity entity)
@@ -76,9 +87,13 @@ namespace BankService.DatabaseManagement.Repositories
 				return;
 			}
 
+			synchronization.Wait();
+
 			dbContext.Set<TEntity>().Attach(entity);
 			dbContext.Entry(entity).State = EntityState.Modified;
 			dbContext.SaveChanges();
+
+			synchronization.Release();
 		}
 	}
 }

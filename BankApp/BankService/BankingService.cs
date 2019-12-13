@@ -9,6 +9,7 @@ using Common;
 using BankService.DatabaseManagement.Repositories;
 using BankService.DatabaseManagement;
 using System.Data.Entity;
+using System.Threading;
 
 namespace BankService
 {
@@ -32,7 +33,7 @@ namespace BankService
 			InitializesObjects();
 
 			responseQueue = new ConcurrentQueue<CommandNotification>();
-			notificationHandler = new NotificationHandler(responseQueue, new NotificationContainer());
+			notificationHandler = new NotificationHandler(responseQueue, new NotificationContainer(ServiceLocator.GetService<IRepository<CommandNotification>>()));
 
 			commandManager = new CommandingManager.CommandingManager(responseQueue);
 			commandManager.CreateDatabase();
@@ -127,9 +128,10 @@ namespace BankService
 		private void InitializesObjects()
 		{
 			BankContext bankContext = new BankContext(connectionString);
+			SemaphoreSlim semaphore = new SemaphoreSlim(1);
 			ServiceLocator.RegisterObject<DbContext>(bankContext);
-			ServiceLocator.RegisterService<IRepository<BaseCommand>>(new Repository<BaseCommand>(bankContext));
-			ServiceLocator.RegisterService<IRepository<CommandNotification>>(new Repository<CommandNotification>(bankContext));
+			ServiceLocator.RegisterService<IRepository<BaseCommand>>(new Repository<BaseCommand>(bankContext, semaphore));
+			ServiceLocator.RegisterService<IRepository<CommandNotification>>(new Repository<CommandNotification>(bankContext, semaphore));
 		}
 	}
 }

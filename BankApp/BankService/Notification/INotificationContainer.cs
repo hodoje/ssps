@@ -6,9 +6,13 @@ namespace BankService.Notification
 {
 	public interface INotificationContainer
 	{
-		void DeleteReceivedCommandNotification(long commandId);
-		IUserServiceCallback CommandNotificationReceived(CommandNotification receivedCommandNotification);
+		void DefaultUsersCallback(string username);
+		void CommandNotificationSent(long commandId);
+
 		void AddExpectingNotificationId(string username, IUserServiceCallback userCallback, long commandId);
+
 		List<CommandNotification> GetCommandNotificationsForUser(string username);
+
+		IUserServiceCallback CommandNotificationReceived(CommandNotification receivedCommandNotification, out string username);
 	}
 }

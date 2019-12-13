@@ -1,7 +1,9 @@
 ﻿using Common.Commanding;
+using Common.Model;
 using Common.ServiceInterfaces;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BankService
 {
@@ -13,19 +15,24 @@ namespace BankService
 		void Stop();
 	}
 
-	public class NotificationInformation
+	public class NotificationInformation : IdentifiedObject
 	{
-		public NotificationInformation(string username, IUserServiceCallback userCallback)
+		public NotificationInformation(string username, IUserServiceCallback userCallback = null, List<CommandNotification> readyNotifications = null)
 		{
 			Username = username;
-			ReadyNotifications = new ConcurrentDictionary<long, CommandNotification>();
-			PendingNotifications = new ConcurrentDictionary<long, long>();
 			UserCallback = userCallback;
+			ReadyNotifications = readyNotifications != null ? new ConcurrentDictionary<long, CommandNotification>(readyNotifications?.ToDictionary(x => x.ID, y => y)) : new ConcurrentDictionary<long, CommandNotification>();
+			PendingNotifications = new ConcurrentDictionary<long, CommandNotification>();
 		}
 
 		public ConcurrentDictionary<long, CommandNotification> ReadyNotifications { get; private set; }
-		public ConcurrentDictionary<long, long> PendingNotifications { get; private set; }
-		public IUserServiceCallback UserCallback { get; private set; }
+		public ConcurrentDictionary<long, CommandNotification> PendingNotifications { get; private set; }
+		public IUserServiceCallback UserCallback { get; set; }
 		public string Username { get; private set; }
+
+		public override int GetHashCode()
+		{
+			return Username.GetHashCode();
+		}
 	}
 }

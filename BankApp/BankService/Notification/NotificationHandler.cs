@@ -31,9 +31,11 @@ namespace BankService
 			Stop();
 		}
 
-		public List<CommandNotification> GetUserNotifications(string key)
+		public List<CommandNotification> GetUserNotifications(string username)
 		{
-			throw new NotImplementedException();
+			List<CommandNotification> notifications = notificationContainer.GetCommandNotificationsForUser(username);
+
+			return notifications?? new List<CommandNotification>();
 		}
 
 		public void RegisterCommand(string username, IUserServiceCallback userCallback, long commandId)
@@ -63,12 +65,18 @@ namespace BankService
 					continue;
 				}
 
-				//IUserServiceCallback callback = notificationContainer.CommandNotificationReceived(notification);
-				
-				//if (SendNotificationToClient(callback, notification))
-				//{
-				//	notificationContainer.DeleteReceivedCommandNotification(notification.ID);
-				//}
+				string username;
+				IUserServiceCallback callback = notificationContainer.CommandNotificationReceived(notification, out username);
+
+				if (SendNotificationToClient(callback, notification))
+				{
+					notificationContainer.CommandNotificationSent(notification.ID);
+				}
+				else
+				{
+					// set callback on null
+					notificationContainer.DefaultUsersCallback(username);
+				}
 			}
 		}
 

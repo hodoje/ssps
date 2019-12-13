@@ -11,6 +11,16 @@
 	}
 
 	/// <summary>
+	/// Indicates the current state of the notification.
+	/// </summary>
+	public enum NotificationState
+	{
+		Expected,
+		Received,
+		Sent
+	}
+
+	/// <summary>
 	/// Indicates status of the command.
 	/// </summary>
 	public enum CommandNotificationStatus

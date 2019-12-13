@@ -90,6 +90,10 @@
     <Compile Include="Migrations\201912121414143_Cleanup.designer.cs">
       <DependentUpon>201912121414143_Cleanup.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201912131657364_Notification.cs" />
+    <Compile Include="Migrations\201912131657364_Notification.designer.cs">
+      <DependentUpon>201912131657364_Notification.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Notification\INotificationContainer.cs" />
     <Compile Include="Notification\INotificationHandler.cs" />
@@ -117,6 +121,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201912121414143_Cleanup.resx">
       <DependentUpon>201912121414143_Cleanup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912131657364_Notification.resx">
+      <DependentUpon>201912131657364_Notification.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
