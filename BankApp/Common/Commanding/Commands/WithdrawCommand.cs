@@ -9,6 +9,11 @@ namespace Common.Commanding
 	[DataContract]
 	public class WithdrawCommand : BaseCommand
 	{
+		public WithdrawCommand()
+		{
+
+		}
+
 		/// <summary>
 		/// Initializes new instance of <see cref="WithdrawCommand"/> class.
 		/// </summary>

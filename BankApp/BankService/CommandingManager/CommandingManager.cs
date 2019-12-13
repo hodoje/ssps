@@ -50,6 +50,18 @@ namespace BankService.CommandingManager
 
 			commandingHosts = new List<ICommandingHost>(supportedCommands.Count);
 			CreateCommandingHosts(commandToQueueMapper, supportedCommands);
+
+			EnqueueNotSentCommands();
+		}
+
+		private void EnqueueNotSentCommands()
+		{
+			IEnumerable<BaseCommand> commands = databaseManager.Find(x => x.State == CommandState.NotSent);
+
+			foreach (BaseCommand command in commands)
+			{
+				SendCommandToSpecificQueue(command);
+			}
 		}
 
 		public bool CancelCommand(long commandId)
@@ -95,10 +107,16 @@ namespace BankService.CommandingManager
 			
 		}
 
+		private void SendCommandToSpecificQueue(BaseCommand command)
+		{
+			commandToQueueMapper[command.GetType()].Enqueue(command);
+
+		}
+
 		public long EnqueueCommand(BaseCommand command)
 		{
 			databaseManager.AddEntity(command);
-			commandToQueueMapper[command.GetType()].Enqueue(command);
+			SendCommandToSpecificQueue(command);
 
 			return command.ID;
 
@@ -120,6 +138,12 @@ namespace BankService.CommandingManager
 
 		private void InitialDatabaseLoading()
 		{
+			try
+			{
+				dbContext.Database.Connection.Open();
+			}
+			catch { }
+
 			IRepository<BaseCommand> commandRepository = ServiceLocator.GetService<IRepository<BaseCommand>>();
 			databaseManager = new DatabaseManager<BaseCommand>(commandRepository);
 		}

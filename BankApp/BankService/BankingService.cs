@@ -35,7 +35,7 @@ namespace BankService
 			notificationHandler = new NotificationHandler(responseQueue, new NotificationContainer());
 
 			commandManager = new CommandingManager.CommandingManager(responseQueue);
-			//commandManager.CreateDatabase();
+			commandManager.CreateDatabase();
 		}
 
 		public void CreateNewDatabase()

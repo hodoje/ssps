@@ -9,6 +9,11 @@ namespace Common.Commanding
 	[DataContract]
 	public class RegistrationCommand : BaseCommand
 	{
+		public RegistrationCommand()
+		{
+
+		}
+
 		/// <summary>
 		/// Initializes new instance of <see cref="RegistrationCommand"/> class. 
 		/// </summary>

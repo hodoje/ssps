@@ -14,6 +14,11 @@ namespace Common.Commanding
 	[KnownType(typeof(RegistrationCommand))]
 	public abstract class BaseCommand : IdentifiedObject
 	{
+		public BaseCommand()
+		{
+
+		}
+
 		/// <summary>
 		/// Initializes new instance of <see cref="BaseCommand"/> class.
 		/// </summary>

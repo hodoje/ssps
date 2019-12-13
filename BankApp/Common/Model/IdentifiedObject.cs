@@ -5,6 +5,11 @@ namespace Common.Model
 	[DataContract]
 	public class IdentifiedObject
 	{
+		public IdentifiedObject()
+		{
+
+		}
+
 		public IdentifiedObject(long id)
 		{
 			ID = id;

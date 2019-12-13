@@ -10,6 +10,13 @@ namespace Common.Commanding
 	public class DepositCommand : BaseCommand
 	{
 		/// <summary>
+		/// Initializes new instance of <see cref="D"/> 
+		/// </summary>
+		public DepositCommand()
+		{
+
+		}
+		/// <summary>
 		/// Initializes new instance of <see cref="DepositCommand"/> class.
 		/// </summary>
 		/// <param name="commandId">Unique command ID.</param>

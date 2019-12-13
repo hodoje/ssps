@@ -61,7 +61,15 @@ namespace BankService.DatabaseManagement
 
 		public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
 		{
-			throw new NotImplementedException();
+			IEnumerable<T> foundEntities;
+
+			locker.EnterReadLock();
+
+			foundEntities = dataPersistence.Find(predicate);
+
+			locker.ExitReadLock();
+
+			return foundEntities;
 		}
 
 		public T Get(long id)

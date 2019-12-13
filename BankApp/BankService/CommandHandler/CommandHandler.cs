@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Common.Commanding;
 using BankService.CommandingHost;
 using BankService.DatabaseManagement;
+using System.Linq;
 
 namespace BankService.CommandHandler
 {
@@ -11,12 +12,11 @@ namespace BankService.CommandHandler
 	/// </summary>
 	public class CommandHandler : ICommandHandler
 	{
-		private INotificationHost notificationHost;
-		private IDatabaseManager<BaseCommand> databaseManager;
-		private HashSet<long> commandsSent;
 		private readonly int sectorSize;
+		private HashSet<long> commandsSent;
+		private IDatabaseManager<BaseCommand> databaseManager;
 		private object locker;
-
+		private INotificationHost notificationHost;
 		/// <summary>
 		/// Initializes new instance of <see cref="CommandHandler"/> class. 
 		/// </summary>
@@ -31,7 +31,7 @@ namespace BankService.CommandHandler
 			// open Service for command response
 
 			locker = new object();
-			commandsSent = new HashSet<long>(sectorSize);
+			commandsSent = LoadSentCommands();
 		}
 
 		/// <inheritdoc/>
@@ -47,14 +47,6 @@ namespace BankService.CommandHandler
 					notificationHost.CommandNotificationReceived(commandNotification);
 				}
 			}
-		}
-
-		private void ChangeCommandState(long id, CommandState state)
-		{
-			BaseCommand command = databaseManager.Get(id);
-			command.State = state;
-
-			databaseManager.Update(command);
 		}
 
 		/// <inheritdoc/>
@@ -82,9 +74,22 @@ namespace BankService.CommandHandler
 			//CommandNotificationReceived(new CommandNotification(command.ID));
 		}
 
+		private void ChangeCommandState(long id, CommandState state)
+		{
+			BaseCommand command = databaseManager.Get(id);
+			command.State = state;
+
+			databaseManager.Update(command);
+		}
+
+		private HashSet<long> LoadSentCommands()
+		{
+			return new HashSet<long>(databaseManager.Find(x => x.State == CommandState.Sent).Select(x => x.ID));
+		}
+
 		private bool SendCommand(BaseCommand command)
 		{
-			return false;
+			return true;
 		}
 	}
 }

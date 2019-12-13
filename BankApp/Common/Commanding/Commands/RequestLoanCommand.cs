@@ -9,6 +9,11 @@ namespace Common.Commanding
 	[DataContract]
 	public class RequestLoanCommand : BaseCommand
 	{
+		public RequestLoanCommand()
+		{
+
+		}
+
 		/// <summary>
 		/// Initializes new instance of <see cref="RequestLoanCommand"/> class.
 		/// </summary>
