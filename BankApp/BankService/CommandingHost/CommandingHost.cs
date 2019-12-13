@@ -22,7 +22,7 @@ namespace BankService.CommandingHost
 		{
 			// todo create Client for Sector with connecitonInfo
 
-			commandHandler = new CommandHandler.CommandHandler(this);
+			commandHandler = new CommandHandler.CommandHandler(this, databaseManager);
 
 			this.responseQueue = responseQueue;
 			this.commandingQueue = commandingQueue;
@@ -83,7 +83,7 @@ namespace BankService.CommandingHost
 				// When awoken, check if cancellation token was canceled (object disposing).
 				if (!cancellationToken.IsCancellationRequested)
 				{
-					commandHandler.SendCommand(commandToSend);
+					commandHandler.SendCommandToSector(commandToSend);
 				}
 			}
 		}

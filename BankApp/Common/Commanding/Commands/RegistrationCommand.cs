@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
 namespace Common.Commanding
 {
@@ -14,23 +15,9 @@ namespace Common.Commanding
 		/// <param name="commandId">Unique commanding ID.</param>
 		/// <param name="username">New users username.</param>
 		/// <param name="password">New users password.</param>
-		public RegistrationCommand(long commandId, string username, string password) : base(commandId)
+		public RegistrationCommand(long commandId, string username) : base(commandId, username)
 		{
-			Username = username;
-			Password = password;
 		}
-
-		/// <summary>
-		/// Username.
-		/// </summary>
-		[DataMember]
-		public string Username { get; private set; }
-
-		/// <summary>
-		/// Password.
-		/// </summary>
-		[DataMember]
-		public string Password { get; private set; }
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
@@ -41,7 +28,7 @@ namespace Common.Commanding
 				return false;
 			}
 
-			return base.Equals(obj) && Username == registraionCommand.Username && Password == registraionCommand.Password;
+			return base.Equals(obj);
 		}
 
 		/// <inheritdoc/>

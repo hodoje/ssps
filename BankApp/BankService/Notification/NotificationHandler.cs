@@ -21,6 +21,9 @@ namespace BankService
 			this.notificationContainer = notificationContainer;
 
 			cancellationToken = new CancellationTokenSource();
+
+			Task listenQueueTask = new Task(ListenForCommandNotifications);
+			listenQueueTask.Start();
 		}
 
 		public void Dispose()
@@ -60,18 +63,27 @@ namespace BankService
 					continue;
 				}
 
-				notificationContainer.CommandNotificationReceived(notification);
+				//IUserServiceCallback callback = notificationContainer.CommandNotificationReceived(notification);
 				
-				if (SendNotificationToClient(notification))
-				{
-					notificationContainer.DeleteReceivedCommandNotification(notification.ID);
-				}
+				//if (SendNotificationToClient(callback, notification))
+				//{
+				//	notificationContainer.DeleteReceivedCommandNotification(notification.ID);
+				//}
 			}
 		}
 
-		private bool SendNotificationToClient(CommandNotification commandNotification)
+		private bool SendNotificationToClient(IUserServiceCallback callback, CommandNotification commandNotification)
 		{
-			return true;
+			try
+			{
+				callback.SendNotification(commandNotification);
+
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
 namespace Common.Commanding
 {
@@ -14,9 +15,8 @@ namespace Common.Commanding
 		/// <param name="commandId">Unique command ID.</param>
 		/// <param name="username">Username of user who requested deposit.</param>
 		/// <param name="amount">Deposit amount.</param>
-		public DepositCommand(long commandId, string username, double amount) : base(commandId)
+		public DepositCommand(long commandId, string username, double amount) : base(commandId, username)
 		{
-			Username = username;
 			Amount = amount;
 		}
 
@@ -25,12 +25,6 @@ namespace Common.Commanding
 		/// </summary>
 		[DataMember]
 		public double Amount { get; private set; }
-
-		/// <summary>
-		/// Username of the user who requested deposit.
-		/// </summary>
-		[DataMember]
-		public string Username { get; private set; }
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
@@ -41,7 +35,7 @@ namespace Common.Commanding
 				return false;
 			}
 
-			return base.Equals(obj) && Amount == depositCommand.Amount && Username == depositCommand.Username;
+			return base.Equals(obj) && Amount == depositCommand.Amount;
 		}
 
 		/// <inheritdoc/>

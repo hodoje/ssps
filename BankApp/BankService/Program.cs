@@ -10,11 +10,14 @@ namespace BankService
 {
 	class Program
 	{
+
+
 		static void Main(string[] args)
 		{
 			NetTcpBinding binding = new NetTcpBinding();
 			string address = "net.tcp://localhost:9999/Receiver";
 			BankingService bankingService = new BankingService();
+
 			ServiceHost host = new ServiceHost(bankingService);
 			host.AddServiceEndpoint(typeof(IUserService), binding, address);
 

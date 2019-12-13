@@ -65,6 +65,7 @@
     <Compile Include="ServiceInterfaces\ISectorService.cs" />
     <Compile Include="ServiceInterfaces\IUserServiceCallback.cs" />
     <Compile Include="ServiceInterfaces\IUserService.cs" />
+    <Compile Include="ServiceLocator.cs" />
     <Compile Include="SymmetricEncryptionAlgorithms\AESAlgorithmProvider.cs" />
     <Compile Include="SymmetricEncryptionAlgorithms\ISymmetricAlgorithmProvider.cs" />
   </ItemGroup>

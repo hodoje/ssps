@@ -5,6 +5,10 @@ using BankService.CommandingManager;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using BankService.Notification;
+using Common;
+using BankService.DatabaseManagement.Repositories;
+using BankService.DatabaseManagement;
+using System.Data.Entity;
 
 namespace BankService
 {
@@ -14,6 +18,7 @@ namespace BankService
 	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
 	public class BankingService : IUserService, IAdminService
 	{
+		private readonly string connectionString;
 		private long commandIdNumber = 0;
 		private ICommandingManager commandManager;
 		private object locker = new object();
@@ -22,9 +27,15 @@ namespace BankService
 		private ConcurrentQueue<CommandNotification> responseQueue;
 		public BankingService()
 		{
+			connectionString = "TEST";
+
+			InitializesObjects();
+
 			responseQueue = new ConcurrentQueue<CommandNotification>();
 			notificationHandler = new NotificationHandler(responseQueue, new NotificationContainer());
+
 			commandManager = new CommandingManager.CommandingManager(responseQueue);
+			//commandManager.CreateDatabase();
 		}
 
 		public void CreateNewDatabase()
@@ -53,14 +64,13 @@ namespace BankService
 		public void Deposit(double amount)
 		{
 			// authorization and authentication
-			string username = null; // get username
+			string username = "dummy"; // get username
 			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
-			long newId = GetUniqueId();
 
-			DepositCommand depositCommand = new DepositCommand(newId, username, amount);
-			commandManager.EnqueueCommand(depositCommand);
+			DepositCommand depositCommand = new DepositCommand(0, username, amount);
+			long commandId = commandManager.EnqueueCommand(depositCommand);
 
-			notificationHandler.RegisterCommand(username, callback, newId);
+			notificationHandler.RegisterCommand(username, callback, commandId);
 		}
 
 		public List<CommandNotification> GetPendingNotifications()
@@ -77,16 +87,16 @@ namespace BankService
 			return userNotifications;
 		}
 
-		public void Register(string username, string password)
+		public void Register()
 		{
 			// authorization and authentication
-			long newId = GetUniqueId();
+			string username = null;
 			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
 
-			RegistrationCommand registrationCommand = new RegistrationCommand(newId, username, password);
-			commandManager.EnqueueCommand(registrationCommand);
+			RegistrationCommand registrationCommand = new RegistrationCommand(0, username);
+			long commandId = commandManager.EnqueueCommand(registrationCommand);
 
-			notificationHandler.RegisterCommand(username, callback, newId);
+			notificationHandler.RegisterCommand(username, callback, commandId);
 
 		}
 
@@ -95,12 +105,11 @@ namespace BankService
 			// authorization and authentication
 			string username = null; // get username
 			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
-			long newId = GetUniqueId();
 
-			RequestLoanCommand requestLoanCommand = new RequestLoanCommand(newId, username, amount);
-			commandManager.EnqueueCommand(requestLoanCommand);
+			RequestLoanCommand requestLoanCommand = new RequestLoanCommand(0, username, amount);
+			long commandId = commandManager.EnqueueCommand(requestLoanCommand);
 
-			notificationHandler.RegisterCommand(username, callback, newId);
+			notificationHandler.RegisterCommand(username, callback, commandId);
 		}
 
 		public void Withdraw(double amount)
@@ -108,24 +117,19 @@ namespace BankService
 			// authorization and authentication
 			string username = null; // get username
 			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
-			long newId = GetUniqueId();
 
-			WithdrawCommand withdrawCommand = new WithdrawCommand(newId, username, amount);
-			commandManager.EnqueueCommand(withdrawCommand);
+			WithdrawCommand withdrawCommand = new WithdrawCommand(0, username, amount);
+			long commandId = commandManager.EnqueueCommand(withdrawCommand);
 
-			notificationHandler.RegisterCommand(username, callback, newId);
+			notificationHandler.RegisterCommand(username, callback, commandId);
 		}
-		private long GetUniqueId()
+
+		private void InitializesObjects()
 		{
-			// TODO, get biggest ID from DB
-
-			long newId;
-			lock (locker)
-			{
-				newId = ++commandIdNumber;
-			}
-
-			return newId;
+			BankContext bankContext = new BankContext(connectionString);
+			ServiceLocator.RegisterObject<DbContext>(bankContext);
+			ServiceLocator.RegisterService<IRepository<BaseCommand>>(new Repository<BaseCommand>(bankContext));
+			ServiceLocator.RegisterService<IRepository<CommandNotification>>(new Repository<CommandNotification>(bankContext));
 		}
 	}
 }

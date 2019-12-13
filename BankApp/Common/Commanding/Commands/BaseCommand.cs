@@ -18,10 +18,12 @@ namespace Common.Commanding
 		/// Initializes new instance of <see cref="BaseCommand"/> class.
 		/// </summary>
 		/// <param name="commandId">Unique command id.</param>
-		public BaseCommand(long commandId) : base(commandId)
+		public BaseCommand(long commandId, string username) : base(commandId)
 		{
 			CreationTime = DateTime.Now;
 			Status = CommandNotificationStatus.None;
+			State = CommandState.NotSent;
+			Username = username;
 		}
 
 		/// <summary>
@@ -29,6 +31,24 @@ namespace Common.Commanding
 		/// </summary>
 		[DataMember]
 		public DateTime CreationTime { get; private set; }
+
+		/// <summary>
+		/// Command status determined by Sector.
+		/// </summary>
+		[DataMember]
+		public CommandNotificationStatus Status { get; set; }
+
+		/// <summary>
+		/// Command state in 
+		/// </summary>
+		[DataMember]
+		public CommandState State { get; set; }
+
+		/// <summary>
+		/// Username of the user who requested withdraw.
+		/// </summary>
+		[DataMember]
+		public string Username { get; private set; }
 
 		/// <summary>
 		/// Indicates if command is in timeout.
@@ -45,7 +65,7 @@ namespace Common.Commanding
 				return false;
 			}
 
-			return base.Equals(obj) && CreationTime == command.CreationTime;
+			return base.Equals(obj) && CreationTime == command.CreationTime && Username  == command.Username;
 		}
 
 		/// <inheritdoc/>
@@ -59,11 +79,5 @@ namespace Common.Commanding
 		{
 			return $"{this.GetType().Name} : {ID}";
 		}
-
-		/// <summary>
-		/// Command status determined by Sector.
-		/// </summary>
-		[DataMember]
-		public CommandNotificationStatus Status { get; set; }
 	}
 }

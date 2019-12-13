@@ -4,11 +4,11 @@ using System.ServiceModel;
 
 namespace Common.ServiceInterfaces
 {
-	[ServiceContract]
+	[ServiceContract(CallbackContract = typeof(IUserServiceCallback))]
 	public interface IUserService
 	{
 		[OperationContract]
-		void Register(string username, string password);
+		void Register();
 
 		[OperationContract]
 		void Withdraw(double amount);

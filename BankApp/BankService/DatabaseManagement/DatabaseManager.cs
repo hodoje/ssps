@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using Common.Model;
+using BankService.DatabaseManagement.Repositories;
+using System.Linq.Expressions;
 
 namespace BankService.DatabaseManagement
 {
@@ -12,21 +14,66 @@ namespace BankService.DatabaseManagement
 	internal class DatabaseManager<T> : IDatabaseManager<T>, IDisposable
 		where T : IdentifiedObject
 	{
-		private ReaderWriterLockSlim locker;
 		private List<T> commandsInDatabase;
-		private IDataPersistence<T> dataPersistence;
-
+		private IRepository<T> dataPersistence;
+		private ReaderWriterLockSlim locker;
 		/// <summary>
 		/// Initializes new instance of <see cref="DatabaseManager"/> class. 
 		/// </summary>
 		/// <param name="dataPersistence">Unit used for data persistence.</param>
-		public DatabaseManager(IDataPersistence<T> dataPersistence)
+		public DatabaseManager(IRepository<T> dataPersistence)
 		{
 			this.dataPersistence = dataPersistence;
 
 			locker = new ReaderWriterLockSlim();
 
 			commandsInDatabase = new List<T>();
+		}
+
+		public void AddEntity(T entity)
+		{
+			locker.EnterWriteLock();
+
+			dataPersistence?.AddEntity(entity);
+
+			if (commandsInDatabase.Exists(x => x.ID == entity.ID))
+			{
+				locker.ExitWriteLock();
+
+				// log ERROR
+				Console.WriteLine($"[DatabaseManager] Command with {entity.ID} already exists in the database.");
+				return;
+			}
+
+			commandsInDatabase.Add(entity);
+			
+
+			locker.ExitWriteLock();
+			// log successful add to DB
+		}
+
+		public void Dispose()
+		{
+			locker.Dispose();
+			((IDisposable)dataPersistence).Dispose();
+			commandsInDatabase.Clear();
+		}
+
+		public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
+		{
+			throw new NotImplementedException();
+		}
+
+		public T Get(long id)
+		{
+			T entity;
+			locker.EnterReadLock();
+
+			entity = dataPersistence.Get(id);
+
+			locker.ExitReadLock();
+
+			return entity;
 		}
 
 		/// <inheritdoc/>
@@ -67,48 +114,13 @@ namespace BankService.DatabaseManagement
 
 			// log successful remove
 		}
-
-		/// <inheritdoc/>
-		public void SaveEntity(T baseCommand)
+		public void Update(T entity)
 		{
 			locker.EnterWriteLock();
 
-			if (commandsInDatabase.Exists(x => x.ID == baseCommand.ID))
-			{
-				locker.ExitReadLock();
-				
-				// log ERROR
-				Console.WriteLine($"[DatabaseManager] Command with {baseCommand.ID} already exists in the database.");
-				return;
-			}
-
-			commandsInDatabase.Add(baseCommand);
-			dataPersistence?.AddEntity(baseCommand);
-
-			locker.ExitReadLock();
-			// log successful add to DB
-		}
-
-		/// <inheritdoc/>
-		public void LoadNewDataPersitenceUnit(IDataPersistence<T> dataPersistence)
-		{
-			locker.EnterWriteLock();
-
-			this.dataPersistence = dataPersistence;
-
-			if (commandsInDatabase.Count > 0)
-			{
-				commandsInDatabase.ForEach(x => dataPersistence.AddEntity(x));
-			}
+			dataPersistence.Update(entity);
 
 			locker.ExitWriteLock();
-		}
-
-		public void Dispose()
-		{
-			locker.Dispose();
-			((IDisposable)dataPersistence).Dispose();
-			commandsInDatabase.Clear();
 		}
 	}
 }

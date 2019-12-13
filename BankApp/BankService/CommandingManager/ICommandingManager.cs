@@ -12,7 +12,7 @@ namespace BankService.CommandingManager
 		/// Enqueues command on the specific commanding queue.
 		/// </summary>
 		/// <param name="command"></param>
-		void EnqueueCommand(BaseCommand command);
+		long EnqueueCommand(BaseCommand command);
 
 		/// <summary>
 		/// Finds command in the queue and removes it from the queue.

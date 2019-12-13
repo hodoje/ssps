@@ -4,6 +4,9 @@ using Common.Commanding;
 using BankService.CommandingHost;
 using System.Collections.Concurrent;
 using BankService.DatabaseManagement;
+using System.Data.Entity;
+using BankService.DatabaseManagement.Repositories;
+using Common;
 
 namespace BankService.CommandingManager
 {
@@ -11,7 +14,8 @@ namespace BankService.CommandingManager
 	{
 		private static readonly int queueSize;
 		private static readonly int timeoutPeriod;
-		private static readonly string xmlFilePath;
+		private readonly DbContext dbContext;
+		private static readonly string connectionString;
 
 		private List<ICommandingHost> commandingHosts;
 
@@ -22,12 +26,14 @@ namespace BankService.CommandingManager
 		static CommandingManager()
 		{
 			// TODO read from configuration
+			
 			queueSize = 5;
 			timeoutPeriod = 3;
 		}
 
 		public CommandingManager(ConcurrentQueue<CommandNotification> responseQueue)
 		{
+			dbContext = ServiceLocator.GetObject<DbContext>();
 			this.responseQueue = responseQueue;
 
 			List<Type> supportedCommands = new List<Type>(4)
@@ -73,8 +79,7 @@ namespace BankService.CommandingManager
 
 		public void CreateDatabase()
 		{
-			IDataPersistence<BaseCommand> databasePersistence = (IDataPersistence<BaseCommand>)new XmlDataPersistence<BaseCommand>(xmlFilePath);
-			databaseManager.LoadNewDataPersitenceUnit(databasePersistence);
+			dbContext.Database.CreateIfNotExists();
 		}
 
 		public void Dispose()
@@ -90,10 +95,12 @@ namespace BankService.CommandingManager
 			
 		}
 
-		public void EnqueueCommand(BaseCommand command)
+		public long EnqueueCommand(BaseCommand command)
 		{
+			databaseManager.AddEntity(command);
 			commandToQueueMapper[command.GetType()].Enqueue(command);
-			databaseManager.SaveEntity(command);
+
+			return command.ID;
 
 			// todo log
 		}
@@ -113,8 +120,8 @@ namespace BankService.CommandingManager
 
 		private void InitialDatabaseLoading()
 		{
-			IDataPersistence<BaseCommand> databasePersistence = XmlDataPersistence<BaseCommand>.CreatePersister(xmlFilePath);
-			databaseManager = new DatabaseManager<BaseCommand>(databasePersistence);
+			IRepository<BaseCommand> commandRepository = ServiceLocator.GetService<IRepository<BaseCommand>>();
+			databaseManager = new DatabaseManager<BaseCommand>(commandRepository);
 		}
 	}
 }

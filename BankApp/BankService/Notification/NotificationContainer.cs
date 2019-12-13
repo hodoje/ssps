@@ -23,7 +23,7 @@ namespace BankService.Notification
 			//todo save to db
 		}
 
-		public void CommandNotificationReceived(CommandNotification receivedCommandNotification)
+		public IUserServiceCallback CommandNotificationReceived(CommandNotification receivedCommandNotification)
 		{
 			foreach (NotificationInformation notificationinfo in pendingUserNotifications.Values)
 			{
@@ -34,8 +34,12 @@ namespace BankService.Notification
 
 					receivedCommandNotification.CommandState = CommandState.Executed;
 					notificationinfo.ReadyNotifications.TryAdd(receivedCommandNotification.ID, receivedCommandNotification);
+
+					return notificationinfo.UserCallback;
 				}
 			}
+
+			return null;
 		}
 
 		public void DeleteReceivedCommandNotification(long commandId)
