@@ -9,17 +9,17 @@ using System.Threading.Tasks;
 
 namespace SectorService.ServiceHosts
 {
-	public class AccountSectorServiceHost : IDisposable
+	public class SectorServiceServiceHost : IDisposable
 	{
 		private readonly string _sectorServiceAddress;
 		private readonly string _sectorServiceEndpointName;
 		private readonly ServiceHost _sectorServiceServiceHost;
 		private readonly NetTcpBinding _binding;
 
-		public AccountSectorServiceHost()
+		public SectorServiceServiceHost(string endpointAddress, string endpointName)
 		{
-			_sectorServiceAddress = SectorConfig.AccountSectorServiceAddress;
-			_sectorServiceEndpointName = SectorConfig.AccountSectorServiceEndpointName;
+			_sectorServiceAddress = endpointAddress;
+			_sectorServiceEndpointName = endpointName;
 			_binding = SetUpBinding();
 			_sectorServiceServiceHost = new ServiceHost(typeof(SectorService.Services.SectorService));
 			_sectorServiceServiceHost.AddServiceEndpoint(typeof(ISectorService), _binding,
@@ -34,7 +34,7 @@ namespace SectorService.ServiceHosts
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine($"AccountSectorServiceHost failed to open with an error: {ex.Message}");
+				Console.WriteLine($"{_sectorServiceEndpointName.ToUpper()} ServiceHost failed to open with an error: {ex.Message}");
 			}
 		}
 
@@ -46,7 +46,7 @@ namespace SectorService.ServiceHosts
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine($"AccountSectorServiceHost failed to close with an error: {ex.Message}");
+				Console.WriteLine($"{_sectorServiceEndpointName.ToUpper()} ServiceHost failed to close with an error: {ex.Message}");
 			}
 		}
 
