@@ -32,6 +32,10 @@ namespace BankService
 		public const string SectorResponseServiceEndpointConfigName = "SectorResponseServiceEndpoint";
 		public const string AuditServiceAddressConfigName = "AuditServiceAddress";
 		public const string AuditServiceEndpointNameConfigName = "AuditServiceEndpointName";
+		public const string AllSectorNamesConfigName = "AllSectorNames";
+		public const string SectorExeFilenameConfigName = "SectorExeFilename";
+		public const string StartupConfirmationServiceAddressConfigName = "StartupConfirmationServiceAddress";
+		public const string StartupConfirmationServiceEndpointNameConfigName = "StartupConfirmationServiceEndpointName";
 
 		static BankServiceConfig()
 		{
@@ -47,6 +51,13 @@ namespace BankService
 			SectorResponseServiceEndpoint = ConfigurationManager.AppSettings[SectorResponseServiceEndpointConfigName];
 			AuditServiceAddress = ConfigurationManager.AppSettings[AuditServiceAddressConfigName];
 			AuditServiceEndpointName = ConfigurationManager.AppSettings[AuditServiceEndpointNameConfigName];
+			AllSectorNames = ConfigurationManager.AppSettings[AllSectorNamesConfigName].Split(',');
+			string rawSectorExeFilename = ConfigurationManager.AppSettings[SectorExeFilenameConfigName];
+			string workingDirectory = Environment.CurrentDirectory;
+			string _solutionDirectory = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
+			SectorExeFilename = rawSectorExeFilename.Replace("{AppDir}", _solutionDirectory);
+			StartupConfirmationServiceAddress = ConfigurationManager.AppSettings[StartupConfirmationServiceAddressConfigName];
+			StartupConfirmationServiceEndpointName = ConfigurationManager.AppSettings[StartupConfirmationServiceEndpointNameConfigName];
 
 			Connections = new Dictionary<Type, ConnectionInfo>()
 			{
@@ -70,5 +81,9 @@ namespace BankService
 		public static string AuditServiceAddress { get; }
 		public static string AuditServiceEndpointName { get; }
 		public static Dictionary<Type, ConnectionInfo> Connections { get; set; }
+		public static string[] AllSectorNames { get; }
+		public static string SectorExeFilename { get; }
+		public static string StartupConfirmationServiceAddress { get; }
+		public static string StartupConfirmationServiceEndpointName { get; }
 	}
 }

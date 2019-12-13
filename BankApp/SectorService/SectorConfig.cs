@@ -22,6 +22,8 @@ namespace SectorService
 		public const string SectorResponseServiceEndpointConfigName = "SectorResponseServiceEndpoint";
 		public const string AuditServiceAddressConfigName = "AuditServiceAddress";
 		public const string AuditServiceEndpointNameConfigName = "AuditServiceEndpointName";
+		public const string StartupConfirmationServiceAddressConfigName = "StartupConfirmationServiceAddress";
+		public const string StartupConfirmationServiceEndpointNameConfigName = "StartupConfirmationServiceEndpointName";
 
 		static SectorConfig()
 		{
@@ -35,6 +37,8 @@ namespace SectorService
 			SectorResponseServiceEndpoint = ConfigurationManager.AppSettings[SectorResponseServiceEndpointConfigName];
 			AuditServiceAddress = ConfigurationManager.AppSettings[AuditServiceAddressConfigName];
 			AuditServiceEndpointName = ConfigurationManager.AppSettings[AuditServiceEndpointNameConfigName];
+			StartupConfirmationServiceAddress = ConfigurationManager.AppSettings[StartupConfirmationServiceAddressConfigName];
+			StartupConfirmationServiceEndpointName = ConfigurationManager.AppSettings[StartupConfirmationServiceEndpointNameConfigName];
 		}
 
 		public static string AccountSectorServiceAddress { get; }
@@ -47,5 +51,7 @@ namespace SectorService
 		public static string SectorResponseServiceEndpoint { get; }
 		public static string AuditServiceAddress { get; }
 		public static string AuditServiceEndpointName { get; }
+		public static string StartupConfirmationServiceAddress { get; }
+		public static string StartupConfirmationServiceEndpointName { get; }
 	}
 }
