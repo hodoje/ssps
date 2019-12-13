@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -56,6 +59,7 @@
     <Compile Include="DataContracts\Dtos\EventLogData.cs" />
     <Compile Include="DataContracts\Enums\UserTypeEnum.cs" />
     <Compile Include="DataContracts\Exceptions\InvalidEventLogTypeException.cs" />
+    <Compile Include="Model\AddressEndpointPair.cs" />
     <Compile Include="Model\IdentifiedObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceInterfaces\IAccessService.cs" />
@@ -63,12 +67,15 @@
     <Compile Include="ServiceInterfaces\IAuditService.cs" />
     <Compile Include="ServiceInterfaces\ISectorResponseService.cs" />
     <Compile Include="ServiceInterfaces\ISectorService.cs" />
+    <Compile Include="ServiceInterfaces\IStartupConfirmationService.cs" />
     <Compile Include="ServiceInterfaces\IUserServiceCallback.cs" />
     <Compile Include="ServiceInterfaces\IUserService.cs" />
     <Compile Include="ServiceLocator.cs" />
     <Compile Include="SymmetricEncryptionAlgorithms\AESAlgorithmProvider.cs" />
     <Compile Include="SymmetricEncryptionAlgorithms\ISymmetricAlgorithmProvider.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

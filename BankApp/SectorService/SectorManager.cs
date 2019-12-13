@@ -84,7 +84,7 @@ namespace SectorService
 				{
 					while (true)
 					{
-						Console.WriteLine("Command recieved: Type 'y' for accept and 'n' for reject:");
+						Console.WriteLine($"Command {command.ID} recieved: Type 'y' for accept and 'n' for reject:");
 						string shouldAccept = Console.ReadLine();
 
 						if (shouldAccept == "y")

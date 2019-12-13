@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace Common.ServiceInterfaces
 {
 	[ServiceContract]
-	public interface IAccessService
+	public interface IStartupConfirmationService
 	{
 		[OperationContract]
-		void Register(string username, string password);
+		void ConfirmStartup(string sectorType);
 	}
 }
