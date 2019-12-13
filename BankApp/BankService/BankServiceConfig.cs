@@ -1,7 +1,11 @@
 ﻿using Common.Commanding;
+using Common.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
@@ -22,12 +26,6 @@ namespace BankService
 	{
 		public const string BankServiceAddressConfigName = "BankServiceAddress";
 		public const string BankServiceEndpointNameConfigName = "BankServiceEndpointName";
-		public const string AccountSectorServiceAddressConfigName = "AccountSectorServiceAddress";
-		public const string LoanSectorServiceAddressConfigName = "LoanSectorServiceAddress";
-		public const string TransactionSectorServiceAddressConfigName = "TransactionSectorServiceAddress";
-		public const string AccountSectorServiceEndpointNameConfigName = "AccountSectorServiceEndpointName";
-		public const string LoanSectorServiceEndpointNameConfigName = "LoanSectorServiceEndpointName";
-		public const string TransactionSectorServiceEndpointNameConfigName = "TransactionSectorServiceEndpointName";
 		public const string SectorResponseServiceAddressConfigName = "SectorResponseServiceAddress";
 		public const string SectorResponseServiceEndpointConfigName = "SectorResponseServiceEndpoint";
 		public const string AuditServiceAddressConfigName = "AuditServiceAddress";
@@ -41,12 +39,6 @@ namespace BankService
 		{
 			BankServiceAddress = ConfigurationManager.AppSettings[BankServiceAddressConfigName];
 			BankServiceEndpointName = ConfigurationManager.AppSettings[BankServiceEndpointNameConfigName];
-			AccountSectorServiceAddress = ConfigurationManager.AppSettings[AccountSectorServiceAddressConfigName];
-			LoanSectorServiceAddress = ConfigurationManager.AppSettings[LoanSectorServiceAddressConfigName];
-			TransactionSectorServiceAddress = ConfigurationManager.AppSettings[TransactionSectorServiceAddressConfigName];
-			AccountSectorServiceEndpointName = ConfigurationManager.AppSettings[AccountSectorServiceEndpointNameConfigName];
-			LoanSectorServiceEndpointName = ConfigurationManager.AppSettings[LoanSectorServiceEndpointNameConfigName];
-			TransactionSectorServiceEndpointName = ConfigurationManager.AppSettings[TransactionSectorServiceEndpointNameConfigName];
 			SectorResponseServiceAddress = ConfigurationManager.AppSettings[SectorResponseServiceAddressConfigName];
 			SectorResponseServiceEndpoint = ConfigurationManager.AppSettings[SectorResponseServiceEndpointConfigName];
 			AuditServiceAddress = ConfigurationManager.AppSettings[AuditServiceAddressConfigName];
@@ -68,20 +60,29 @@ namespace BankService
 			};
 		}
 
+		private static Dictionary<string, AddressEndpointPair> GetSectorsConfig(string sectorsConfigJson)
+		{
+			Dictionary<string, AddressEndpointPair> result = new Dictionary<string, AddressEndpointPair>();
+			JObject sectorsConfigJObject = JsonConvert.DeserializeObject<JObject>(sectorsConfigJson);
+			var sectors = sectorsConfigJObject["sectors"];
+
+			foreach (var child in sectors.Children())
+			{
+				SectorConfigs.Add((child as JProperty).Name, child.First.ToObject<AddressEndpointPair>());
+			}
+
+			return result;
+		}
+
 		public static string BankServiceAddress { get; }
 		public static string BankServiceEndpointName { get; }
-		public static string AccountSectorServiceAddress { get; }
-		public static string LoanSectorServiceAddress { get; }
-		public static string TransactionSectorServiceAddress { get; }
-		public static string AccountSectorServiceEndpointName { get; }
-		public static string LoanSectorServiceEndpointName { get; }
-		public static string TransactionSectorServiceEndpointName { get; }
 		public static string SectorResponseServiceAddress { get; }
 		public static string SectorResponseServiceEndpoint { get; }
 		public static string AuditServiceAddress { get; }
 		public static string AuditServiceEndpointName { get; }
 		public static Dictionary<Type, ConnectionInfo> Connections { get; set; }
 		public static string[] AllSectorNames { get; }
+		public static Dictionary<string, AddressEndpointPair> SectorConfigs { get; }
 		public static string SectorExeFilename { get; }
 		public static string StartupConfirmationServiceAddress { get; }
 		public static string StartupConfirmationServiceEndpointName { get; }
