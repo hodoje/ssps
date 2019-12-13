@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 
 namespace Common.ServiceInterfaces
 {
+	[ServiceContract]
 	public interface IAccessService
 	{
+		[OperationContract]
+		void Register(string username, string password);
 	}
 }
