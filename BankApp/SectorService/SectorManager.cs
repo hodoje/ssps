@@ -73,8 +73,6 @@ namespace SectorService
 		/// </summary>
 		private void ProcessCommands()
 		{
-			Random acceptOrRejectRandomizer = new Random();
-
 			while (true)
 			{
 				BaseCommand command = _requestQueue.Dequeue();
@@ -84,14 +82,25 @@ namespace SectorService
 				}
 				else
 				{
-					int isAccepted = acceptOrRejectRandomizer.Next(0, 1);
-					if(isAccepted == 1)
+					while (true)
 					{
-						command.Status = CommandNotificationStatus.Confirmed;
-					}
-					else
-					{
-						command.Status = CommandNotificationStatus.Rejected;
+						Console.WriteLine("Command recieved: Type 'y' for accept and 'n' for reject:");
+						string shouldAccept = Console.ReadLine();
+
+						if (shouldAccept == "y")
+						{
+							command.Status = CommandNotificationStatus.Confirmed;
+							break;
+						}
+						else if(shouldAccept == "n")
+						{
+							command.Status = CommandNotificationStatus.Rejected;
+							break;
+						}
+						else
+						{
+							continue;
+						}
 					}
 				}
 				_responseQueue.Enqueue(command);
