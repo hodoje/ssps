@@ -24,8 +24,7 @@ namespace Common.Communication
 		public CertificateClientProxy(object callback, string serviceAddress, string serviceEndpointName)
 			: base(callback, SetUpBinding(), SetUpEndpoint(serviceAddress, serviceEndpointName))
 		{
-			//string cltCertCN = ParseName(WindowsIdentity.GetCurrent().Name);
-			string cltCertCN = "bankservice";
+			string cltCertCN = ParseName(WindowsIdentity.GetCurrent().Name);
 
 			Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
 			Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
