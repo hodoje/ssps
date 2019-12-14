@@ -1,5 +1,7 @@
 ﻿using Client.Model;
 using Client.UICommands;
+using Common.Commanding;
+using Common.Communication;
 using Common.ServiceInterfaces;
 using System;
 using System.Collections.Generic;
@@ -17,6 +19,9 @@ namespace Client.ViewModels
 		private int? _loanDuration;
 		private double? _transactionAmount;
 		private TransactionType _selectedTransactionType;
+		private CertificateClientProxy<IUserService> _userServiceProxy;
+		private CertificateClientProxy<IAdminService> _adminServiceProxy;
+		public BankServiceCallbackObject _userServiceCallbackObject;
 		#endregion
 
 		#region Properties
@@ -77,6 +82,11 @@ namespace Client.ViewModels
 			ExecuteTransactionCommand = new UIICommand(OnExecuteTransaction, CanExecuteTransaction);
 			CreateNewDatabaseCommand = new UIICommand(OnCreateNewDatabase);
 			RemoveExpiredRequestsCommand = new UIICommand(OnRemoveExpiredRequests);
+
+			_userServiceCallbackObject = new BankServiceCallbackObject(HandleNotifications);
+
+			_userServiceProxy = new CertificateClientProxy<IUserService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.UserServiceEndpoint);
+			_adminServiceProxy = new CertificateClientProxy<IAdminService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.AdminServiceEndpoint);
 		}
 		#endregion
 
@@ -117,9 +127,10 @@ namespace Client.ViewModels
 			// TODO: Open service and start listening
 		}
 
-		private void ProcessNotifications()
+		private void HandleNotifications(CommandNotification commandNotification)
 		{
-			// TODO: Add notifications to the Notifications collection
+			Notification notification = new Notification(commandNotification.Information, commandNotification.CommandStatus);
+			Notifications.Add(notification);
 		}
 
 		private void OnRemoveExpiredRequests()

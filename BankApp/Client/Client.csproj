@@ -71,6 +71,7 @@
     <Compile Include="Model\Notification.cs" />
     <Compile Include="Model\TransactionTypeEnum.cs" />
     <Compile Include="UICommands\UIICommand.cs" />
+    <Compile Include="BankServiceCallbackObject.cs" />
     <Compile Include="ViewModels\ContentViewModel.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="Views\ContentView.xaml.cs">
