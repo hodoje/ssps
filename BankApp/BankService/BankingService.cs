@@ -21,9 +21,8 @@ namespace BankService
 	public class BankingService : IUserService, IAdminService
 	{
 		private readonly string connectionString;
-		private long commandIdNumber = 0;
-		private ICommandingManager commandManager;
 		private object locker = new object();
+		private ICommandingManager commandManager;
 		private INotificationHandler notificationHandler;
 
 		private ConcurrentQueue<CommandNotification> responseQueue;
@@ -47,11 +46,6 @@ namespace BankService
 			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
 
 			commandManager.CreateDatabase();
-
-			lock (locker)
-			{
-				commandIdNumber = 0;
-			}
 		}
 
 		public void DeleteStaleCommands()
@@ -78,13 +72,8 @@ namespace BankService
 		public List<CommandNotification> GetPendingNotifications()
 		{
 			string username = null;
-			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
 
-			// authentication
-
-			List<CommandNotification> userNotifications = null;
-
-			// find notifications in notifications unit
+			List<CommandNotification> userNotifications = notificationHandler.GetUserNotifications(username);
 
 			return userNotifications;
 		}
