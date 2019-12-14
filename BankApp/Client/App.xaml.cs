@@ -22,14 +22,10 @@ namespace Client
 			IUnityContainer container = new UnityContainer();
 
 			// Register ViewModels
-			var accessViewModel = new AccessViewModel();
-			container.RegisterInstance<AccessViewModel>(accessViewModel);
 			var contentViewModel = new ContentViewModel(container);
 			container.RegisterInstance<ContentViewModel>(contentViewModel);
 			var userViewModel = new UserViewModel();
 			container.RegisterInstance<UserViewModel>(userViewModel);
-			var adminViewModel = new AdminViewModel();
-			container.RegisterInstance<AdminViewModel>(adminViewModel);
 			var mainWindowViewModel = new MainWindowViewModel(container);
 			container.RegisterInstance<MainWindowViewModel>(mainWindowViewModel);
 

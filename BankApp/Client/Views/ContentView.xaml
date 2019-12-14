@@ -7,7 +7,7 @@
 			 xmlns:views="clr-namespace:Client.Views"
 			 xmlns:viewModels="clr-namespace:Client.ViewModels"
              mc:Ignorable="d" 
-             Height="390" Width="700">
+             Height="390" Width="950">
 	<UserControl.Resources>
 		<!-- Custom Button Control Template Override-->
 		<ControlTemplate x:Key="CustomButtonBaseControlTemplate" TargetType="{x:Type ButtonBase}">
@@ -41,21 +41,9 @@
 		<DataTemplate DataType="{x:Type viewModels:UserViewModel}">
 			<views:UserView/>
 		</DataTemplate>
-		<DataTemplate DataType="{x:Type viewModels:AdminViewModel}">
-			<views:AdminView/>
-		</DataTemplate>
 	</UserControl.Resources>
 	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="30"/>
-			<RowDefinition Height="*"/>
-		</Grid.RowDefinitions>
-		<Grid Grid.Row="0">
-			<Button Command="{Binding LogoutCommand}" BorderBrush="#232323" BorderThickness="1 1 1 1" Background="#2E2E2E" Foreground="White" Content="Log out" FontSize="16" Template="{DynamicResource CustomButtonBaseControlTemplate}"/>
-		</Grid>
-		<Grid Grid.Row="1">
-			<ContentControl Content="{Binding CurrentContentViewModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-		</Grid>
+		<ContentControl Content="{Binding CurrentContentViewModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 	</Grid>
 </UserControl>
 

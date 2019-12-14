@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.Commanding;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace Client.Model
 	{
 		private string _message;
 		private string _displayedInfo;
+		private CommandNotificationStatus _status;
 
 		public string Message
 		{
@@ -23,10 +25,17 @@ namespace Client.Model
 			set { SetField(ref _displayedInfo, value); }
 		}
 
-		public Notification(string message)
+		public CommandNotificationStatus Status
+		{
+			get { return _status; }
+			set { SetField(ref _status, value); }
+		}
+
+		public Notification(string message, CommandNotificationStatus status)
 		{
 			_message = message;
-			DisplayedInfo = $"{Message}{Environment.NewLine}STATUS: SUCCESSFUL";
+			_status = status;
+			DisplayedInfo = $"{Message}{Environment.NewLine}Status: {status}";
 		}
 	}
 }
