@@ -9,9 +9,6 @@
         mc:Ignorable="d"
         Title="Joki-Hoki Bank Client" SizeToContent="WidthAndHeight" ResizeMode="NoResize" Background="#232323" WindowStartupLocation="CenterScreen">
 	<Window.Resources>
-		<DataTemplate DataType="{x:Type viewModels:AccessViewModel}">
-			<views:AccessView/>
-		</DataTemplate>
 		<DataTemplate DataType="{x:Type viewModels:ContentViewModel}">
 			<views:ContentView/>
 		</DataTemplate>

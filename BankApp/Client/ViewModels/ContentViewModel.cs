@@ -14,9 +14,6 @@ namespace Client.ViewModels
 		private IUnityContainer _container;
 		private BindableBase _currentContentViewModel;
 		private UserViewModel _userViewModel;
-		private AdminViewModel _adminViewModel;
-		public delegate void LogoutEventHandler(object sender, EventArgs args);
-		public event LogoutEventHandler LoggedOut;
 		#endregion
 
 		#region Properties
@@ -25,8 +22,6 @@ namespace Client.ViewModels
 			get { return _currentContentViewModel; }
 			set { SetField(ref _currentContentViewModel, value); }
 		}
-
-		public UIICommand LogoutCommand { get; private set; }
 		#endregion
 
 		#region Constructors
@@ -35,9 +30,7 @@ namespace Client.ViewModels
 			_container = container;
 
 			_userViewModel = _container.Resolve<UserViewModel>();
-			_adminViewModel = _container.Resolve<AdminViewModel>();
-
-			LogoutCommand = new UIICommand(OnLoggingOut);
+			CurrentContentViewModel = _userViewModel;
 		}
 		#endregion
 
@@ -45,16 +38,6 @@ namespace Client.ViewModels
 		public void DisplayCustomerView()
 		{
 			CurrentContentViewModel = _userViewModel;
-		}
-
-		public void DisplayAdminView()
-		{			
-			CurrentContentViewModel = _adminViewModel;
-		}
-
-		private void OnLoggingOut()
-		{
-			LoggedOut?.Invoke(this, EventArgs.Empty);
 		}
 		#endregion
 	}

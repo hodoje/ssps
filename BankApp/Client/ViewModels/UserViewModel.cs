@@ -63,6 +63,8 @@ namespace Client.ViewModels
 		public ObservableCollection<Notification> Notifications { get; set; }
 		public UIICommand ApplyForCreditCommand { get; set; }
 		public UIICommand ExecuteTransactionCommand { get; set; }
+		public UIICommand CreateNewDatabaseCommand { get; set; }
+		public UIICommand RemoveExpiredRequestsCommand { get; set; }
 		#endregion
 
 		#region Constructors
@@ -73,6 +75,8 @@ namespace Client.ViewModels
 
 			ApplyForCreditCommand = new UIICommand(OnApplyForCredit, CanApplyForCredit);
 			ExecuteTransactionCommand = new UIICommand(OnExecuteTransaction, CanExecuteTransaction);
+			CreateNewDatabaseCommand = new UIICommand(OnCreateNewDatabase);
+			RemoveExpiredRequestsCommand = new UIICommand(OnRemoveExpiredRequests);
 		}
 		#endregion
 
@@ -116,6 +120,16 @@ namespace Client.ViewModels
 		private void ProcessNotifications()
 		{
 			// TODO: Add notifications to the Notifications collection
+		}
+
+		private void OnRemoveExpiredRequests()
+		{
+			
+		}
+
+		private void OnCreateNewDatabase()
+		{
+			
 		}
 		#endregion
 	}
