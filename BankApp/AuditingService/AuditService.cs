@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace AuditingService
 {
-	[ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single)]
+	[ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single, InstanceContextMode = InstanceContextMode.PerSession)]
 	public class AuditService : IAuditService
 	{
 		private readonly string _logName = AuditServiceConfig.LogName;
@@ -28,8 +28,27 @@ namespace AuditingService
 
 			using (var log = new EventLog(_logName))
 			{
+				string message = String.Empty;
+				if (!String.IsNullOrEmpty(eventLogData.AccountName))
+				{
+					message += $"{eventLogData.AccountName} : ";
+				}
+
+				if (String.IsNullOrEmpty(eventLogData.LogMessage))
+				{
+					return;
+				}
+
+				message += eventLogData.LogMessage;
+
+				if (String.IsNullOrEmpty(message))
+				{
+					return;
+				}
+
 				log.MachineName = Environment.MachineName;
 				log.Source = eventLogData.BankName;
+
 				log.WriteEntry($"{eventLogData.AccountName}: {eventLogData.LogMessage}", eventLogData.EventLogType);
 			}
 		}
