@@ -13,15 +13,18 @@ namespace Client
 	public static class ClientConfig
 	{
 		public const string BankServiceAddressConfigName = "BankServiceAddress";
-		public const string BankServiceEndpointNameConfigName = "BankServiceEndpointName";
+		public const string UserServiceEndpointNameConfigName = "UserServiceEndpointName";
+		public const string AdminServiceEndpointNameConfigName = "AdminServiceEndpointName";
 
 		static ClientConfig()
 		{
 			BankServiceAddress = ConfigurationManager.AppSettings[BankServiceAddressConfigName];
-			BankServiceEndpointName = ConfigurationManager.AppSettings[BankServiceEndpointNameConfigName];
+			UserServiceEndpoint = ConfigurationManager.AppSettings[UserServiceEndpointNameConfigName];
+			AdminServiceEndpoint = ConfigurationManager.AppSettings[AdminServiceEndpointNameConfigName];
 		}
 
 		public static string BankServiceAddress { get; }
-		public static string BankServiceEndpointName { get; }
+		public static string UserServiceEndpoint { get; }
+		public static string AdminServiceEndpoint { get; }
 	}
 }
