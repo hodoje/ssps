@@ -1,4 +1,5 @@
-﻿using Common.ServiceInterfaces;
+﻿using Common.Model;
+using Common.ServiceInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +17,13 @@ namespace SectorService.ServiceHosts
 		private readonly ServiceHost _sectorServiceServiceHost;
 		private readonly NetTcpBinding _binding;
 
-		public SectorServiceServiceHost(string endpointAddress, string endpointName)
+		public SectorServiceServiceHost(SectorAdditionalConfig sectorConfig)
 		{
-			_sectorServiceAddress = endpointAddress;
-			_sectorServiceEndpointName = endpointName;
+			_sectorServiceAddress = sectorConfig.Address;
+			_sectorServiceEndpointName = sectorConfig.EndpointName;
 			_binding = SetUpBinding();
-			_sectorServiceServiceHost = new ServiceHost(typeof(SectorService.Services.SectorService));
+			Services.SectorService sectorService = new Services.SectorService(SectorConfig.SectorQueueSize, SectorConfig.SectorQueueTimeoutInSeconds);
+			_sectorServiceServiceHost = new ServiceHost(sectorService);
 			_sectorServiceServiceHost.AddServiceEndpoint(typeof(ISectorService), _binding,
 				$"{_sectorServiceAddress}/{_sectorServiceEndpointName}");
 		}

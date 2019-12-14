@@ -26,6 +26,8 @@ namespace BankService
 	{
 		public const string BankServiceAddressConfigName = "BankServiceAddress";
 		public const string BankServiceEndpointNameConfigName = "BankServiceEndpointName";
+		public const string SectorQueueSizeConfigName = "SectorQueueSize";
+		public const string SectorQueueTimeoutInSecondsConfigName = "SectorQueueTimeoutInSeconds";
 		public const string SectorResponseServiceAddressConfigName = "SectorResponseServiceAddress";
 		public const string SectorResponseServiceEndpointConfigName = "SectorResponseServiceEndpoint";
 		public const string AuditServiceAddressConfigName = "AuditServiceAddress";
@@ -39,6 +41,15 @@ namespace BankService
 		{
 			BankServiceAddress = ConfigurationManager.AppSettings[BankServiceAddressConfigName];
 			BankServiceEndpointName = ConfigurationManager.AppSettings[BankServiceEndpointNameConfigName];
+			try
+			{
+				SectorQueueSize = Int32.Parse(ConfigurationManager.AppSettings[SectorQueueSizeConfigName]);
+				SectorQueueTimeoutInSeconds = Int32.Parse(ConfigurationManager.AppSettings[SectorQueueTimeoutInSecondsConfigName]);
+			}
+			catch(Exception e)
+			{
+				throw new Exception("Invalid configuration. Expected a number.", e);
+			}
 			SectorResponseServiceAddress = ConfigurationManager.AppSettings[SectorResponseServiceAddressConfigName];
 			SectorResponseServiceEndpoint = ConfigurationManager.AppSettings[SectorResponseServiceEndpointConfigName];
 			AuditServiceAddress = ConfigurationManager.AppSettings[AuditServiceAddressConfigName];
@@ -83,6 +94,8 @@ namespace BankService
 		public static Dictionary<Type, ConnectionInfo> Connections { get; set; }
 		public static string[] AllSectorNames { get; }
 		public static Dictionary<string, SectorAdditionalConfig> SectorConfigs { get; }
+		public static int SectorQueueSize { get; }
+		public static int SectorQueueTimeoutInSeconds { get; }
 		public static string SectorExeFilename { get; }
 		public static string StartupConfirmationServiceAddress { get; }
 		public static string StartupConfirmationServiceEndpointName { get; }

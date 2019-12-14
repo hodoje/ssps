@@ -28,9 +28,7 @@ namespace BankService.CommandingHost
 		public CommandingHost(IAudit auditService, CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo, IDatabaseManager<BaseCommand> databaseManager, string hostName)
 		{
 			// todo create Client for Sector with connecitonInfo
-
-			// (HODOJE) URADI OVO, dodaj queueSize(iz konfiguracije) u handler, to mu je property sectorSize
-			commandHandler = new CommandHandler.CommandHandler(auditService, this, databaseManager);
+			commandHandler = new CommandHandler.CommandHandler(auditService, this, databaseManager, BankServiceConfig.SectorQueueSize);
 
 			this.auditService = auditService;
 			this.responseQueue = responseQueue;

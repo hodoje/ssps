@@ -63,7 +63,7 @@
     <Compile Include="DataContracts\Dtos\EventLogData.cs" />
     <Compile Include="DataContracts\Enums\UserTypeEnum.cs" />
     <Compile Include="DataContracts\Exceptions\InvalidEventLogTypeException.cs" />
-    <Compile Include="Model\AddressEndpointPair.cs" />
+    <Compile Include="Model\SectorAdditionalConfig.cs" />
     <Compile Include="Model\IdentifiedObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceInterfaces\IAccessService.cs" />

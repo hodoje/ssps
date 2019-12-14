@@ -26,11 +26,10 @@ namespace SectorService
 		/// <summary>
 		/// Initializes an instance of <see cref="SectorManager" class./>
 		/// </summary>
-		public SectorManager()
+		public SectorManager(int sectorQueueSize, int sectorQueueTimeoutPeriodInSeconds)
 		{
-			// (HODOJE) ispravi i ovde kao sto je na servisu trazeno da se iscita iz konfiguracije
-			_requestQueue = new CommandQueue(1, 3600);
-			_responseQueue = new CommandQueue(1, 3600);
+			_requestQueue = new CommandQueue(sectorQueueSize, sectorQueueTimeoutPeriodInSeconds);
+			_responseQueue = new CommandQueue(sectorQueueSize, sectorQueueTimeoutPeriodInSeconds);
 			_responseProxy = new WindowsClientProxy<ISectorResponseService>(SectorConfig.SectorResponseServiceAddress, SectorConfig.SectorResponseServiceEndpoint);
 			_processorTask = new Task(ProcessCommands);
 			_responderTask = new Task(SendResponses);
@@ -85,8 +84,7 @@ namespace SectorService
 				{
 					while (true)
 					{
-						Console.WriteLine($"Command {command.ID} recieved: Type 'y' for accept and 'n' for reject:");
-						string shouldAccept = Console.ReadLine();
+						string shouldAccept = GetSectorWorkerInput(command);
 
 						if (shouldAccept == "y")
 						{
@@ -132,6 +130,17 @@ namespace SectorService
 						break;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Gets the Sector worker input about if the command should be accepted or rejected.
+		/// </summary>
+		/// <param name="command">Received command.</param>
+		/// <returns>Returns the user input either 'y' for accpet or 'n' for reject.</returns>
+		private string GetSectorWorkerInput(BaseCommand command)
+		{
+			Console.WriteLine($"{command} recieved: Type 'y' for accept and 'n' for reject:");
+			return Console.ReadLine();
 		}
 		#endregion
 	}
