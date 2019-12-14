@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Common.CertificateManagement;
+using System;
 using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.ServiceModel;
 
 namespace Common.Communication
@@ -8,10 +11,9 @@ namespace Common.Communication
 	/// Represents client proxy for given interface with certificate management.
 	/// </summary>
 	/// <typeparam name="T">Interface which will be used for proxy.</typeparam>
-	public class CertificateClientProxy<T> : IDisposable where T : class
+	public class CertificateClientProxy<T> : ChannelFactory<T>, IDisposable where T : class
 	{
 		private T _proxy;
-		private ChannelFactory<T> _channelFactory;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="CertificateClientProxy<T> class."/>
@@ -19,11 +21,22 @@ namespace Common.Communication
 		/// <param name="serviceAddress">Service address.</param>
 		/// <param name="serviceEndpointName">Service endpoint name.</param>
 		public CertificateClientProxy(string serviceAddress, string serviceEndpointName)
+			: base(SetUpBinding(), SetUpEndpoint(serviceAddress, serviceEndpointName))
 		{
-			var binding = SetUpBinding();
-			var endpointAddress = SetUpEndpoint(serviceAddress, serviceEndpointName);
-			_channelFactory = new ChannelFactory<T>(binding, endpointAddress);
-			_proxy = _channelFactory.CreateChannel();
+			string cltCertCN = ParseName(WindowsIdentity.GetCurrent().Name);
+
+			Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
+			Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+
+			X509Certificate2 certificate;
+			if (CertificateStorageReader.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN, out certificate))
+			{
+				this.Credentials.ClientCertificate.Certificate = certificate;
+			}
+			else
+			{
+				throw new ArgumentException("Service will not be initializes since it has no valid certificate!");
+			}
 		}
 
 		/// <summary>
@@ -35,7 +48,7 @@ namespace Common.Communication
 			{
 				if (_proxy == null)
 				{
-					_proxy = _channelFactory.CreateChannel();
+					_proxy = this.CreateChannel();
 				}
 				return _proxy;
 			}
@@ -45,15 +58,36 @@ namespace Common.Communication
 		public void Dispose()
 		{
 			_proxy = null;
-			_channelFactory = null;
 		}
 
-		private EndpointAddress SetUpEndpoint(string serviceAddress, string serviceEndpointName)
+		private static EndpointAddress SetUpEndpoint(string serviceAddress, string serviceEndpointName)
 		{
 			return new EndpointAddress($"{serviceAddress}/{serviceEndpointName}");
 		}
 
-		private NetTcpBinding SetUpBinding()
+		private static string ParseName(string winLogonName)
+		{
+			string[] parts = new string[] { };
+
+			if (winLogonName.Contains("@"))
+			{
+				///UPN format
+				parts = winLogonName.Split('@');
+				return parts[0];
+			}
+			else if (winLogonName.Contains("\\"))
+			{
+				/// SPN format
+				parts = winLogonName.Split('\\');
+				return parts[1];
+			}
+			else
+			{
+				return winLogonName;
+			}
+		}
+
+		private static NetTcpBinding SetUpBinding()
 		{
 			var binding = new NetTcpBinding(SecurityMode.Transport);
 			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;

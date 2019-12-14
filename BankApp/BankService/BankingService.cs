@@ -10,6 +10,7 @@ using BankService.DatabaseManagement.Repositories;
 using BankService.DatabaseManagement;
 using System.Data.Entity;
 using System.Threading;
+using Common.CertificateManagement;
 
 namespace BankService
 {
