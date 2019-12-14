@@ -82,7 +82,7 @@ namespace Common.Commanding
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return $"{this.GetType().Name} : {ID}";
+			return $"{this.GetType().Name} : (id = {ID}) ";
 		}
 	}
 }

@@ -28,6 +28,7 @@ namespace SectorService
 		/// </summary>
 		public SectorManager()
 		{
+			// (HODOJE) ispravi i ovde kao sto je na servisu trazeno da se iscita iz konfiguracije
 			_requestQueue = new CommandQueue(1, 3600);
 			_responseQueue = new CommandQueue(1, 3600);
 			_responseProxy = new WindowsClientProxy<ISectorResponseService>(SectorConfig.SectorResponseServiceAddress, SectorConfig.SectorResponseServiceEndpoint);

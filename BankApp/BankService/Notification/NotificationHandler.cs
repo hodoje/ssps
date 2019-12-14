@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using BankService.Notification;
+using Common.Communication;
+using Common.DataContracts.Dtos;
 
 namespace BankService
 {
@@ -14,9 +16,11 @@ namespace BankService
 		private CancellationTokenSource cancellationToken;
 		private INotificationContainer notificationContainer;
 		private ConcurrentQueue<CommandNotification> notificationQueue;
+		private IAudit auditService;
 
-		public NotificationHandler(ConcurrentQueue<CommandNotification> notificationQueue, INotificationContainer notificationContainer)
+		public NotificationHandler(IAudit auditService, ConcurrentQueue<CommandNotification> notificationQueue, INotificationContainer notificationContainer)
 		{
+			this.auditService = auditService;
 			this.notificationQueue = notificationQueue;
 			this.notificationContainer = notificationContainer;
 

@@ -5,25 +5,34 @@ using Common.Commanding;
 using BankService.CommandHandler;
 using System.Collections.Concurrent;
 using BankService.DatabaseManagement;
+using Common.Communication;
+using Common.ServiceInterfaces;
 
 namespace BankService.CommandingHost
 {
 	public class CommandingHost : ICommandingHost, INotificationHost, IDisposable
 	{
 		private string hostName;
+
 		private CancellationTokenSource cancellationToken = new CancellationTokenSource();
-		private ICommandHandler commandHandler;
-		private IDatabaseManager<BaseCommand> databaseManager;
-		private CommandQueue commandingQueue;
-		private ConcurrentQueue<CommandNotification> responseQueue;
 		private AutoResetEvent sendingSynchronization = new AutoResetEvent(false);
 
-		public CommandingHost(CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo, IDatabaseManager<BaseCommand> databaseManager, string hostName)
+		private CommandQueue commandingQueue;
+		private ConcurrentQueue<CommandNotification> responseQueue;
+
+		private ICommandHandler commandHandler;
+		private IDatabaseManager<BaseCommand> databaseManager;
+
+		private IAudit auditService;
+
+		public CommandingHost(IAudit auditService, CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo, IDatabaseManager<BaseCommand> databaseManager, string hostName)
 		{
 			// todo create Client for Sector with connecitonInfo
 
-			commandHandler = new CommandHandler.CommandHandler(this, databaseManager);
+			// (HODOJE) URADI OVO, dodaj queueSize(iz konfiguracije) u handler, to mu je property sectorSize
+			commandHandler = new CommandHandler.CommandHandler(auditService, this, databaseManager);
 
+			this.auditService = auditService;
 			this.responseQueue = responseQueue;
 			this.commandingQueue = commandingQueue;
 			this.hostName = hostName;
@@ -37,6 +46,8 @@ namespace BankService.CommandingHost
 			BaseCommand command = databaseManager.Get(commandNotification.ID);
 			command.State = CommandState.Executed;
 			databaseManager.Update(command);
+
+			auditService.Log(command.ToString(), "Changed state to executed!");
 
 			// Awake WorkerThread because there is enough command space in Commanding Handler.
 			sendingSynchronization.Set();
@@ -71,11 +82,13 @@ namespace BankService.CommandingHost
 			{
 				BaseCommand commandToSend = commandingQueue.Dequeue();
 
-				// Queue might be disposing procedure.
+				// Queue might be in disposing procedure.
 				if (commandToSend == null)
 				{
 					continue;
 				}
+
+				auditService.Log("CommandingHost", $"Dequeued {commandToSend.GetType().Name}(id = {commandToSend.ID}) command.");
 
 				if (!commandHandler.HasAvailableSpace())
 				{
@@ -83,10 +96,15 @@ namespace BankService.CommandingHost
 					sendingSynchronization.WaitOne();
 				}
 
-				// When awoken, check if cancellation token was canceled (object disposing).
-				if (!cancellationToken.IsCancellationRequested)
+				if (cancellationToken.IsCancellationRequested)
 				{
-					commandHandler.SendCommandToSector(commandToSend);
+					// When awoken, check if cancellation token was canceled (object disposing).
+					return;
+				}
+
+				if (!commandHandler.SendCommandToSector(commandToSend))
+				{
+					commandingQueue.Enqueue(commandToSend);
 				}
 			}
 		}

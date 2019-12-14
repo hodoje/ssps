@@ -11,6 +11,7 @@ using BankService.DatabaseManagement;
 using System.Data.Entity;
 using System.Threading;
 using Common.CertificateManagement;
+using Common.Communication;
 
 namespace BankService
 {
@@ -22,8 +23,10 @@ namespace BankService
 	{
 		private readonly string connectionString;
 		private object locker = new object();
+
 		private ICommandingManager commandManager;
 		private INotificationHandler notificationHandler;
+		private IAudit auditService; 
 
 		private ConcurrentQueue<CommandNotification> responseQueue;
 		public BankingService()
@@ -32,11 +35,15 @@ namespace BankService
 
 			InitializesObjects();
 
-			responseQueue = new ConcurrentQueue<CommandNotification>();
-			notificationHandler = new NotificationHandler(responseQueue, new NotificationContainer(ServiceLocator.GetService<IRepository<CommandNotification>>()));
+			auditService = new AuditClientProxy(BankServiceConfig.AuditServiceAddress, BankServiceConfig.AuditServiceEndpointName);
 
-			commandManager = new CommandingManager.CommandingManager(responseQueue);
-			commandManager.CreateDatabase();
+			responseQueue = new ConcurrentQueue<CommandNotification>();
+			notificationHandler = new NotificationHandler(auditService, responseQueue, new NotificationContainer(ServiceLocator.GetService<IRepository<CommandNotification>>()));
+
+			commandManager = new CommandingManager.CommandingManager(auditService, responseQueue);
+
+			//FOR TESTING
+			//commandManager.CreateDatabase();
 		}
 
 		public void CreateNewDatabase()

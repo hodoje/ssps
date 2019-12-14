@@ -17,7 +17,8 @@ namespace BankService.CommandHandler
 		/// Sends command to command handler.
 		/// </summary>
 		/// <param name="command">Command to be sent.</param>
-		void SendCommandToSector(BaseCommand command);
+		/// <returns><b>True</b> if command is successfully sent, otherwise <b>false</b>.</returns>
+		bool SendCommandToSector(BaseCommand command);
 
 		/// <summary>
 		/// Indicate command handler unit that command has been received.
