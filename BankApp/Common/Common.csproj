@@ -56,7 +56,9 @@
     <Compile Include="Commanding\Commands\RegistrationCommand.cs" />
     <Compile Include="Commanding\Commands\RequestLoanCommand.cs" />
     <Compile Include="Commanding\Commands\WithdrawCommand.cs" />
+    <Compile Include="Communication\Audit\IAudit.cs" />
     <Compile Include="Communication\CertificateClientProxy.cs" />
+    <Compile Include="Communication\Audit\AuditClientProxy.cs" />
     <Compile Include="Communication\WindowsClientProxy.cs" />
     <Compile Include="DataContracts\Dtos\EventLogData.cs" />
     <Compile Include="DataContracts\Enums\UserTypeEnum.cs" />
