@@ -38,15 +38,15 @@ namespace SectorService
 			SectorsConfigs = GetSectorsConfig(sectorsConfigJson);
 		}
 
-		private static Dictionary<string, AddressEndpointPair> GetSectorsConfig(string sectorsConfigJson)
+		private static Dictionary<string, SectorAdditionalConfig> GetSectorsConfig(string sectorsConfigJson)
 		{
-			Dictionary<string, AddressEndpointPair> result = new Dictionary<string, AddressEndpointPair>();
+			Dictionary<string, SectorAdditionalConfig> result = new Dictionary<string, SectorAdditionalConfig>();
 			JObject sectorsConfigJObject = JsonConvert.DeserializeObject<JObject>(sectorsConfigJson);
 			var sectors = sectorsConfigJObject["sectors"];
 			
 			foreach (var child in sectors.Children())
 			{
-				result.Add((child as JProperty).Name, child.First.ToObject<AddressEndpointPair>());
+				result.Add((child as JProperty).Name, child.First.ToObject<SectorAdditionalConfig>());
 			}
 
 			return result;
@@ -59,6 +59,6 @@ namespace SectorService
 		public static string StartupConfirmationServiceAddress { get; }
 		public static string StartupConfirmationServiceEndpointName { get; }
 		public static string[] AllSectorNames { get; }
-		public static Dictionary<string, AddressEndpointPair> SectorsConfigs { get; }
+		public static Dictionary<string, SectorAdditionalConfig> SectorsConfigs { get; }
 	}
 }

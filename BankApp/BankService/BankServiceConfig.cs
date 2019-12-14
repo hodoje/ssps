@@ -60,15 +60,15 @@ namespace BankService
 			};
 		}
 
-		private static Dictionary<string, AddressEndpointPair> GetSectorsConfig(string sectorsConfigJson)
+		private static Dictionary<string, SectorAdditionalConfig> GetSectorsConfig(string sectorsConfigJson)
 		{
-			Dictionary<string, AddressEndpointPair> result = new Dictionary<string, AddressEndpointPair>();
+			Dictionary<string, SectorAdditionalConfig> result = new Dictionary<string, SectorAdditionalConfig>();
 			JObject sectorsConfigJObject = JsonConvert.DeserializeObject<JObject>(sectorsConfigJson);
 			var sectors = sectorsConfigJObject["sectors"];
 
 			foreach (var child in sectors.Children())
 			{
-				SectorConfigs.Add((child as JProperty).Name, child.First.ToObject<AddressEndpointPair>());
+				SectorConfigs.Add((child as JProperty).Name, child.First.ToObject<SectorAdditionalConfig>());
 			}
 
 			return result;
@@ -82,7 +82,7 @@ namespace BankService
 		public static string AuditServiceEndpointName { get; }
 		public static Dictionary<Type, ConnectionInfo> Connections { get; set; }
 		public static string[] AllSectorNames { get; }
-		public static Dictionary<string, AddressEndpointPair> SectorConfigs { get; }
+		public static Dictionary<string, SectorAdditionalConfig> SectorConfigs { get; }
 		public static string SectorExeFilename { get; }
 		public static string StartupConfirmationServiceAddress { get; }
 		public static string StartupConfirmationServiceEndpointName { get; }
