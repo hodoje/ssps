@@ -11,19 +11,21 @@ namespace Common.Communication
 	/// Represents client proxy for given interface with certificate management.
 	/// </summary>
 	/// <typeparam name="T">Interface which will be used for proxy.</typeparam>
-	public class CertificateClientProxy<T> : ChannelFactory<T>, IDisposable where T : class
+	public class CertificateClientProxy<T> : DuplexChannelFactory<T>, IDisposable where T : class
 	{
 		private T _proxy;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="CertificateClientProxy<T> class."/>
 		/// </summary>
+		/// <param name="callback">Service callback.</param>
 		/// <param name="serviceAddress">Service address.</param>
 		/// <param name="serviceEndpointName">Service endpoint name.</param>
-		public CertificateClientProxy(string serviceAddress, string serviceEndpointName)
-			: base(SetUpBinding(), SetUpEndpoint(serviceAddress, serviceEndpointName))
+		public CertificateClientProxy(object callback, string serviceAddress, string serviceEndpointName)
+			: base(callback, SetUpBinding(), SetUpEndpoint(serviceAddress, serviceEndpointName))
 		{
-			string cltCertCN = ParseName(WindowsIdentity.GetCurrent().Name);
+			//string cltCertCN = ParseName(WindowsIdentity.GetCurrent().Name);
+			string cltCertCN = "bankservice";
 
 			Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
 			Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
