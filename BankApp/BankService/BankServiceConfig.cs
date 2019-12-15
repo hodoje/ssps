@@ -25,9 +25,9 @@ namespace BankService
 	public static class BankServiceConfig
 	{
 		public const string BankServiceAddressConfigName = "BankServiceAddress";
-		public const string BankServiceEndpointNameConfigName = "BankServiceEndpointName";
 		public const string SectorQueueSizeConfigName = "SectorQueueSize";
 		public const string SectorQueueTimeoutInSecondsConfigName = "SectorQueueTimeoutInSeconds";
+		public const string UserServiceEndpointNameConfigName = "UserServiceEndpointName";
 		public const string SectorResponseServiceAddressConfigName = "SectorResponseServiceAddress";
 		public const string SectorResponseServiceEndpointConfigName = "SectorResponseServiceEndpoint";
 		public const string AuditServiceAddressConfigName = "AuditServiceAddress";
@@ -40,7 +40,6 @@ namespace BankService
 		static BankServiceConfig()
 		{
 			BankServiceAddress = ConfigurationManager.AppSettings[BankServiceAddressConfigName];
-			BankServiceEndpointName = ConfigurationManager.AppSettings[BankServiceEndpointNameConfigName];
 			try
 			{
 				SectorQueueSize = Int32.Parse(ConfigurationManager.AppSettings[SectorQueueSizeConfigName]);
@@ -62,13 +61,8 @@ namespace BankService
 			StartupConfirmationServiceAddress = ConfigurationManager.AppSettings[StartupConfirmationServiceAddressConfigName];
 			StartupConfirmationServiceEndpointName = ConfigurationManager.AppSettings[StartupConfirmationServiceEndpointNameConfigName];
 
-			Connections = new Dictionary<Type, ConnectionInfo>()
-			{
-				{ typeof(DepositCommand), new ConnectionInfo() },
-				{ typeof(WithdrawCommand), new ConnectionInfo() },
-				{ typeof(RequestLoanCommand), new ConnectionInfo() },
-				{ typeof(RegistrationCommand), new ConnectionInfo() },
-			};
+			// ili SectorAddiotnalConfig ne znam gde si planirao da drzis informaciju o endpoint-u servisa sa strane hosta i servisa sa strane sektora
+			Connections = AllSectorNames.ToDictionary(x => x, x => new ConnectionInfo());
 		}
 
 		private static Dictionary<string, SectorAdditionalConfig> GetSectorsConfig(string sectorsConfigJson)
@@ -86,12 +80,12 @@ namespace BankService
 		}
 
 		public static string BankServiceAddress { get; }
-		public static string BankServiceEndpointName { get; }
+		public static string UserServiceEndpointName { get; }
 		public static string SectorResponseServiceAddress { get; }
 		public static string SectorResponseServiceEndpoint { get; }
 		public static string AuditServiceAddress { get; }
 		public static string AuditServiceEndpointName { get; }
-		public static Dictionary<Type, ConnectionInfo> Connections { get; set; }
+		public static Dictionary<string, ConnectionInfo> Connections { get; set; }
 		public static string[] AllSectorNames { get; }
 		public static Dictionary<string, SectorAdditionalConfig> SectorConfigs { get; }
 		public static int SectorQueueSize { get; }

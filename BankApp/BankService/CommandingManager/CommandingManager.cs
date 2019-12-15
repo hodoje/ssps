@@ -9,11 +9,24 @@ using BankService.DatabaseManagement.Repositories;
 using Common;
 using Common.Communication;
 using Common.ServiceInterfaces;
+using System.Linq;
 
 namespace BankService.CommandingManager
 {
 	public class CommandingManager : ICommandingManager, IDisposable
 	{
+		private class CommandsPerQueue
+		{
+			public CommandsPerQueue(string sectorName, List<Type> commands)
+			{
+				SectorName = sectorName;
+				Commands = commands;
+			}
+
+			public string SectorName { get; private set; }
+			public List<Type> Commands { get; private set; }
+		}
+
 		private static readonly int queueSize;
 		private static readonly int timeoutPeriod;
 		private readonly DbContext dbContext;
@@ -40,12 +53,12 @@ namespace BankService.CommandingManager
 			this.auditService = auditService;
 			this.responseQueue = responseQueue;
 
-			List<Type> supportedCommands = new List<Type>(4)
+			List<CommandsPerQueue> supportedCommands = new List<CommandsPerQueue>(3)
 			{
-				typeof(DepositCommand),
-				typeof(WithdrawCommand),
-				typeof(RequestLoanCommand),
-				typeof(RegistrationCommand)
+				// AllSectorNames mapped from config file (json)
+				new CommandsPerQueue(BankServiceConfig.AllSectorNames[2], new List<Type>(2){ typeof(DepositCommand), typeof(WithdrawCommand) }),
+				new CommandsPerQueue(BankServiceConfig.AllSectorNames[1], new List<Type>() { typeof(RequestLoanCommand) }),
+				new CommandsPerQueue(BankServiceConfig.AllSectorNames[0], new List<Type>() { typeof(RegistrationCommand) })
 			};
 
 			InitialDatabaseLoading();
@@ -133,18 +146,23 @@ namespace BankService.CommandingManager
 
 		}
 
-		private void CreateCommandingHosts(Dictionary<Type, CommandQueue> commandToQueueMapper, List<Type> commandTypes)
+		private void CreateCommandingHosts(Dictionary<Type, CommandQueue> commandToQueueMapper, List<CommandsPerQueue> supportedCommands)
 		{
-			foreach (Type commandType in commandTypes)
+			foreach (CommandsPerQueue commandsPerQueue in supportedCommands)
 			{
+				string commandingHostString = String.Join(", ", commandsPerQueue.Commands.Select(x => x.Name));
 				CommandQueue newQueue = new CommandQueue(queueSize, timeoutPeriod);
-				CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(auditService, newQueue, responseQueue, BankServiceConfig.Connections[commandType], databaseManager, commandType.Name);
+				CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(auditService, newQueue, responseQueue, BankServiceConfig.Connections[commandsPerQueue.SectorName], databaseManager, commandingHostString);
 				commandingHosts.Add(newHost);
 
-				commandToQueueMapper.Add(commandType, newQueue);
+				foreach (Type commandType in commandsPerQueue.Commands)
+				{
+					commandToQueueMapper.Add(commandType, newQueue);
+				}
+
 				newHost.Start();
 
-				auditService.Log($"CommandingHost[{commandType.Name}]", "Initialized.");
+				auditService.Log($"CommandingHost[{commandingHostString}]", "Initialized.");
 			}
 		}
 
