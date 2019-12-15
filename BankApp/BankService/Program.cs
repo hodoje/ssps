@@ -2,6 +2,7 @@
 using Common.ServiceInterfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
@@ -36,7 +37,27 @@ namespace BankService
 
 			host.Open();
 
+			try
+			{
+				StartAllSectors();
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+
 			Console.ReadLine();
+		}
+
+		private static void StartAllSectors()
+		{
+			foreach (var sectorName in BankServiceConfig.AllSectorNames)
+			{
+				Process sectorProcess = new Process();
+				sectorProcess.StartInfo.FileName = BankServiceConfig.SectorExeFilename;
+				sectorProcess.StartInfo.Arguments = $"\"{sectorName}\"";
+				sectorProcess.Start();
+			}
 		}
 
 		private static string ParseName(string winLogonName)
