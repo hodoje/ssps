@@ -139,7 +139,7 @@ namespace SectorService
 		/// <returns>Returns the user input either 'y' for accpet or 'n' for reject.</returns>
 		private string GetSectorWorkerInput(BaseCommand command)
 		{
-			Console.WriteLine($"{command} recieved: Type 'y' for accept and 'n' for reject:");
+			Console.WriteLine($"{command.StringifyCommand()}{Environment.NewLine}Type 'y' for accept and 'n' for reject: ");
 			return Console.ReadLine();
 		}
 		#endregion

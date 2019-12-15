@@ -48,5 +48,10 @@ namespace Common.Commanding
 		{
 			return base.GetHashCode();
 		}
+
+		public override string StringifyCommand()
+		{
+			return $"{Username} requested withdraw with {Amount}$";
+		}
 	}
 }
