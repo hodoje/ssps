@@ -92,7 +92,7 @@ namespace Client.ViewModels
 
 			//string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
 			// TEST
-			string username = "user1";
+			string username = "pera";
 			X509Certificate2 certificate = GetCertificateFromStorage(username);
 
 			_userServiceProxy = new CertificateClientProxy<IUserService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.UserServiceEndpoint, certificate);
@@ -106,7 +106,6 @@ namespace Client.ViewModels
 		{
 			try
 			{
-				// TODO: Call user service
 				switch (SelectedTransactionType)
 				{
 					case TransactionType.Payment:
@@ -154,9 +153,24 @@ namespace Client.ViewModels
 		}
 		#endregion
 
-		private void StartListeningForNotifications()
+		private void AskServiceForNotifications()
 		{
-			// TODO: Open service and start listening
+			try
+			{
+				List<CommandNotification> notifications = _userServiceProxy.Proxy.GetPendingNotifications();
+				foreach (CommandNotification notification in notifications)
+				{
+					Notifications.Add(new Notification(notification.Information, notification.CommandStatus));
+				}
+			}
+			catch (SecurityAccessDeniedException securityAccess)
+			{
+				Notifications.Add(new Notification("Service has denied access since you have no permission for action.", CommandNotificationStatus.Rejected));
+			}
+			catch (Exception e)
+			{
+				Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+			}
 		}
 
 		private void HandleNotifications(CommandNotification commandNotification)
