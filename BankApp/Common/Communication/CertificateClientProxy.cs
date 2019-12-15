@@ -1,9 +1,11 @@
 ﻿using Common.CertificateManagement;
 using System;
+using System.Collections.Generic;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.Threading;
 
 namespace Common.Communication
 {
@@ -21,23 +23,13 @@ namespace Common.Communication
 		/// <param name="callback">Service callback.</param>
 		/// <param name="serviceAddress">Service address.</param>
 		/// <param name="serviceEndpointName">Service endpoint name.</param>
-		public CertificateClientProxy(object callback, string serviceAddress, string serviceEndpointName)
+		public CertificateClientProxy(object callback, string serviceAddress, string serviceEndpointName, X509Certificate2 certificate)
 			: base(callback, SetUpBinding(), SetUpEndpoint(serviceAddress, serviceEndpointName))
 		{
-			string cltCertCN = ParseName(WindowsIdentity.GetCurrent().Name);
-
 			Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
 			Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
-
-			X509Certificate2 certificate;
-			if (CertificateStorageReader.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN, out certificate))
-			{
-				this.Credentials.ClientCertificate.Certificate = certificate;
-			}
-			else
-			{
-				throw new ArgumentException("Service will not be initializes since it has no valid certificate!");
-			}
+			Credentials.ClientCertificate.Certificate = certificate;
+			_proxy = this.CreateChannel();
 		}
 
 		/// <summary>
@@ -51,6 +43,7 @@ namespace Common.Communication
 				{
 					_proxy = this.CreateChannel();
 				}
+
 				return _proxy;
 			}
 		}
@@ -63,29 +56,8 @@ namespace Common.Communication
 
 		private static EndpointAddress SetUpEndpoint(string serviceAddress, string serviceEndpointName)
 		{
-			return new EndpointAddress($"{serviceAddress}/{serviceEndpointName}");
-		}
-
-		private static string ParseName(string winLogonName)
-		{
-			string[] parts = new string[] { };
-
-			if (winLogonName.Contains("@"))
-			{
-				///UPN format
-				parts = winLogonName.Split('@');
-				return parts[0];
-			}
-			else if (winLogonName.Contains("\\"))
-			{
-				/// SPN format
-				parts = winLogonName.Split('\\');
-				return parts[1];
-			}
-			else
-			{
-				return winLogonName;
-			}
+			return
+				new EndpointAddress(new Uri($"{serviceAddress}/{serviceEndpointName}"), new DnsEndpointIdentity("bankservice"));
 		}
 
 		private static NetTcpBinding SetUpBinding()
