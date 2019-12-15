@@ -15,6 +15,8 @@ namespace SectorService
 	/// </summary>
 	public static class SectorConfig
 	{
+		public const string SectorQueueSizeConfigName = "SectorQueueSize";
+		public const string SectorQueueTimeoutInSecondsConfigName = "SectorQueueTimeoutInSeconds";
 		public const string SectorResponseServiceAddressConfigName = "SectorResponseServiceAddress";
 		public const string SectorResponseServiceEndpointConfigName = "SectorResponseServiceEndpoint";
 		public const string AuditServiceAddressConfigName = "AuditServiceAddress";
@@ -26,6 +28,15 @@ namespace SectorService
 
 		static SectorConfig()
 		{
+			try
+			{
+				SectorQueueSize = Int32.Parse(ConfigurationManager.AppSettings[SectorQueueSizeConfigName]);
+				SectorQueueTimeoutInSeconds = Int32.Parse(ConfigurationManager.AppSettings[SectorQueueTimeoutInSecondsConfigName]);
+			}
+			catch (Exception e)
+			{
+				throw new Exception("Invalid configuration. Expected a number.", e);
+			}
 			SectorResponseServiceAddress = ConfigurationManager.AppSettings[SectorResponseServiceAddressConfigName];
 			SectorResponseServiceEndpoint = ConfigurationManager.AppSettings[SectorResponseServiceEndpointConfigName];
 			AuditServiceAddress = ConfigurationManager.AppSettings[AuditServiceAddressConfigName];
@@ -52,6 +63,8 @@ namespace SectorService
 			return result;
 		}
 
+		public static int SectorQueueSize { get; }
+		public static int SectorQueueTimeoutInSeconds { get; }
 		public static string SectorResponseServiceAddress { get; }
 		public static string SectorResponseServiceEndpoint { get; }
 		public static string AuditServiceAddress { get; }

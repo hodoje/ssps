@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Common.Model;
+using SectorService.ServiceHosts;
+using System;
+using System.ServiceModel;
 
 namespace SectorService
 {
@@ -10,6 +9,34 @@ namespace SectorService
 	{
 		static void Main(string[] args)
 		{
+			string sectorType = args[0];
+			Console.WriteLine(sectorType);
+
+			try
+			{
+				SectorAdditionalConfig sectorAdditionalConfig;
+				if (SectorConfig.SectorsConfigs.TryGetValue(sectorType, out sectorAdditionalConfig))
+				{
+					var sectorHost = new SectorServiceServiceHost(sectorAdditionalConfig);
+					sectorHost.OpenService();
+
+					//WindowsClientProxy<IStartupConfirmationService> startupProxy = new WindowsClientProxy<IStartupConfirmationService>(
+					//	SectorConfig.StartupConfirmationServiceAddress, SectorConfig.StartupConfirmationServiceEndpointName);
+					//startupProxy.Proxy.ConfirmStartup(sectorType);
+				}
+				else
+				{
+					throw new Exception($"{sectorType} ServiceHost does not exist.");
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine("Reporting exception to Bank service.");
+				Console.WriteLine("Shutting down...");
+				throw new FaultException(e.Message);
+			}
+
+			Console.Read();
 		}
 	}
 }

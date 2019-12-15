@@ -28,12 +28,12 @@ namespace BankService.CommandHandler
 		/// Initializes new instance of <see cref="CommandHandler"/> class. 
 		/// </summary>
 		/// <param name="notificationHost">Notification host to notify for received command notification.</param>
-		public CommandHandler(IAudit auditService, INotificationHost notificationHost, IDatabaseManager<BaseCommand> databaseManager)
+		public CommandHandler(IAudit auditService, INotificationHost notificationHost, IDatabaseManager<BaseCommand> databaseManager, int sectorQueueSize)
 		{
 			this.auditService = auditService;
 			this.notificationHost = notificationHost;
 			this.databaseManager = databaseManager;
-			this.sectorSize = 1;
+			this.sectorSize = sectorQueueSize;
 
 			// open ClientProxy for Sector
 			// open Service for command response

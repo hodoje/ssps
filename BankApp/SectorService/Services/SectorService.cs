@@ -12,7 +12,12 @@ namespace SectorService.Services
 	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
 	public class SectorService : ISectorService
 	{
-		private SectorManager _sectorManager = new SectorManager();
+		private SectorManager _sectorManager;
+
+		public SectorService(int sectorQueueSize, int sectorQueueTimeoutPeriodInSeconds)
+		{
+			_sectorManager = new SectorManager(sectorQueueSize, sectorQueueTimeoutPeriodInSeconds);
+		}
 
 		public void SendRequest(BaseCommand command, byte[] integrityCheck)
 		{

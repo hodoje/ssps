@@ -1,15 +1,14 @@
-﻿using Common.CertificateManagement;
-using Common.Communication;
-using Common.Communication.AuthorizationPolicy;
+﻿using Common.Communication.AuthorizationPolicy;
 using Common.ServiceInterfaces;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Policy;
+using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
-using System.Security.Principal;
 using System.ServiceModel;
 using System.ServiceModel.Description;
 using System.ServiceModel.Security;
+using Common.CertificateManagement;
 
 namespace BankService
 {
@@ -26,7 +25,28 @@ namespace BankService
 			address = $"{BankServiceConfig.BankServiceAddress}/{BankServiceConfig.AdminServiceEndpointName}";
 			ServiceHost adminHost = CreateHost(address, typeof(IAdminService), bankingService, srvCertCN, "AdminService");
 
+			try
+			{
+				StartAllSectors();
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+
 			Console.ReadLine();
+		}
+
+
+		private static void StartAllSectors()
+		{
+			foreach (var sectorName in BankServiceConfig.AllSectorNames)
+			{
+				Process sectorProcess = new Process();
+				sectorProcess.StartInfo.FileName = BankServiceConfig.SectorExeFilename;
+				sectorProcess.StartInfo.Arguments = $"\"{sectorName}\"";
+				sectorProcess.Start();
+			}
 		}
 
 		private static ServiceHost CreateHost(string address, Type contract, BankingService bankingService, string srvCertCN, string serviceName)
