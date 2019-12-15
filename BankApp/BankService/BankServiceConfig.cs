@@ -26,6 +26,7 @@ namespace BankService
 	{
 		public const string BankServiceAddressConfigName = "BankServiceAddress";
 		public const string UserServiceEndpointNameConfigName = "UserServiceEndpointName";
+		public const string AdminServiceEndpointNameConfigName = "AdminServiceEndpointName";
 		public const string SectorResponseServiceAddressConfigName = "SectorResponseServiceAddress";
 		public const string SectorResponseServiceEndpointConfigName = "SectorResponseServiceEndpoint";
 		public const string AuditServiceAddressConfigName = "AuditServiceAddress";
@@ -39,6 +40,7 @@ namespace BankService
 		{
 			BankServiceAddress = ConfigurationManager.AppSettings[BankServiceAddressConfigName];
 			UserServiceEndpointName = ConfigurationManager.AppSettings[UserServiceEndpointNameConfigName];
+			AdminServiceEndpointName = ConfigurationManager.AppSettings[AdminServiceEndpointNameConfigName];
 			SectorResponseServiceAddress = ConfigurationManager.AppSettings[SectorResponseServiceAddressConfigName];
 			SectorResponseServiceEndpoint = ConfigurationManager.AppSettings[SectorResponseServiceEndpointConfigName];
 			AuditServiceAddress = ConfigurationManager.AppSettings[AuditServiceAddressConfigName];
@@ -81,5 +83,6 @@ namespace BankService
 		public static string SectorExeFilename { get; }
 		public static string StartupConfirmationServiceAddress { get; }
 		public static string StartupConfirmationServiceEndpointName { get; }
+		public static string AdminServiceEndpointName { get; }
 	}
 }

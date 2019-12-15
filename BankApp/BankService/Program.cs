@@ -17,31 +17,40 @@ namespace BankService
 	{
 		static void Main(string[] args)
 		{
-			string srvCertCN = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
-			NetTcpBinding binding = CreateCertificateBinding();
+			string srvCertCN = "bankservice";/*StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);*/
 			string address = $"{BankServiceConfig.BankServiceAddress}/{BankServiceConfig.UserServiceEndpointName}";
 			BankingService bankingService = new BankingService();
 
+			ServiceHost userHost = CreateHost(address, bankingService, srvCertCN, "UserService");
+
+			address = $"{BankServiceConfig.BankServiceAddress}/{BankServiceConfig.AdminServiceEndpointName}";
+			ServiceHost adminHost = CreateHost(address, bankingService, srvCertCN, "AdminService");
+
+			Console.ReadLine();
+		}
+
+		private static ServiceHost CreateHost(string address, BankingService bankingService, string srvCertCN, string serviceName)
+		{
 			ServiceHost host = new ServiceHost(bankingService);
-			host.AddServiceEndpoint(typeof(IUserService), binding, address);
+			host.AddServiceEndpoint(typeof(IUserService), CreateCertificateBinding(), address);
 
 			InitializeHostForCertificateUse(host);
 			InitializeHostForCustomAuthorizationPolicy(host);
 
 			///Set appropriate service's certificate on the host. Use CertManager class to obtain the certificate based on the "srvCertCN"
 			X509Certificate2 certificate;
-			if (CertificateStorageReader.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, "bankservice", out certificate))
+			if (CertificateStorageReader.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN, out certificate))
 			{
 				host.Credentials.ServiceCertificate.Certificate = certificate;
 				host.Open();
-				Console.WriteLine("BankService started...");
+				Console.WriteLine($"{serviceName} started...");
 			}
 			else
 			{
-				Console.WriteLine("No valid certificates...");
+				Console.WriteLine($"{serviceName} has no valid certificates...");
 			}
 
-			Console.ReadLine();
+			return host;
 		}
 
 		private static void InitializeHostForCustomAuthorizationPolicy(ServiceHost host)
