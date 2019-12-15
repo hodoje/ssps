@@ -1,10 +1,4 @@
 ﻿using Client.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using Unity;
 
@@ -24,8 +18,6 @@ namespace Client
 			// Register ViewModels
 			var contentViewModel = new ContentViewModel(container);
 			container.RegisterInstance<ContentViewModel>(contentViewModel);
-			var userViewModel = new UserViewModel();
-			container.RegisterInstance<UserViewModel>(userViewModel);
 			var mainWindowViewModel = new MainWindowViewModel(container);
 			container.RegisterInstance<MainWindowViewModel>(mainWindowViewModel);
 
