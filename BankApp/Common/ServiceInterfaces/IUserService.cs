@@ -8,6 +8,9 @@ namespace Common.ServiceInterfaces
 	public interface IUserService
 	{
 		[OperationContract]
+		void Register();
+
+		[OperationContract]
 		void Withdraw(double amount);
 
 		[OperationContract]
