@@ -1,5 +1,6 @@
 ﻿using Client.Model;
 using Client.UICommands;
+using Common.CertificateManagement;
 using Common.Commanding;
 using Common.Communication;
 using Common.ServiceInterfaces;
@@ -7,7 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
+using System.ServiceModel.Security;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Client.ViewModels
@@ -15,9 +20,10 @@ namespace Client.ViewModels
 	public class UserViewModel : BindableBase
 	{
 		#region Fields
-		private double? _loanAmount;
-		private int? _loanDuration;
-		private double? _transactionAmount;
+		private double _loanAmount = 100;
+		private int _loanDuration = 1;
+		private double _transactionAmount;
+		private GenericPrincipal genericPrincipal;
 		private TransactionType _selectedTransactionType;
 		private CertificateClientProxy<IUserService> _userServiceProxy;
 		private CertificateClientProxy<IAdminService> _adminServiceProxy;
@@ -25,7 +31,7 @@ namespace Client.ViewModels
 		#endregion
 
 		#region Properties
-		public double? LoanAmount
+		public double LoanAmount
 		{
 			get { return _loanAmount; }
 			set
@@ -35,7 +41,7 @@ namespace Client.ViewModels
 			}
 		}
 
-		public int? LoanDuration
+		public int LoanDuration
 		{
 			get { return _loanDuration; }
 			set
@@ -45,7 +51,7 @@ namespace Client.ViewModels
 			}
 		}
 
-		public double? TransactionAmount
+		public double TransactionAmount
 		{
 			get { return _transactionAmount; }
 			set
@@ -85,8 +91,13 @@ namespace Client.ViewModels
 
 			_userServiceCallbackObject = new BankServiceCallbackObject(HandleNotifications);
 
-			_userServiceProxy = new CertificateClientProxy<IUserService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.UserServiceEndpoint);
-			_adminServiceProxy = new CertificateClientProxy<IAdminService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.AdminServiceEndpoint);
+			//string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
+			// TEST
+			string username = "user1";
+			X509Certificate2 certificate = GetCertificateFromStorage(username);
+
+			_userServiceProxy = new CertificateClientProxy<IUserService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.UserServiceEndpoint, certificate);
+			_adminServiceProxy = new CertificateClientProxy<IAdminService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.AdminServiceEndpoint, certificate);
 		}
 		#endregion
 
@@ -94,15 +105,26 @@ namespace Client.ViewModels
 		#region CommandMethods
 		private void OnExecuteTransaction()
 		{
-			// TODO: Call user service
-			switch (SelectedTransactionType)
+			try
 			{
-				case TransactionType.Payment:
-					// TODO: Call user service for payment
-					break;
-				case TransactionType.Withdrawal:
-					// TODO: Call user service for withdrawal
-					break;
+				// TODO: Call user service
+				switch (SelectedTransactionType)
+				{
+					case TransactionType.Payment:
+						_userServiceProxy.Proxy.Deposit(TransactionAmount);
+						break;
+					case TransactionType.Withdrawal:
+						_userServiceProxy.Proxy.Withdraw(TransactionAmount);
+						break;
+				}
+			}
+			catch (SecurityAccessDeniedException securityAccess)
+			{
+				Notifications.Add(new Notification("Service has denied access since you have no permission for action.", CommandNotificationStatus.Rejected));
+			}
+			catch (Exception e)
+			{
+				Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
 			}
 		}
 
@@ -113,7 +135,18 @@ namespace Client.ViewModels
 
 		private void OnApplyForCredit()
 		{
-			// TODO: Call user service for loan raising
+			try
+			{
+				_userServiceProxy.Proxy.Register();
+			}
+			catch (SecurityAccessDeniedException securityAccess)
+			{
+				Notifications.Add(new Notification("Service has denied access since you have no permission for action.", CommandNotificationStatus.Rejected));
+			}
+			catch (Exception e)
+			{
+				Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+			}
 		}
 
 		private bool CanApplyForCredit()
@@ -135,13 +168,49 @@ namespace Client.ViewModels
 
 		private void OnRemoveExpiredRequests()
 		{
-			
+			try
+			{
+				_adminServiceProxy.Proxy.DeleteStaleCommands();
+			}
+			catch (SecurityAccessDeniedException securityAccess)
+			{
+				Notifications.Add(new Notification("Service has denied access since you have no permission for action.", CommandNotificationStatus.Rejected));
+			}
+			catch (Exception e)
+			{
+				Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+			}
 		}
 
 		private void OnCreateNewDatabase()
 		{
-			
+			try
+			{
+				_adminServiceProxy.Proxy.CreateNewDatabase();
+			}
+			catch (SecurityAccessDeniedException securityAccess)
+			{
+				Notifications.Add(new Notification("Service has denied access since you have no permission for action.", CommandNotificationStatus.Rejected));
+			}
+			catch (Exception e)
+			{
+				Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+			}
 		}
+
+		private X509Certificate2 GetCertificateFromStorage(string cltCertCN)
+		{
+			X509Certificate2 certificate;
+			if (CertificateStorageReader.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN, out certificate))
+			{
+				return certificate;
+			}
+			else
+			{
+				throw new ArgumentException("Service will not be initializes since it has no valid certificate!");
+			}
+		}
+
 		#endregion
 	}
 }
