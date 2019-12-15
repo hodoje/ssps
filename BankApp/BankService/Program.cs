@@ -1,14 +1,15 @@
 ﻿using Common.CertificateManagement;
+using Common.Communication;
+using Common.Communication.AuthorizationPolicy;
 using Common.ServiceInterfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IdentityModel.Policy;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.ServiceModel.Security;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BankService
 {
@@ -16,49 +17,53 @@ namespace BankService
 	{
 		static void Main(string[] args)
 		{
-			NetTcpBinding binding = new NetTcpBinding();
-			string address = "net.tcp://localhost:9999/Receiver";
+			string srvCertCN = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
+			NetTcpBinding binding = CreateCertificateBinding();
+			string address = $"{BankServiceConfig.BankServiceAddress}/{BankServiceConfig.UserServiceEndpointName}";
 			BankingService bankingService = new BankingService();
 
 			ServiceHost host = new ServiceHost(bankingService);
 			host.AddServiceEndpoint(typeof(IUserService), binding, address);
 
-			///Custom validation mode enables creation of a custom validator - CustomCertificateValidator
-			//host.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
-
-			///If CA doesn't have a CRL associated, WCF blocks every client because it cannot be validated
-			//host.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+			InitializeHostForCertificateUse(host);
+			InitializeHostForCustomAuthorizationPolicy(host);
 
 			///Set appropriate service's certificate on the host. Use CertManager class to obtain the certificate based on the "srvCertCN"
-			//host.Credentials.ServiceCertificate.Certificate = CertificateStorageReader.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-
-			//string srvCertCN = ParseName(WindowsIdentity.GetCurrent().Name);
-
-			host.Open();
+			X509Certificate2 certificate;
+			if (CertificateStorageReader.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, "bankservice", out certificate))
+			{
+				host.Credentials.ServiceCertificate.Certificate = certificate;
+				host.Open();
+				Console.WriteLine("BankService started...");
+			}
+			else
+			{
+				Console.WriteLine("No valid certificates...");
+			}
 
 			Console.ReadLine();
 		}
 
-		private static string ParseName(string winLogonName)
+		private static void InitializeHostForCustomAuthorizationPolicy(ServiceHost host)
 		{
-			string[] parts = new string[] { };
+			host.Authorization.PrincipalPermissionMode = PrincipalPermissionMode.Custom;
+			List<IAuthorizationPolicy> policies = new List<IAuthorizationPolicy>();
+			policies.Add(new OUAuthorizationPolicy());
+			host.Authorization.ExternalAuthorizationPolicies = policies.AsReadOnly();
+		}
 
-			if (winLogonName.Contains("@"))
-			{
-				///UPN format
-				parts = winLogonName.Split('@');
-				return parts[0];
-			}
-			else if (winLogonName.Contains("\\"))
-			{
-				/// SPN format
-				parts = winLogonName.Split('\\');
-				return parts[1];
-			}
-			else
-			{
-				return winLogonName;
-			}
+		private static void InitializeHostForCertificateUse(ServiceHost host)
+		{
+			host.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
+			host.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+		}
+
+		private static NetTcpBinding CreateCertificateBinding()
+		{
+			NetTcpBinding binding = new NetTcpBinding();
+			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+			binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
+			return binding;
 		}
 	}
 }
