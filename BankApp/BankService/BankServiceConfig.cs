@@ -15,8 +15,8 @@ namespace BankService
 {
 	public struct ConnectionInfo
 	{
-		EndpointAddress EndpointAddess { get; set; }
-		NetTcpBinding NetTcpBinding { get; set; }
+		public string Address { get; set; }
+		public string EndpointName { get; set; }
 	}
 
 	/// <summary>
@@ -25,6 +25,7 @@ namespace BankService
 	public static class BankServiceConfig
 	{
 		public const string BankServiceAddressConfigName = "BankServiceAddress";
+		public const string SectorsConfigName = "Sectors";
 		public const string SectorQueueSizeConfigName = "SectorQueueSize";
 		public const string SectorQueueTimeoutInSecondsConfigName = "SectorQueueTimeoutInSeconds";
 		public const string UserServiceEndpointNameConfigName = "UserServiceEndpointName";
@@ -61,8 +62,17 @@ namespace BankService
 			StartupConfirmationServiceAddress = ConfigurationManager.AppSettings[StartupConfirmationServiceAddressConfigName];
 			StartupConfirmationServiceEndpointName = ConfigurationManager.AppSettings[StartupConfirmationServiceEndpointNameConfigName];
 
-			// ili SectorAddiotnalConfig ne znam gde si planirao da drzis informaciju o endpoint-u servisa sa strane hosta i servisa sa strane sektora
-			Connections = AllSectorNames.ToDictionary(x => x, x => new ConnectionInfo());
+			string sectorsConfigJson = ConfigurationManager.AppSettings[SectorsConfigName];
+			SectorsConfigs = GetSectorsConfig(sectorsConfigJson);
+
+			Connections = new Dictionary<string, ConnectionInfo>(SectorsConfigs.Count);
+			foreach(var sectorName in AllSectorNames)
+			{
+				ConnectionInfo ci = new ConnectionInfo();
+				ci.Address = SectorsConfigs[sectorName].Address;
+				ci.EndpointName = SectorsConfigs[sectorName].EndpointName;
+				Connections.Add(sectorName, ci);
+			}
 		}
 
 		private static Dictionary<string, SectorAdditionalConfig> GetSectorsConfig(string sectorsConfigJson)
@@ -73,7 +83,7 @@ namespace BankService
 
 			foreach (var child in sectors.Children())
 			{
-				SectorConfigs.Add((child as JProperty).Name, child.First.ToObject<SectorAdditionalConfig>());
+				result.Add((child as JProperty).Name, child.First.ToObject<SectorAdditionalConfig>());
 			}
 
 			return result;
@@ -87,7 +97,7 @@ namespace BankService
 		public static string AuditServiceEndpointName { get; }
 		public static Dictionary<string, ConnectionInfo> Connections { get; set; }
 		public static string[] AllSectorNames { get; }
-		public static Dictionary<string, SectorAdditionalConfig> SectorConfigs { get; }
+		public static Dictionary<string, SectorAdditionalConfig> SectorsConfigs { get; }
 		public static int SectorQueueSize { get; }
 		public static int SectorQueueTimeoutInSeconds { get; }
 		public static string SectorExeFilename { get; }
