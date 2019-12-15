@@ -2,7 +2,7 @@
 
 namespace Common.ServiceInterfaces
 {
-	[ServiceContract]
+	[ServiceContract(CallbackContract = typeof(IClientServiceCallback))]
 	public interface IAdminService
 	{
 		/// <summary>

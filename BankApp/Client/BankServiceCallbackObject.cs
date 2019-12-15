@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-	public class BankServiceCallbackObject : IUserServiceCallback
+	public class BankServiceCallbackObject : IClientServiceCallback
 	{
 		private Action<CommandNotification> _callback;
 

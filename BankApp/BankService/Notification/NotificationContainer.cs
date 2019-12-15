@@ -18,7 +18,7 @@ namespace BankService.Notification
 			pendingUserNotifications = new ConcurrentDictionary<string, NotificationInformation>(LoadNotificationsFromDatabase().ToDictionary(x => x.Username, x => x));
 		}
 
-		public void AddExpectingNotificationId(string username, IUserServiceCallback userCallback, long commandId)
+		public void AddExpectingNotificationId(string username, IClientServiceCallback userCallback, long commandId)
 		{
 			CommandNotification notification = new CommandNotification(commandId);
 			NotificationInformation userNotificationInfo = pendingUserNotifications.GetOrAdd(username, (x) => { return new NotificationInformation(username, userCallback); });
@@ -27,7 +27,7 @@ namespace BankService.Notification
 			dataPersister.AddEntity(notification);
 		}
 
-		public IUserServiceCallback CommandNotificationReceived(CommandNotification receivedCommandNotification, out string username)
+		public IClientServiceCallback CommandNotificationReceived(CommandNotification receivedCommandNotification, out string username)
 		{
 			username = "";
 			foreach (NotificationInformation notificationinfo in pendingUserNotifications.Values)

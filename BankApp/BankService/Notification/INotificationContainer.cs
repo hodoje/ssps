@@ -9,10 +9,10 @@ namespace BankService.Notification
 		void DefaultUsersCallback(string username);
 		void CommandNotificationSent(long commandId);
 
-		void AddExpectingNotificationId(string username, IUserServiceCallback userCallback, long commandId);
+		void AddExpectingNotificationId(string username, IClientServiceCallback userCallback, long commandId);
 
 		List<CommandNotification> GetCommandNotificationsForUser(string username);
 
-		IUserServiceCallback CommandNotificationReceived(CommandNotification receivedCommandNotification, out string username);
+		IClientServiceCallback CommandNotificationReceived(CommandNotification receivedCommandNotification, out string username);
 	}
 }

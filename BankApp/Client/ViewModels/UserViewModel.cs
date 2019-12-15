@@ -23,7 +23,6 @@ namespace Client.ViewModels
 		private double _loanAmount = 100;
 		private int _loanDuration = 1;
 		private double _transactionAmount;
-		private GenericPrincipal genericPrincipal;
 		private TransactionType _selectedTransactionType;
 		private CertificateClientProxy<IUserService> _userServiceProxy;
 		private CertificateClientProxy<IAdminService> _adminServiceProxy;
@@ -130,7 +129,7 @@ namespace Client.ViewModels
 
 		private bool CanExecuteTransaction()
 		{
-			return (TransactionAmount != null && TransactionAmount > 0);
+			return TransactionAmount > 0;
 		}
 
 		private void OnApplyForCredit()
@@ -151,7 +150,7 @@ namespace Client.ViewModels
 
 		private bool CanApplyForCredit()
 		{
-			return (LoanAmount != null && LoanAmount > 0 && LoanDuration != null && LoanDuration > 0);
+			return LoanAmount > 0 && LoanDuration > 0;
 		}
 		#endregion
 

@@ -75,7 +75,7 @@
     <Compile Include="ServiceInterfaces\ISectorResponseService.cs" />
     <Compile Include="ServiceInterfaces\ISectorService.cs" />
     <Compile Include="ServiceInterfaces\IStartupConfirmationService.cs" />
-    <Compile Include="ServiceInterfaces\IUserServiceCallback.cs" />
+    <Compile Include="ServiceInterfaces\IClientServiceCallback.cs" />
     <Compile Include="ServiceInterfaces\IUserService.cs" />
     <Compile Include="ServiceLocator.cs" />
     <Compile Include="SymmetricEncryptionAlgorithms\AESAlgorithmProvider.cs" />

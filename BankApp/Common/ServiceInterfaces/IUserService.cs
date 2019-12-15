@@ -4,7 +4,7 @@ using System.ServiceModel;
 
 namespace Common.ServiceInterfaces
 {
-	[ServiceContract(CallbackContract = typeof(IUserServiceCallback))]
+	[ServiceContract(CallbackContract = typeof(IClientServiceCallback))]
 	public interface IUserService
 	{
 		[OperationContract]

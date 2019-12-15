@@ -42,7 +42,7 @@ namespace BankService
 			return notifications?? new List<CommandNotification>();
 		}
 
-		public void RegisterCommand(string username, IUserServiceCallback userCallback, long commandId)
+		public void RegisterCommand(string username, IClientServiceCallback userCallback, long commandId)
 		{
 			notificationContainer.AddExpectingNotificationId(username, userCallback, commandId);
 		}
@@ -70,7 +70,7 @@ namespace BankService
 				}
 
 				string username;
-				IUserServiceCallback callback = notificationContainer.CommandNotificationReceived(notification, out username);
+				IClientServiceCallback callback = notificationContainer.CommandNotificationReceived(notification, out username);
 
 				if (SendNotificationToClient(callback, notification))
 				{
@@ -84,7 +84,7 @@ namespace BankService
 			}
 		}
 
-		private bool SendNotificationToClient(IUserServiceCallback callback, CommandNotification commandNotification)
+		private bool SendNotificationToClient(IClientServiceCallback callback, CommandNotification commandNotification)
 		{
 			try
 			{

@@ -10,14 +10,14 @@ namespace BankService
 	public interface INotificationHandler
 	{
 		List<CommandNotification> GetUserNotifications(string key);
-		void RegisterCommand(string username, IUserServiceCallback userCallback, long commandId);
+		void RegisterCommand(string username, IClientServiceCallback userCallback, long commandId);
 		void Start();
 		void Stop();
 	}
 
 	public class NotificationInformation : IdentifiedObject
 	{
-		public NotificationInformation(string username, IUserServiceCallback userCallback = null, List<CommandNotification> readyNotifications = null)
+		public NotificationInformation(string username, IClientServiceCallback userCallback = null, List<CommandNotification> readyNotifications = null)
 		{
 			Username = username;
 			UserCallback = userCallback;
@@ -27,7 +27,7 @@ namespace BankService
 
 		public ConcurrentDictionary<long, CommandNotification> ReadyNotifications { get; private set; }
 		public ConcurrentDictionary<long, CommandNotification> PendingNotifications { get; private set; }
-		public IUserServiceCallback UserCallback { get; set; }
+		public IClientServiceCallback UserCallback { get; set; }
 		public string Username { get; private set; }
 
 		public override int GetHashCode()
