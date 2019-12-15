@@ -21,18 +21,18 @@ namespace BankService
 			string address = $"{BankServiceConfig.BankServiceAddress}/{BankServiceConfig.UserServiceEndpointName}";
 			BankingService bankingService = new BankingService();
 
-			ServiceHost userHost = CreateHost(address, bankingService, srvCertCN, "UserService");
+			ServiceHost userHost = CreateHost(address, typeof(IUserService), bankingService, srvCertCN, "UserService");
 
 			address = $"{BankServiceConfig.BankServiceAddress}/{BankServiceConfig.AdminServiceEndpointName}";
-			ServiceHost adminHost = CreateHost(address, bankingService, srvCertCN, "AdminService");
+			ServiceHost adminHost = CreateHost(address, typeof(IAdminService), bankingService, srvCertCN, "AdminService");
 
 			Console.ReadLine();
 		}
 
-		private static ServiceHost CreateHost(string address, BankingService bankingService, string srvCertCN, string serviceName)
+		private static ServiceHost CreateHost(string address, Type contract, BankingService bankingService, string srvCertCN, string serviceName)
 		{
 			ServiceHost host = new ServiceHost(bankingService);
-			host.AddServiceEndpoint(typeof(IUserService), CreateCertificateBinding(), address);
+			host.AddServiceEndpoint(contract, CreateCertificateBinding(), address);
 
 			InitializeHostForCertificateUse(host);
 			InitializeHostForCustomAuthorizationPolicy(host);

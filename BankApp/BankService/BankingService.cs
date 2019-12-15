@@ -52,7 +52,7 @@ namespace BankService
 		public void CreateNewDatabase()
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
-			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
+			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			commandManager.CreateDatabase();
 		}
@@ -61,7 +61,7 @@ namespace BankService
 		public void DeleteStaleCommands()
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
-			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
+			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			commandManager.ClearStaleCommands();
 		}
@@ -70,7 +70,7 @@ namespace BankService
 		public void Deposit(double amount)
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
-			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
+			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			DepositCommand depositCommand = new DepositCommand(0, username, amount);
 			long commandId = commandManager.EnqueueCommand(depositCommand);
@@ -91,20 +91,19 @@ namespace BankService
 		public void Register()
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
-			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
+			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			RegistrationCommand registrationCommand = new RegistrationCommand(0, username);
 			long commandId = commandManager.EnqueueCommand(registrationCommand);
 
 			notificationHandler.RegisterCommand(username, callback, commandId);
-
 		}
 
 		[PrincipalPermission(SecurityAction.Demand, Role = "users")]
 		public void RequestLoan(double amount)
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
-			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
+			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			RequestLoanCommand requestLoanCommand = new RequestLoanCommand(0, username, amount);
 			long commandId = commandManager.EnqueueCommand(requestLoanCommand);
@@ -116,7 +115,7 @@ namespace BankService
 		public void Withdraw(double amount)
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
-			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
+			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			WithdrawCommand withdrawCommand = new WithdrawCommand(0, username, amount);
 			long commandId = commandManager.EnqueueCommand(withdrawCommand);
