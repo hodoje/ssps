@@ -12,6 +12,8 @@ using System.Data.Entity;
 using System.Threading;
 using Common.CertificateManagement;
 using Common.Communication;
+using System.Security.Permissions;
+using Common.Model;
 
 namespace BankService
 {
@@ -46,28 +48,28 @@ namespace BankService
 			//commandManager.CreateDatabase();
 		}
 
+		[PrincipalPermission(SecurityAction.Demand, Role = "admins")]
 		public void CreateNewDatabase()
 		{
-			// authorization and authentication
-			string username = null;
+			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
 			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
 
 			commandManager.CreateDatabase();
 		}
 
+		[PrincipalPermission(SecurityAction.Demand, Role = "admins")]
 		public void DeleteStaleCommands()
 		{
-			// authorization and authentication
-			string username = null;
+			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
 			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
 
 			commandManager.ClearStaleCommands();
 		}
 
+		[PrincipalPermission(SecurityAction.Demand, Role = "users")]
 		public void Deposit(double amount)
 		{
-			// authorization and authentication
-			string username = "dummy"; // get username
+			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
 			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
 
 			DepositCommand depositCommand = new DepositCommand(0, username, amount);
@@ -76,19 +78,19 @@ namespace BankService
 			notificationHandler.RegisterCommand(username, callback, commandId);
 		}
 
+		[PrincipalPermission(SecurityAction.Demand, Role = "users")]
 		public List<CommandNotification> GetPendingNotifications()
 		{
-			string username = null;
-
+			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
 			List<CommandNotification> userNotifications = notificationHandler.GetUserNotifications(username);
 
 			return userNotifications;
 		}
 
+		[PrincipalPermission(SecurityAction.Demand, Role = "users")]
 		public void Register()
 		{
-			// authorization and authentication
-			string username = null;
+			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
 			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
 
 			RegistrationCommand registrationCommand = new RegistrationCommand(0, username);
@@ -98,10 +100,10 @@ namespace BankService
 
 		}
 
+		[PrincipalPermission(SecurityAction.Demand, Role = "users")]
 		public void RequestLoan(double amount)
 		{
-			// authorization and authentication
-			string username = null; // get username
+			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
 			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
 
 			RequestLoanCommand requestLoanCommand = new RequestLoanCommand(0, username, amount);
@@ -110,10 +112,10 @@ namespace BankService
 			notificationHandler.RegisterCommand(username, callback, commandId);
 		}
 
+		[PrincipalPermission(SecurityAction.Demand, Role = "users")]
 		public void Withdraw(double amount)
 		{
-			// authorization and authentication
-			string username = null; // get username
+			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
 			IUserServiceCallback callback = OperationContext.Current.GetCallbackChannel<IUserServiceCallback>();
 
 			WithdrawCommand withdrawCommand = new WithdrawCommand(0, username, amount);
