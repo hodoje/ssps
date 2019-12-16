@@ -12,6 +12,8 @@ namespace BankService
 	{
 		public string Address { get; set; }
 		public string EndpointName { get; set; }
+		public string SectorResponseAddress { get; set; }
+		public string SectorResponseEndpoint { get; set; }
 	}
 
 	/// <summary>
@@ -25,8 +27,6 @@ namespace BankService
 		public const string SectorQueueTimeoutInSecondsConfigName = "SectorQueueTimeoutInSeconds";
 		public const string UserServiceEndpointNameConfigName = "UserServiceEndpointName";
 		public const string AdminServiceEndpointNameConfigName = "AdminServiceEndpointName";
-		public const string SectorResponseServiceAddressConfigName = "SectorResponseServiceAddress";
-		public const string SectorResponseServiceEndpointConfigName = "SectorResponseServiceEndpoint";
 		public const string AuditServiceAddressConfigName = "AuditServiceAddress";
 		public const string AuditServiceEndpointNameConfigName = "AuditServiceEndpointName";
 		public const string AllSectorNamesConfigName = "AllSectorNames";
@@ -53,8 +53,6 @@ namespace BankService
 				throw new Exception("Invalid configuration. Expected a number.", e);
 			}
 
-			SectorResponseServiceAddress = ConfigurationManager.AppSettings[SectorResponseServiceAddressConfigName];
-			SectorResponseServiceEndpoint = ConfigurationManager.AppSettings[SectorResponseServiceEndpointConfigName];
 			AuditServiceAddress = ConfigurationManager.AppSettings[AuditServiceAddressConfigName];
 			AuditServiceEndpointName = ConfigurationManager.AppSettings[AuditServiceEndpointNameConfigName];
 			AllSectorNames = ConfigurationManager.AppSettings[AllSectorNamesConfigName].Split(',');
@@ -74,6 +72,8 @@ namespace BankService
 				ConnectionInfo ci = new ConnectionInfo();
 				ci.Address = SectorsConfigs[sectorName].Address;
 				ci.EndpointName = SectorsConfigs[sectorName].EndpointName;
+				ci.SectorResponseAddress = SectorsConfigs[sectorName].SectorResponseAddress;
+				ci.SectorResponseEndpoint = SectorsConfigs[sectorName].SectorResponseEndpointName;
 				Connections.Add(sectorName, ci);
 			}
 		}
@@ -94,8 +94,6 @@ namespace BankService
 
 		public static string BankServiceAddress { get; }
 		public static string UserServiceEndpointName { get; }
-		public static string SectorResponseServiceAddress { get; }
-		public static string SectorResponseServiceEndpoint { get; }
 		public static string AuditServiceAddress { get; }
 		public static string AuditServiceEndpointName { get; }
 		public static Dictionary<string, ConnectionInfo> Connections { get; set; }
