@@ -42,10 +42,13 @@ namespace BankService.CommandingHost
 			responseQueue.Enqueue(commandNotification);
 
 			BaseCommand command = databaseManager.Get(commandNotification.ID);
-			command.State = CommandState.Executed;
-			databaseManager.Update(command);
+			if (command != null)
+			{
+				command.State = CommandState.Executed;
+				databaseManager.Update(command);
 
-			auditService.Log(command.ToString(), "Changed state to executed!");
+				auditService.Log(command.ToString(), "Changed state to executed!");
+			}
 
 			// Awake WorkerThread because there is enough command space in Commanding Handler.
 			sendingSynchronization.Set();
