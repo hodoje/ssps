@@ -14,6 +14,7 @@ using System.ServiceModel.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Client.ViewModels
 {
@@ -93,7 +94,13 @@ namespace Client.ViewModels
 			//string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
 			// TEST
 			string username = "pera";
-			X509Certificate2 certificate = GetCertificateFromStorage(username);
+			X509Certificate2 certificate;
+			certificate = GetCertificateFromStorage(username);
+			if(certificate == null)
+			{
+				Environment.Exit(0);
+				return;
+			}
 
 			_userServiceProxy = new CertificateClientProxy<IUserService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.UserServiceEndpoint, certificate);
 			_adminServiceProxy = new CertificateClientProxy<IAdminService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.AdminServiceEndpoint, certificate);
@@ -221,7 +228,9 @@ namespace Client.ViewModels
 			}
 			else
 			{
-				throw new ArgumentException("Service will not be initializes since it has no valid certificate!");
+				//throw new ArgumentException("Service will not be initializes since it has no valid certificate!");
+				MessageBox.Show("Unable to connect to Bank since you don't have a valid certificate.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				return null;
 			}
 		}
 
