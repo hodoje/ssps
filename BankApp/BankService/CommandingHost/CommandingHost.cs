@@ -7,6 +7,8 @@ using System.Collections.Concurrent;
 using BankService.DatabaseManagement;
 using Common.Communication;
 using Common.ServiceInterfaces;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BankService.CommandingHost
 {
@@ -27,7 +29,7 @@ namespace BankService.CommandingHost
 
 		public CommandingHost(string sectorType, IAudit auditService, CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo, IDatabaseManager<BaseCommand> databaseManager, string hostName)
 		{
-			commandHandler = new CommandHandler.CommandHandler(sectorType, auditService, this, databaseManager, BankServiceConfig.SectorQueueSize);
+			commandHandler = new CommandHandler.CommandHandler(sectorType, auditService, this, BankServiceConfig.SectorQueueSize, LoadSentCommands());
 
 			this.auditService = auditService;
 			this.responseQueue = responseQueue;
@@ -108,12 +110,38 @@ namespace BankService.CommandingHost
 					return;
 				}
 
-				if (!commandHandler.SendCommandToSector(commandToSend))
+				if (commandHandler.SendCommandToSector(commandToSend))
+				{
+					ChangeCommandState(commandToSend.ID, CommandState.Sent);
+				}
+				// command not sent
+				else
 				{
                     // If command handler couldn't sent the command, requeue the command.
 					commandingQueue.Enqueue(commandToSend);
 				}
 			}
+		}
+
+		private List<BaseCommand> LoadSentCommands()
+		{
+			return databaseManager.Find(x => x.State == CommandState.Sent).ToList();
+		}
+
+		private void ChangeCommandState(long id, CommandState state)
+		{
+			BaseCommand command = databaseManager.Get(id);
+			if (command == null)
+			{
+				return;
+			}
+
+			command.State = state;
+
+			// log to audit : command changed state
+			auditService.Log("CommandHandler", $"Command ({command.ToString()}) changed state to sent.");
+
+			databaseManager.Update(command);
 		}
 	}
 }

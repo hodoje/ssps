@@ -18,32 +18,26 @@ namespace BankService.CommandHandler
 	{
 		private object locker;
 		private readonly int sectorSize;
-
-		private HashSet<long> commandsSent;
-
-		private IDatabaseManager<BaseCommand> databaseManager;
-		private INotificationHost notificationHost;
-
+		private Dictionary<long, BaseCommand> commandsSent;
 		private WindowsClientProxy<ISectorService> sectoreServiceProxy;
-
 		private IAudit auditService;
+		private INotificationHost notificationHost;
 
 		/// <summary>
 		/// Initializes new instance of <see cref="CommandHandler"/> class. 
 		/// </summary>
 		/// <param name="notificationHost">Notification host to notify for received command notification.</param>
-		public CommandHandler(string sectorType, IAudit auditService, INotificationHost notificationHost, IDatabaseManager<BaseCommand> databaseManager, int sectorQueueSize)
+		public CommandHandler(string sectorType, IAudit auditService, INotificationHost notificationHost, int sectorQueueSize, List<BaseCommand> sentCommands)
 		{
 			this.auditService = auditService;
 			this.notificationHost = notificationHost;
-			this.databaseManager = databaseManager;
 			this.sectorSize = sectorQueueSize;
 
 			ConnectionInfo ci = BankServiceConfig.Connections[sectorType];
 			sectoreServiceProxy = new WindowsClientProxy<ISectorService>(ci.Address, ci.EndpointName);
 
 			locker = new object();
-			commandsSent = LoadSentCommands();
+			this.commandsSent = sentCommands.ToDictionary(x => x.ID, x => x);
 		}
 
 		/// <inheritdoc/>
@@ -51,10 +45,12 @@ namespace BankService.CommandHandler
 		{
 			lock (locker)
 			{
-				if (commandsSent.Contains(commandNotification.ID))
+				if (commandsSent.ContainsKey(commandNotification.ID))
 				{
-					auditService.Log("CommandHandler", $"Response received for command with {commandNotification.ID} id.");
 					commandsSent.Remove(commandNotification.ID);
+
+					auditService.Log("CommandHandler", $"Response received for command with {commandNotification.ID} id.");
+
 					notificationHost.CommandNotificationReceived(commandNotification);
 				}
 				else
@@ -79,12 +75,11 @@ namespace BankService.CommandHandler
 		/// <inheritdoc/>
 		public bool SendCommandToSector(BaseCommand command)
 		{
-			bool commandSent = SendCommand(command);
+			bool commandSent = TrySendCommand(command);
 			if (commandSent)
 			{
-				ChangeCommandState(command.ID, CommandState.Sent);
-
-				commandsSent.Add(command.ID);
+				// remember sent command in sake of response handling
+				commandsSent.Add(command.ID, command);
 
 				auditService.Log("CommandHandler", $"Command ({command.ToString()}) sent to sector.");
 			}
@@ -93,33 +88,10 @@ namespace BankService.CommandHandler
 				auditService.Log("CommandHandler", $"Command ({command.ToString()}) not sent to sector.", System.Diagnostics.EventLogEntryType.Error);
 			}
 
-			//CommandNotificationReceived(new CommandNotification(command.ID));
-
 			return commandSent;
 		}
 
-		private void ChangeCommandState(long id, CommandState state)
-		{
-			BaseCommand command = databaseManager.Get(id);
-			if (command == null)
-			{
-				return;
-			}
-
-			command.State = state;
-
-			// log to audit : command changed state
-			auditService.Log("CommandHandler", $"Command ({command.ToString()}) changed state to sent.");
-
-			databaseManager.Update(command);
-		}
-
-		private HashSet<long> LoadSentCommands()
-		{
-			return new HashSet<long>(databaseManager.Find(x => x.State == CommandState.Sent).Select(x => x.ID));
-		}
-
-		private bool SendCommand(BaseCommand command)
+		private bool TrySendCommand(BaseCommand command)
 		{
 			try
 			{
