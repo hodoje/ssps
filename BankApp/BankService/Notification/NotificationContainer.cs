@@ -40,7 +40,7 @@ namespace BankService.Notification
 
 					dataPersister.Update(notification);
 
-					notificationinfo.ReadyNotifications.TryAdd(receivedCommandNotification.ID, receivedCommandNotification);
+					notificationinfo.ReadyNotifications.TryAdd(notification.ID, notification);
 
 					username = notificationinfo.Username;
 

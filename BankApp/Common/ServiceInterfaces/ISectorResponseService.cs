@@ -20,7 +20,7 @@ namespace Common.ServiceInterfaces
 		/// <param name="commandId">ID of accepted command.</param>
 		/// <returns></returns>
 		[OperationContract]
-		void Accept(long commandId);
+		void Accept(long commandId, string information);
 
 		/// <summary>
 		/// Returns a reject response to bank service.

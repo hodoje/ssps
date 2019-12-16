@@ -24,6 +24,7 @@ namespace Common.Commanding
 		public CommandNotification(long commandId, CommandNotificationStatus commandStatus = CommandNotificationStatus.None) : base(commandId)
 		{
 			NotificationState = NotificationState.Expected;
+			CommandStatus = commandStatus;
 		}
 
 		/// <summary>

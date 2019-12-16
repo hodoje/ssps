@@ -3,6 +3,7 @@ using SectorService.ServiceHosts;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Threading;
 
 namespace SectorService
 {
@@ -53,7 +54,9 @@ namespace SectorService
 				throw new FaultException(e.Message);
 			}
 
-			Console.Read();
+			// Don't let me go
+			SemaphoreSlim ss = new SemaphoreSlim(0);
+			ss.Wait();
 		}
 	}
 }

@@ -91,9 +91,9 @@ namespace Client.ViewModels
 
 			_userServiceCallbackObject = new BankServiceCallbackObject(HandleNotifications);
 
-			string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
+			//string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
 			//TEST
-			//string username = "pera";
+			string username = "user1";
 			X509Certificate2 certificate;
 			certificate = GetCertificateFromStorage(username);
 			if (certificate == null)
@@ -101,7 +101,7 @@ namespace Client.ViewModels
 				Environment.Exit(0);
 				return;
 			}
-
+			
 			_userServiceProxy = new CertificateClientProxy<IUserService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.UserServiceEndpoint, certificate);
 			_adminServiceProxy = new CertificateClientProxy<IAdminService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.AdminServiceEndpoint, certificate);
             if(StringFormatter.GetAttributeFromSubjetName(certificate.SubjectName.Name, "OU") == "users")
@@ -197,10 +197,6 @@ namespace Client.ViewModels
 				if (_userServiceProxy == null)
 				{
 					Notifications.Add(new Notification("User service unavailable.", CommandNotificationStatus.Rejected));
-				}
-				else
-				{
-					Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
 				}
 			}
 		}
