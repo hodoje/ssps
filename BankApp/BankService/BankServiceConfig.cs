@@ -33,9 +33,13 @@ namespace BankService
 		public const string SectorExeFilenameConfigName = "SectorExeFilename";
 		public const string StartupConfirmationServiceAddressConfigName = "StartupConfirmationServiceAddress";
 		public const string StartupConfirmationServiceEndpointNameConfigName = "StartupConfirmationServiceEndpointName";
+		public const string BankAliveServiceAddressConfigName = "BankAliveServiceAddress";
+		public const string BankAliveServiceEndpointConfigName = "BankAliveServiceEndpointName";
 
 		static BankServiceConfig()
 		{
+			BankAliveServiceAddress = ConfigurationManager.AppSettings[BankAliveServiceAddressConfigName];
+			BankAliveServiceEndpointName = ConfigurationManager.AppSettings[BankAliveServiceEndpointConfigName];
 			BankServiceAddress = ConfigurationManager.AppSettings[BankServiceAddressConfigName];
 			UserServiceEndpointName = ConfigurationManager.AppSettings[UserServiceEndpointNameConfigName];
 			AdminServiceEndpointName = ConfigurationManager.AppSettings[AdminServiceEndpointNameConfigName];
@@ -103,5 +107,7 @@ namespace BankService
 		public static string StartupConfirmationServiceAddress { get; }
 		public static string StartupConfirmationServiceEndpointName { get; }
 		public static string AdminServiceEndpointName { get; }
+		public static string BankAliveServiceAddress { get; }
+		public static string BankAliveServiceEndpointName { get; }
 	}
 }

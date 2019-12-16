@@ -25,9 +25,13 @@ namespace SectorService
 		public const string StartupConfirmationServiceEndpointNameConfigName = "StartupConfirmationServiceEndpointName";
 		public const string AllSectorNamesConfigName = "AllSectorNames";
 		public const string SectorsConfigName = "Sectors";
+		public const string BankAliveServiceAddressConfigName = "BankAliveServiceAddress";
+		public const string BankAliveServiceEndpointConfigName = "BankAliveServiceEndpointName";
 
 		static SectorConfig()
 		{
+			BankAliveServiceAddress = ConfigurationManager.AppSettings[BankAliveServiceAddressConfigName];
+			BankAliveServiceEndpointName = ConfigurationManager.AppSettings[BankAliveServiceEndpointConfigName];
 			try
 			{
 				SectorQueueSize = Int32.Parse(ConfigurationManager.AppSettings[SectorQueueSizeConfigName]);
@@ -73,5 +77,7 @@ namespace SectorService
 		public static string StartupConfirmationServiceEndpointName { get; }
 		public static string[] AllSectorNames { get; }
 		public static Dictionary<string, SectorAdditionalConfig> SectorsConfigs { get; }
+		public static string BankAliveServiceAddress { get; }
+		public static string BankAliveServiceEndpointName { get; }
 	}
 }

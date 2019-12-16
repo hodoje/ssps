@@ -20,33 +20,16 @@ namespace BankService
 			string address = $"{BankServiceConfig.BankServiceAddress}/{BankServiceConfig.UserServiceEndpointName}";
 			BankingService bankingService = new BankingService();
 
+			Console.WriteLine("Wait for sector connections...");
+			bankingService.StartListeningForSectorConnections();
+			bankingService.StartListeningForCheckAlivePings();
+
 			ServiceHost userHost = CreateHost(address, typeof(IUserService), bankingService, srvCertCN, "UserService");
 
 			address = $"{BankServiceConfig.BankServiceAddress}/{BankServiceConfig.AdminServiceEndpointName}";
 			ServiceHost adminHost = CreateHost(address, typeof(IAdminService), bankingService, srvCertCN, "AdminService");
 
-			try
-			{
-				StartAllSectors();
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine(e);
-			}
-
 			Console.ReadLine();
-		}
-
-
-		private static void StartAllSectors()
-		{
-			foreach (var sectorName in BankServiceConfig.AllSectorNames)
-			{
-				Process sectorProcess = new Process();
-				sectorProcess.StartInfo.FileName = BankServiceConfig.SectorExeFilename;
-				sectorProcess.StartInfo.Arguments = $"\"{sectorName}\"";
-				sectorProcess.Start();
-			}
 		}
 
 		private static ServiceHost CreateHost(string address, Type contract, BankingService bankingService, string srvCertCN, string serviceName)

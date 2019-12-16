@@ -10,10 +10,13 @@ using Common;
 using Common.Communication;
 using Common.ServiceInterfaces;
 using System.Linq;
+using System.ServiceModel;
+using System.Net.Security;
 
 namespace BankService.CommandingManager
 {
-	public class CommandingManager : ICommandingManager, IDisposable
+	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+	public class CommandingManager : ICommandingManager, IDisposable, IStartupConfirmationService, IBankAliveService
 	{
 		private class CommandsPerQueue
 		{
@@ -35,10 +38,14 @@ namespace BankService.CommandingManager
 		private Dictionary<Type, CommandQueue> commandToQueueMapper;
 		private ConcurrentQueue<CommandNotification> responseQueue;
 		private List<ICommandingHost> commandingHosts;
+		private List<CommandsPerQueue> supportedCommands;
 
 		private IAudit auditService;
 
 		private IDatabaseManager<BaseCommand> databaseManager;
+
+		private ServiceHost startupConfirmationHost;
+		private ServiceHost bankAliveServiceHost;
 
 		static CommandingManager()
 		{
@@ -53,7 +60,7 @@ namespace BankService.CommandingManager
 			this.auditService = auditService;
 			this.responseQueue = responseQueue;
 
-			List<CommandsPerQueue> supportedCommands = new List<CommandsPerQueue>(3)
+			supportedCommands = new List<CommandsPerQueue>(3)
 			{
 				// AllSectorNames mapped from config file (json)
 				new CommandsPerQueue(BankServiceConfig.AllSectorNames[2], new List<Type>(2){ typeof(DepositCommand), typeof(WithdrawCommand) }),
@@ -66,7 +73,7 @@ namespace BankService.CommandingManager
 			commandToQueueMapper = new Dictionary<Type, CommandQueue>(supportedCommands.Count);
 
 			commandingHosts = new List<ICommandingHost>(supportedCommands.Count);
-			CreateCommandingHosts(commandToQueueMapper, supportedCommands);
+			//CreateCommandingHosts(commandToQueueMapper, supportedCommands);
 
 			EnqueueNotSentCommands();
 		}
@@ -146,25 +153,25 @@ namespace BankService.CommandingManager
 
 		}
 
-		private void CreateCommandingHosts(Dictionary<Type, CommandQueue> commandToQueueMapper, List<CommandsPerQueue> supportedCommands)
-		{
-			foreach (CommandsPerQueue commandsPerQueue in supportedCommands)
-			{
-				string commandingHostString = String.Join(", ", commandsPerQueue.Commands.Select(x => x.Name));
-				CommandQueue newQueue = new CommandQueue(queueSize, timeoutPeriod);
-				CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(auditService, newQueue, responseQueue, BankServiceConfig.Connections[commandsPerQueue.SectorName], databaseManager, commandingHostString);
-				commandingHosts.Add(newHost);
+		//private void CreateCommandingHosts(Dictionary<Type, CommandQueue> commandToQueueMapper, List<CommandsPerQueue> supportedCommands)
+		//{
+		//	foreach (CommandsPerQueue commandsPerQueue in supportedCommands)
+		//	{
+		//		string commandingHostString = String.Join(", ", commandsPerQueue.Commands.Select(x => x.Name));
+		//		CommandQueue newQueue = new CommandQueue(queueSize, timeoutPeriod);
+		//		CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(auditService, newQueue, responseQueue, BankServiceConfig.Connections[commandsPerQueue.SectorName], databaseManager, commandingHostString);
+		//		commandingHosts.Add(newHost);
 
-				foreach (Type commandType in commandsPerQueue.Commands)
-				{
-					commandToQueueMapper.Add(commandType, newQueue);
-				}
+		//		foreach (Type commandType in commandsPerQueue.Commands)
+		//		{
+		//			commandToQueueMapper.Add(commandType, newQueue);
+		//		}
 
-				newHost.Start();
+		//		newHost.Start();
 
-				auditService.Log($"CommandingHost[{commandingHostString}]", "Initialized.");
-			}
-		}
+		//		auditService.Log($"CommandingHost[{commandingHostString}]", "Initialized.");
+		//	}
+		//}
 
 		private void InitialDatabaseLoading()
 		{
@@ -177,6 +184,73 @@ namespace BankService.CommandingManager
 
 			IRepository<BaseCommand> commandRepository = ServiceLocator.GetService<IRepository<BaseCommand>>();
 			databaseManager = new DatabaseManager<BaseCommand>(commandRepository);
+		}
+
+		public void StartListeningForAlivePings()
+		{
+			bankAliveServiceHost = new ServiceHost(this);
+			var binding = new NetTcpBinding();
+			binding.Security.Mode = SecurityMode.Transport;
+			binding.Security.Transport.ProtectionLevel = ProtectionLevel.Sign;
+			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+			var address = $"{BankServiceConfig.BankAliveServiceAddress}/{BankServiceConfig.BankAliveServiceEndpointName}";
+			bankAliveServiceHost.AddServiceEndpoint(typeof(IBankAliveService), binding, address);
+			try
+			{
+				bankAliveServiceHost.Open();
+			}
+			catch(Exception e)
+			{
+				throw;
+			}
+		}
+
+		public void StartListeningForConnectedSectors()
+		{
+			startupConfirmationHost = new ServiceHost(this);
+			var binding = new NetTcpBinding();
+			binding.Security.Mode = SecurityMode.Transport;
+			binding.Security.Transport.ProtectionLevel = ProtectionLevel.Sign;
+			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+			string address = $"{BankServiceConfig.StartupConfirmationServiceAddress}/{BankServiceConfig.StartupConfirmationServiceEndpointName}";
+			startupConfirmationHost.AddServiceEndpoint(typeof(IStartupConfirmationService), binding, address);
+			try
+			{
+				startupConfirmationHost.Open();
+			}
+			catch(Exception e)
+			{
+				throw;
+			}
+		}
+
+		public void OpenCommandHostForSector(string sectorType)
+		{
+			CommandsPerQueue commandsPerQueue = supportedCommands.FirstOrDefault(x => x.SectorName == sectorType);
+			string commandingHostString = String.Join(", ", commandsPerQueue.Commands.Select(x => x.Name));
+			CommandQueue newQueue = new CommandQueue(queueSize, timeoutPeriod);
+			CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(sectorType, auditService, newQueue, responseQueue, BankServiceConfig.Connections[commandsPerQueue.SectorName], databaseManager, commandingHostString);
+			commandingHosts.Add(newHost);
+
+			foreach (Type commandType in commandsPerQueue.Commands)
+			{
+				commandToQueueMapper.Add(commandType, newQueue);
+			}
+
+			newHost.Start();
+
+			auditService.Log($"CommandingHost[{commandingHostString}]", "Initialized.");
+		}
+
+		public void ConfirmStartup(string sectorType)
+		{
+			Console.WriteLine($"{sectorType.ToUpper()} connected.");
+			OpenCommandHostForSector(sectorType);
+		}
+
+		public void CheckIfBankAlive(string callingSector)
+		{
+			Console.WriteLine($"{callingSector.ToUpper()} checking if I'm alive.");
 		}
 	}
 }

@@ -30,5 +30,15 @@ namespace BankService.CommandingManager
 		/// Deletes commands which are timed out.
 		/// </summary>
 		void ClearStaleCommands();
+
+		/// <summary>
+		/// Starts listening for connected sectors.
+		/// </summary>
+		void StartListeningForConnectedSectors();
+
+		/// <summary>
+		/// Starts listening for pings comming from sectors.
+		/// </summary>
+		void StartListeningForAlivePings();
 	}
 }

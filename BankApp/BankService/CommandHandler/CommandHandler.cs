@@ -6,13 +6,15 @@ using BankService.DatabaseManagement;
 using System.Linq;
 using Common.Communication;
 using Common.ServiceInterfaces;
+using System.ServiceModel;
+using System.Net.Security;
 
 namespace BankService.CommandHandler
 {
 	/// <summary>
 	/// Unit responsible for sending commands and receiving notifications from sectors.
 	/// </summary>
-	public class CommandHandler : ICommandHandler
+	public class CommandHandler : ICommandHandler, ISectorResponseService
 	{
 		private object locker;
 		private readonly int sectorSize;
@@ -22,21 +24,23 @@ namespace BankService.CommandHandler
 		private IDatabaseManager<BaseCommand> databaseManager;
 		private INotificationHost notificationHost;
 
+		private WindowsClientProxy<ISectorService> sectoreServiceProxy;
+
 		private IAudit auditService;
 
 		/// <summary>
 		/// Initializes new instance of <see cref="CommandHandler"/> class. 
 		/// </summary>
 		/// <param name="notificationHost">Notification host to notify for received command notification.</param>
-		public CommandHandler(IAudit auditService, INotificationHost notificationHost, IDatabaseManager<BaseCommand> databaseManager, int sectorQueueSize)
+		public CommandHandler(string sectorType, IAudit auditService, INotificationHost notificationHost, IDatabaseManager<BaseCommand> databaseManager, int sectorQueueSize)
 		{
 			this.auditService = auditService;
 			this.notificationHost = notificationHost;
 			this.databaseManager = databaseManager;
 			this.sectorSize = sectorQueueSize;
 
-			// open ClientProxy for Sector
-			// open Service for command response
+			ConnectionInfo ci = BankServiceConfig.Connections[sectorType];
+			sectoreServiceProxy = new WindowsClientProxy<ISectorService>(ci.Address, ci.EndpointName);
 
 			locker = new object();
 			commandsSent = LoadSentCommands();
@@ -115,12 +119,38 @@ namespace BankService.CommandHandler
 			try
 			{
 				// Send command to sector
+				// TODO: DO INTEGRITY CHECK
+				sectoreServiceProxy.Proxy.SendRequest(command, new byte[1]);
 				return true;
 			}
 			catch
 			{
 				return false;
 			}
+		}
+
+		#region ISectoreResponse
+		public void Accept(long commandId)
+		{
+			CommandNotification cn = new CommandNotification(commandId);
+			CommandNotificationReceived(cn);
+		}
+
+		public void Reject(long commandId, string reason)
+		{
+			CommandNotification cn = new CommandNotification(commandId);
+			cn.Information = reason;
+			CommandNotificationReceived(cn);
+		}
+		#endregion
+
+		private NetTcpBinding SetUpBindingForStartupConfirmation()
+		{
+			var binding = new NetTcpBinding();
+			binding.Security.Mode = SecurityMode.Transport;
+			binding.Security.Transport.ProtectionLevel = ProtectionLevel.Sign;
+			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+			return binding;
 		}
 	}
 }

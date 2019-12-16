@@ -1,6 +1,4 @@
-﻿using Common.Communication;
-using Common.Model;
-using Common.ServiceInterfaces;
+﻿using Common.Model;
 using SectorService.ServiceHosts;
 using System;
 using System.Collections.Generic;
@@ -38,12 +36,10 @@ namespace SectorService
 				SectorAdditionalConfig sectorAdditionalConfig;
 				if (SectorConfig.SectorsConfigs.TryGetValue(chosenSectorType, out sectorAdditionalConfig))
 				{
-					var sectorHost = new SectorServiceServiceHost(sectorAdditionalConfig);
+					var sectorHost = new SectorServiceServiceHost(chosenSectorType, sectorAdditionalConfig);
 					sectorHost.OpenService();
+					sectorHost.TryConnectToBank();
 					Console.WriteLine($"{chosenSectorType.ToUpper()} started.");
-					//WindowsClientProxy<IStartupConfirmationService> startupProxy = new WindowsClientProxy<IStartupConfirmationService>(
-					//	SectorConfig.StartupConfirmationServiceAddress, SectorConfig.StartupConfirmationServiceEndpointName);
-					//startupProxy.Proxy.ConfirmStartup(chosenSectorType);
 				}
 				else
 				{

@@ -72,6 +72,7 @@
     <Compile Include="ServiceInterfaces\IAccessService.cs" />
     <Compile Include="ServiceInterfaces\IAdminService.cs" />
     <Compile Include="ServiceInterfaces\IAuditService.cs" />
+    <Compile Include="ServiceInterfaces\IBankAliveService.cs" />
     <Compile Include="ServiceInterfaces\ISectorResponseService.cs" />
     <Compile Include="ServiceInterfaces\ISectorService.cs" />
     <Compile Include="ServiceInterfaces\IStartupConfirmationService.cs" />

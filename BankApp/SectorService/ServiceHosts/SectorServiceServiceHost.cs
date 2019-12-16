@@ -1,4 +1,5 @@
-﻿using Common.Model;
+﻿using Common.Communication;
+using Common.Model;
 using Common.ServiceInterfaces;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Net.Security;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SectorService.ServiceHosts
@@ -16,9 +18,13 @@ namespace SectorService.ServiceHosts
 		private readonly string _sectorServiceEndpointName;
 		private readonly ServiceHost _sectorServiceServiceHost;
 		private readonly NetTcpBinding _binding;
+		private WindowsClientProxy<IStartupConfirmationService> _startupProxy;
+		private WindowsClientProxy<IBankAliveService> _bankALiveServiceProxy;
+		private readonly string _sectorType;
 
-		public SectorServiceServiceHost(SectorAdditionalConfig sectorConfig)
+		public SectorServiceServiceHost(string sectorType, SectorAdditionalConfig sectorConfig)
 		{
+			_sectorType = sectorType;
 			_sectorServiceAddress = sectorConfig.Address;
 			_sectorServiceEndpointName = sectorConfig.EndpointName;
 			_binding = SetUpBinding();
@@ -26,6 +32,60 @@ namespace SectorService.ServiceHosts
 			_sectorServiceServiceHost = new ServiceHost(sectorService);
 			_sectorServiceServiceHost.AddServiceEndpoint(typeof(ISectorService), _binding,
 				$"{_sectorServiceAddress}/{_sectorServiceEndpointName}");
+		}
+
+		private void CheckIfBankAlive()
+		{
+			Task.Run(() =>
+			{
+				while (true)
+				{
+					try
+					{
+						Console.WriteLine("Check if bank alive...");
+						_bankALiveServiceProxy.Proxy.CheckIfBankAlive(_sectorType);
+						Console.WriteLine("Bank alive.");
+					}
+					catch (Exception e)
+					{
+						Console.WriteLine("Bank disconnected.");
+						_bankALiveServiceProxy = null;
+						TryConnectToBank();
+						return;
+					}
+					Thread.Sleep(1000);
+				}
+			});
+		}
+
+		public void TryConnectToBank()
+		{
+			bool isSectorConfirmed = false;
+
+			while (!isSectorConfirmed)
+			{
+				try
+				{
+					Console.WriteLine("Trying to connect to bank...");
+					_startupProxy = new WindowsClientProxy<IStartupConfirmationService>(
+						SectorConfig.StartupConfirmationServiceAddress, SectorConfig.StartupConfirmationServiceEndpointName);
+					_startupProxy.Proxy.ConfirmStartup(_sectorType);
+					isSectorConfirmed = true;
+					Console.WriteLine("Connected.");
+					_bankALiveServiceProxy = new WindowsClientProxy<IBankAliveService>(SectorConfig.BankAliveServiceAddress, SectorConfig.BankAliveServiceEndpointName);
+					CheckIfBankAlive();
+					break;
+				}
+				catch (Exception e)
+				{
+					_startupProxy = null;
+					int sleep = 5;
+					Console.WriteLine("Bank not available.");
+					Console.WriteLine($"Trying again in {sleep} seconds.");
+					isSectorConfirmed = false;
+					Thread.Sleep(sleep * 1000);
+				}
+			}
 		}
 
 		public void OpenService()

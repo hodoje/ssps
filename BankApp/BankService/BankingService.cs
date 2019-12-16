@@ -28,7 +28,7 @@ namespace BankService
 
 		private ICommandingManager commandManager;
 		private INotificationHandler notificationHandler;
-		private IAudit auditService; 
+		private IAudit auditService;
 
 		private ConcurrentQueue<CommandNotification> responseQueue;
 		public BankingService()
@@ -46,6 +46,16 @@ namespace BankService
 
 			//FOR TESTING
 			//commandManager.CreateDatabase();
+		}
+
+		public void StartListeningForSectorConnections()
+		{
+			commandManager.StartListeningForConnectedSectors();
+		}
+
+		public void StartListeningForCheckAlivePings()
+		{
+			commandManager.StartListeningForAlivePings();
 		}
 
 		[PrincipalPermission(SecurityAction.Demand, Role = "admins")]

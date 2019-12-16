@@ -25,10 +25,10 @@ namespace BankService.CommandingHost
 
 		private IAudit auditService;
 
-		public CommandingHost(IAudit auditService, CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo, IDatabaseManager<BaseCommand> databaseManager, string hostName)
+		public CommandingHost(string sectorType, IAudit auditService, CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo, IDatabaseManager<BaseCommand> databaseManager, string hostName)
 		{
 			// todo create Client for Sector with connecitonInfo
-			commandHandler = new CommandHandler.CommandHandler(auditService, this, databaseManager, BankServiceConfig.SectorQueueSize);
+			commandHandler = new CommandHandler.CommandHandler(sectorType, auditService, this, databaseManager, BankServiceConfig.SectorQueueSize);
 
 			this.auditService = auditService;
 			this.responseQueue = responseQueue;
