@@ -27,7 +27,6 @@ namespace BankService.CommandingHost
 
 		public CommandingHost(string sectorType, IAudit auditService, CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo, IDatabaseManager<BaseCommand> databaseManager, string hostName)
 		{
-			// todo create Client for Sector with connecitonInfo
 			commandHandler = new CommandHandler.CommandHandler(sectorType, auditService, this, databaseManager, BankServiceConfig.SectorQueueSize);
 
 			this.auditService = auditService;
@@ -105,6 +104,7 @@ namespace BankService.CommandingHost
 
 				if (!commandHandler.SendCommandToSector(commandToSend))
 				{
+                    // If command handler couldn't sent the command, requeue the command.
 					commandingQueue.Enqueue(commandToSend);
 				}
 			}

@@ -9,6 +9,8 @@ using System.ServiceModel;
 using System.ServiceModel.Description;
 using System.ServiceModel.Security;
 using Common.CertificateManagement;
+using System.Security.Principal;
+using Common.Communication;
 
 namespace BankService
 {
@@ -16,7 +18,7 @@ namespace BankService
 	{
 		static void Main(string[] args)
 		{
-			string srvCertCN = "bankservice";/*StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);*/
+			string srvCertCN = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
 			string address = $"{BankServiceConfig.BankServiceAddress}/{BankServiceConfig.UserServiceEndpointName}";
 			BankingService bankingService = new BankingService();
 
