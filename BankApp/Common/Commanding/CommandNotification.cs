@@ -21,9 +21,8 @@ namespace Common.Commanding
 		/// Initializes new instance of <see cref="CommandNotification"/> class.
 		/// </summary>
 		/// <param name="commandId"></param>
-		public CommandNotification(long commandId) : base(commandId)
+		public CommandNotification(long commandId, CommandNotificationStatus commandStatus = CommandNotificationStatus.None) : base(commandId)
 		{
-			CommandStatus = CommandNotificationStatus.None;
 			NotificationState = NotificationState.Expected;
 		}
 

@@ -36,6 +36,7 @@ namespace BankService.Notification
 				if (notificationinfo.PendingNotifications.TryRemove(receivedCommandNotification.ID, out notification))
 				{
 					notification.NotificationState = NotificationState.Received;
+                    notification.Information = receivedCommandNotification.Information;
 
 					dataPersister.Update(notification);
 

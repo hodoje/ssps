@@ -91,9 +91,9 @@ namespace Client.ViewModels
 
 			_userServiceCallbackObject = new BankServiceCallbackObject(HandleNotifications);
 
-			//string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
+			string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
 			//TEST
-			string username = "pera";
+			//string username = "pera";
 			X509Certificate2 certificate;
 			certificate = GetCertificateFromStorage(username);
 			if (certificate == null)
@@ -104,7 +104,10 @@ namespace Client.ViewModels
 
 			_userServiceProxy = new CertificateClientProxy<IUserService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.UserServiceEndpoint, certificate);
 			_adminServiceProxy = new CertificateClientProxy<IAdminService>(_userServiceCallbackObject, ClientConfig.BankServiceAddress, ClientConfig.AdminServiceEndpoint, certificate);
-			AskServiceForNotifications();
+            if(StringFormatter.GetAttributeFromSubjetName(certificate.SubjectName.Name, "OU") == "users")
+            {
+                AskServiceForNotifications();
+            }
 		}
 		#endregion
 

@@ -59,7 +59,7 @@ namespace BankService.CommandHandler
 				}
 				else
 				{
-					auditService.Log("CommandHandler", $"Unexpected response received for command with {commandNotification.ID} id.");
+					auditService.Log("CommandHandler", $"Unexpected response received for command with {commandNotification.ID} id.", System.Diagnostics.EventLogEntryType.Warning);
 				}
 			}
 		}
@@ -137,13 +137,13 @@ namespace BankService.CommandHandler
 		#region ISectoreResponse
 		public void Accept(long commandId)
 		{
-			CommandNotification cn = new CommandNotification(commandId);
+			CommandNotification cn = new CommandNotification(commandId, CommandNotificationStatus.Confirmed);          
 			CommandNotificationReceived(cn);
 		}
 
 		public void Reject(long commandId, string reason)
 		{
-			CommandNotification cn = new CommandNotification(commandId);
+			CommandNotification cn = new CommandNotification(commandId, CommandNotificationStatus.Rejected);
 			cn.Information = reason;
 			CommandNotificationReceived(cn);
 		}
