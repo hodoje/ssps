@@ -37,5 +37,10 @@ namespace Client.Model
 			_status = status;
 			DisplayedInfo = $"{Message}{Environment.NewLine}Status: {status}";
 		}
+
+		public override string ToString()
+		{
+			return $"{Message}{Environment.NewLine}Status: {Status}";
+		}
 	}
 }

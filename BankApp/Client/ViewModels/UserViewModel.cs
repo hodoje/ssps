@@ -21,8 +21,8 @@ namespace Client.ViewModels
 	public class UserViewModel : BindableBase
 	{
 		#region Fields
-		private double _loanAmount = 100;
-		private int _loanDuration = 1;
+		private double _loanAmount = 0;
+		private int _loanDuration = 0;
 		private double _transactionAmount;
 		private TransactionType _selectedTransactionType;
 		private CertificateClientProxy<IUserService> _userServiceProxy;
@@ -37,7 +37,7 @@ namespace Client.ViewModels
 			set
 			{
 				SetField(ref _loanAmount, value);
-				ApplyForCreditCommand.RaiseCanExecuteChanged();
+				RequestLoanCommand.RaiseCanExecuteChanged();
 			}
 		}
 
@@ -47,7 +47,7 @@ namespace Client.ViewModels
 			set
 			{
 				SetField(ref _loanDuration, value);
-				ApplyForCreditCommand.RaiseCanExecuteChanged();
+				RequestLoanCommand.RaiseCanExecuteChanged();
 			}
 		}
 
@@ -72,7 +72,7 @@ namespace Client.ViewModels
 		}
 		public ObservableCollection<TransactionType> TransactionTypes { get; set; }
 		public ObservableCollection<Notification> Notifications { get; set; }
-		public UIICommand ApplyForCreditCommand { get; set; }
+		public UIICommand RequestLoanCommand { get; set; }
 		public UIICommand ExecuteTransactionCommand { get; set; }
 		public UIICommand CreateNewDatabaseCommand { get; set; }
 		public UIICommand RemoveExpiredRequestsCommand { get; set; }
@@ -84,7 +84,7 @@ namespace Client.ViewModels
 			TransactionTypes = new ObservableCollection<TransactionType>(Enum.GetValues(typeof(TransactionType)).Cast<TransactionType>());
 			Notifications = new ObservableCollection<Notification>();
 
-			ApplyForCreditCommand = new UIICommand(OnApplyForCredit, CanApplyForCredit);
+			RequestLoanCommand = new UIICommand(OnRequestLoan, CanRequestLoan);
 			ExecuteTransactionCommand = new UIICommand(OnExecuteTransaction, CanExecuteTransaction);
 			CreateNewDatabaseCommand = new UIICommand(OnCreateNewDatabase);
 			RemoveExpiredRequestsCommand = new UIICommand(OnRemoveExpiredRequests);
@@ -92,11 +92,11 @@ namespace Client.ViewModels
 			_userServiceCallbackObject = new BankServiceCallbackObject(HandleNotifications);
 
 			//string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
-			// TEST
+			//TEST
 			string username = "pera";
 			X509Certificate2 certificate;
 			certificate = GetCertificateFromStorage(username);
-			if(certificate == null)
+			if (certificate == null)
 			{
 				Environment.Exit(0);
 				return;
@@ -130,7 +130,14 @@ namespace Client.ViewModels
 			}
 			catch (Exception e)
 			{
-				Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+				if(_userServiceProxy == null)
+				{
+					Notifications.Add(new Notification("User service unavailable.", CommandNotificationStatus.Rejected));
+				}
+				else
+				{
+					Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+				}
 			}
 		}
 
@@ -139,11 +146,11 @@ namespace Client.ViewModels
 			return TransactionAmount > 0;
 		}
 
-		private void OnApplyForCredit()
+		private void OnRequestLoan()
 		{
 			try
 			{
-				_userServiceProxy.Proxy.Register();
+				_userServiceProxy.Proxy.RequestLoan(LoanAmount, LoanDuration);
 			}
 			catch (SecurityAccessDeniedException securityAccess)
 			{
@@ -151,11 +158,18 @@ namespace Client.ViewModels
 			}
 			catch (Exception e)
 			{
-				Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+				if (_userServiceProxy == null)
+				{
+					Notifications.Add(new Notification("User service unavailable.", CommandNotificationStatus.Rejected));
+				}
+				else
+				{
+					Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+				}
 			}
 		}
 
-		private bool CanApplyForCredit()
+		private bool CanRequestLoan()
 		{
 			return LoanAmount > 0 && LoanDuration > 0;
 		}
@@ -177,7 +191,14 @@ namespace Client.ViewModels
 			}
 			catch (Exception e)
 			{
-				Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+				if (_userServiceProxy == null)
+				{
+					Notifications.Add(new Notification("User service unavailable.", CommandNotificationStatus.Rejected));
+				}
+				else
+				{
+					Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+				}
 			}
 		}
 
@@ -199,7 +220,14 @@ namespace Client.ViewModels
 			}
 			catch (Exception e)
 			{
-				Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+				if (_adminServiceProxy == null)
+				{
+					Notifications.Add(new Notification("Admin service unavailable.", CommandNotificationStatus.Rejected));
+				}
+				else
+				{
+					Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+				}
 			}
 		}
 
@@ -215,7 +243,14 @@ namespace Client.ViewModels
 			}
 			catch (Exception e)
 			{
-				Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+				if (_adminServiceProxy == null)
+				{
+					Notifications.Add(new Notification("Admin service unavailable.", CommandNotificationStatus.Rejected));
+				}
+				else
+				{
+					Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+				}
 			}
 		}
 
