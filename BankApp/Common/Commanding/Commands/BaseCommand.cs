@@ -8,8 +8,7 @@ namespace Common.Commanding
 	/// Class used to represent user command.
 	/// </summary>
 	[DataContract]
-	[KnownType(typeof(DepositCommand))]
-	[KnownType(typeof(WithdrawCommand))]
+	[KnownType(typeof(TransactionCommand))]
 	[KnownType(typeof(RequestLoanCommand))]
 	[KnownType(typeof(RegistrationCommand))]
 	public abstract class BaseCommand : IdentifiedObject

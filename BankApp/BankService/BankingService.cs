@@ -100,7 +100,7 @@ namespace BankService
 			auditService.Log(username, $"Authorized as user, {amount} requested.", System.Diagnostics.EventLogEntryType.Information);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
-			DepositCommand depositCommand = new DepositCommand(0, username, amount);
+			TransactionCommand depositCommand = new TransactionCommand(0, username, amount, TransactionType.Deposit);
 			long commandId = commandManager.EnqueueCommand(depositCommand);
 
 			notificationHandler.RegisterCommand(username, callback, commandId);
@@ -169,7 +169,7 @@ namespace BankService
 			auditService.Log(username, $"Authorized as user, requests loan of {amount}.", System.Diagnostics.EventLogEntryType.Information);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
-			WithdrawCommand withdrawCommand = new WithdrawCommand(0, username, amount);
+			TransactionCommand withdrawCommand = new TransactionCommand(0, username, amount, TransactionType.Withdraw);
 			long commandId = commandManager.EnqueueCommand(withdrawCommand);
 
 			notificationHandler.RegisterCommand(username, callback, commandId);

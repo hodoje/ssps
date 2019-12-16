@@ -14,7 +14,7 @@ namespace BankService.CommandingHost
 {
 	public class CommandingHost : ICommandingHost, INotificationHost, IDisposable
 	{
-		private string hostName;
+		private string sectorType;
 
 		private CancellationTokenSource cancellationToken = new CancellationTokenSource();
 		private AutoResetEvent sendingSynchronization = new AutoResetEvent(false);
@@ -27,14 +27,14 @@ namespace BankService.CommandingHost
 
 		private IAudit auditService;
 
-		public CommandingHost(string sectorType, IAudit auditService, CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo, IDatabaseManager<BaseCommand> databaseManager, string hostName)
+		public CommandingHost(string sectorType, IAudit auditService, CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, IDatabaseManager<BaseCommand> databaseManager)
 		{
 			commandHandler = new CommandHandler.CommandHandler(sectorType, auditService, this, BankServiceConfig.SectorQueueSize, LoadSentCommands());
 
 			this.auditService = auditService;
 			this.responseQueue = responseQueue;
 			this.commandingQueue = commandingQueue;
-			this.hostName = hostName;
+			this.sectorType = sectorType;
 			this.databaseManager = databaseManager;
 		}
 
@@ -46,7 +46,7 @@ namespace BankService.CommandingHost
 			if (command != null)
 			{
 				command.State = CommandState.Executed;
-                command.Status = commandNotification.CommandStatus;
+				command.Status = commandNotification.CommandStatus;
 				databaseManager.Update(command);
 
 				auditService.Log(command.ToString(), "Changed state to executed!");
@@ -85,7 +85,7 @@ namespace BankService.CommandingHost
 
 		private void WorkerThread()
 		{
-			Console.WriteLine($"[CommandingHost] {hostName} started...");
+			Console.WriteLine($"[CommandingHost({sectorType.ToUpper()})] started...");
 			while (!cancellationToken.IsCancellationRequested)
 			{
 				BaseCommand commandToSend = commandingQueue.Dequeue();

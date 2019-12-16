@@ -53,10 +53,9 @@
     <Compile Include="Commanding\CommandEnumerations.cs" />
     <Compile Include="Commanding\CommandQueue.cs" />
     <Compile Include="Commanding\CommandNotification.cs" />
-    <Compile Include="Commanding\Commands\DepositCommand.cs" />
+    <Compile Include="Commanding\Commands\TransactionCommand.cs" />
     <Compile Include="Commanding\Commands\RegistrationCommand.cs" />
     <Compile Include="Commanding\Commands\RequestLoanCommand.cs" />
-    <Compile Include="Commanding\Commands\WithdrawCommand.cs" />
     <Compile Include="Communication\Audit\IAudit.cs" />
     <Compile Include="Communication\AuthorizationPolicy\OUPrincipal.cs" />
     <Compile Include="Communication\AuthorizationPolicy\OUAuthorizationPolicy.cs" />
@@ -65,6 +64,7 @@
     <Compile Include="Communication\StringFormatter.cs" />
     <Compile Include="Communication\WindowsClientProxy.cs" />
     <Compile Include="DataContracts\Dtos\EventLogData.cs" />
+    <Compile Include="DataContracts\Enums\TransactionType.cs" />
     <Compile Include="DataContracts\Enums\UserTypeEnum.cs" />
     <Compile Include="DataContracts\Exceptions\InvalidEventLogTypeException.cs" />
     <Compile Include="Model\IdentifiedObject.cs" />

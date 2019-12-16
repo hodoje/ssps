@@ -7,22 +7,22 @@ namespace Common.Commanding
 	/// Command used to represent deposit request initiated by user.
 	/// </summary>
 	[DataContract]
-	public class DepositCommand : BaseCommand
+	public class TransactionCommand : BaseCommand
 	{
 		/// <summary>
 		/// Initializes new instance of <see cref="D"/> 
 		/// </summary>
-		public DepositCommand()
+		public TransactionCommand()
 		{
 
 		}
 		/// <summary>
-		/// Initializes new instance of <see cref="DepositCommand"/> class.
+		/// Initializes new instance of <see cref="TransactionCommand"/> class.
 		/// </summary>
 		/// <param name="commandId">Unique command ID.</param>
 		/// <param name="username">Username of user who requested deposit.</param>
 		/// <param name="amount">Deposit amount.</param>
-		public DepositCommand(long commandId, string username, double amount) : base(commandId, username)
+		public TransactionCommand(long commandId, string username, double amount, TransactionType transactionType) : base(commandId, username)
 		{
 			Amount = amount;
 		}
@@ -33,16 +33,22 @@ namespace Common.Commanding
 		[DataMember]
 		public double Amount { get; private set; }
 
+		/// <summary>
+		/// Type of transaction.
+		/// </summary>
+		[DataMember]
+		public TransactionType TransactionType { get; set; }
+
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
-			DepositCommand depositCommand = obj as DepositCommand;
-			if (depositCommand == null)
+			TransactionCommand transactionCommand = obj as TransactionCommand;
+			if (transactionCommand == null)
 			{
 				return false;
 			}
 
-			return base.Equals(obj) && Amount == depositCommand.Amount;
+			return base.Equals(obj) && Amount == transactionCommand.Amount && TransactionType == transactionCommand.TransactionType;
 		}
 
 		/// <inheritdoc/>
