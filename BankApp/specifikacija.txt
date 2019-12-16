@@ -1,12 +1,4 @@
-Provera zastarelosti zahteva se proverava na interval koji je konfigurabilno.
-
-Kada se klijent pokrene treba da proveri od banke da li ima neke notifikacije koje ga cekaju.
-
-Otvaranje racuna, zahtev kredita i uplata mora da bude asinhrono.
-Isplata je "sinhrona" operacija odnosno kada klijent "padne" ne treba da se cuva notifikacija.
-
-Zahtev za brisanjem zastarelih komandi moze SAMO admin da kreira bazu.
-
-Cuvati sve obradjene zahteve.
-
-Sektor ima view.
+CommandHost mora detektovati pad sektora.
+Kreirati User i BankAccount modele. Jedan User, vise BankAccount-a. Jedan BankAccount, jedan User. Prilagoditi applikaciju tome.
+Komande se zapravo izvrsavaju i postoji stanje korisnickih racuna (ovo gore iznad).
+Proveriti months kod request loan.
