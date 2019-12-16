@@ -11,6 +11,7 @@ using System.Net.Security;
 
 namespace BankService.CommandHandler
 {
+	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
 	/// <summary>
 	/// Unit responsible for sending commands and receiving notifications from sectors.
 	/// </summary>
@@ -35,6 +36,21 @@ namespace BankService.CommandHandler
 
 			ConnectionInfo ci = BankServiceConfig.Connections[sectorType];
 			sectoreServiceProxy = new WindowsClientProxy<ISectorService>(ci.Address, ci.EndpointName);
+
+			ServiceHost sectorResponseServiceHost = new ServiceHost(this);
+			sectorResponseServiceHost.AddServiceEndpoint(
+				typeof(ISectorResponseService), 
+				SetUpBindingForSectoreResponse(), 
+				$"{ci.SectorResponseAddress}/{ci.SectorResponseEndpoint}");
+			try
+			{
+				sectorResponseServiceHost.Open();
+				Console.WriteLine($"{sectorType.ToUpper()} sector response service opened.");
+			}
+			catch(Exception e)
+			{
+				Console.WriteLine(e);
+			}
 
 			locker = new object();
 			this.commandsSent = sentCommands.ToDictionary(x => x.ID, x => x);
@@ -107,9 +123,10 @@ namespace BankService.CommandHandler
 		}
 
 		#region ISectoreResponse
-		public void Accept(long commandId)
+		public void Accept(long commandId, string information)
 		{
-			CommandNotification cn = new CommandNotification(commandId, CommandNotificationStatus.Confirmed);          
+			CommandNotification cn = new CommandNotification(commandId, CommandNotificationStatus.Confirmed);
+			cn.Information = information;     
 			CommandNotificationReceived(cn);
 		}
 
@@ -122,6 +139,15 @@ namespace BankService.CommandHandler
 		#endregion
 
 		private NetTcpBinding SetUpBindingForStartupConfirmation()
+		{
+			var binding = new NetTcpBinding();
+			binding.Security.Mode = SecurityMode.Transport;
+			binding.Security.Transport.ProtectionLevel = ProtectionLevel.Sign;
+			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+			return binding;
+		}
+
+		private NetTcpBinding SetUpBindingForSectoreResponse()
 		{
 			var binding = new NetTcpBinding();
 			binding.Security.Mode = SecurityMode.Transport;

@@ -29,13 +29,13 @@ namespace BankService.CommandingHost
 
 		public CommandingHost(string sectorType, IAudit auditService, CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, IDatabaseManager<BaseCommand> databaseManager)
 		{
-			commandHandler = new CommandHandler.CommandHandler(sectorType, auditService, this, BankServiceConfig.SectorQueueSize, LoadSentCommands());
-
+			this.databaseManager = databaseManager;
 			this.auditService = auditService;
 			this.responseQueue = responseQueue;
 			this.commandingQueue = commandingQueue;
 			this.sectorType = sectorType;
-			this.databaseManager = databaseManager;
+
+			commandHandler = new CommandHandler.CommandHandler(sectorType, auditService, this, BankServiceConfig.SectorQueueSize, LoadSentCommands());
 		}
 
 		public void CommandNotificationReceived(CommandNotification commandNotification)
@@ -50,12 +50,12 @@ namespace BankService.CommandingHost
 				databaseManager.Update(command);
 
 				auditService.Log(command.ToString(), "Changed state to executed!");
-			}
 
-            if (command.Status == CommandNotificationStatus.Confirmed)
-            {
-                // enqueue on CommandExecutor
-            }
+				if (command.Status == CommandNotificationStatus.Confirmed)
+				{
+					// enqueue on CommandExecutor
+				}
+			}
 
 			// Awake WorkerThread because there is enough command space in Commanding Handler.
 			sendingSynchronization.Set();

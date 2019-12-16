@@ -14,9 +14,9 @@ namespace SectorService.Services
 	{
 		private SectorManager _sectorManager;
 
-		public SectorService(int sectorQueueSize, int sectorQueueTimeoutPeriodInSeconds)
+		public SectorService(string sectorType, int sectorQueueSize, int sectorQueueTimeoutPeriodInSeconds)
 		{
-			_sectorManager = new SectorManager(sectorQueueSize, sectorQueueTimeoutPeriodInSeconds);
+			_sectorManager = new SectorManager(sectorType, sectorQueueSize, sectorQueueTimeoutPeriodInSeconds);
 		}
 
 		public void SendRequest(BaseCommand command, byte[] integrityCheck)

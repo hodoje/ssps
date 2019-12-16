@@ -26,11 +26,12 @@ namespace SectorService
 		/// <summary>
 		/// Initializes an instance of <see cref="SectorManager" class./>
 		/// </summary>
-		public SectorManager(int sectorQueueSize, int sectorQueueTimeoutPeriodInSeconds)
+		public SectorManager(string sectorType, int sectorQueueSize, int sectorQueueTimeoutPeriodInSeconds)
 		{
 			_requestQueue = new CommandQueue(sectorQueueSize, sectorQueueTimeoutPeriodInSeconds);
 			_responseQueue = new CommandQueue(sectorQueueSize, sectorQueueTimeoutPeriodInSeconds);
-			_responseProxy = new WindowsClientProxy<ISectorResponseService>(SectorConfig.SectorResponseServiceAddress, SectorConfig.SectorResponseServiceEndpoint);
+			_responseProxy = new WindowsClientProxy<ISectorResponseService>(
+				SectorConfig.SectorsConfigs[sectorType].SectorResponseAddress, SectorConfig.SectorsConfigs[sectorType].SectorResponseEndpointName);
 			_processorTask = new Task(ProcessCommands);
 			_responderTask = new Task(SendResponses);
 
@@ -53,9 +54,16 @@ namespace SectorService
 		/// Confirms a given command to Bank service.
 		/// </summary>
 		/// <param name="commandId">Id of a command that has been successfully executed.</param>
-		private void AcceptRequest(long commandId)
+		private void AcceptRequest(long commandId, string information)
 		{
-			_responseProxy.Proxy.Accept(commandId);
+			try
+			{
+				_responseProxy.Proxy.Accept(commandId, information);
+			}
+			catch(Exception e)
+			{
+				throw;
+			}
 		}
 
 		/// <summary>
@@ -65,7 +73,14 @@ namespace SectorService
 		/// <param name="reason">Reason why a command has been rejected.</param>
 		private void RejectRequest(long commandId, string reason)
 		{
-			_responseProxy.Proxy.Reject(commandId, reason);
+			try
+			{
+				_responseProxy.Proxy.Reject(commandId, reason);
+			}
+			catch(Exception e)
+			{
+				throw;
+			}
 		}
 		
 		/// <summary>
@@ -75,7 +90,15 @@ namespace SectorService
 		{
 			while (true)
 			{
-				BaseCommand command = _requestQueue.Dequeue();
+				BaseCommand command;
+				try
+				{
+					command = _requestQueue.Dequeue();
+				}
+				catch(Exception e)
+				{
+					throw;
+				}
 				if (command.TimedOut)
 				{
 					command.Status = CommandNotificationStatus.Rejected;
@@ -117,10 +140,10 @@ namespace SectorService
 				switch (command.Status)
 				{
 					case CommandNotificationStatus.Confirmed:
-						AcceptRequest(command.ID);
+						AcceptRequest(command.ID, "Request successfully processed.");
 						break;
 					case CommandNotificationStatus.Rejected:
-						RejectRequest(command.ID, "Request timed out.");
+						RejectRequest(command.ID, "Request was rejected.");
 						break;
 					case CommandNotificationStatus.None:
 						RejectRequest(command.ID, "Failed to process request.");
@@ -139,8 +162,11 @@ namespace SectorService
 		/// <returns>Returns the user input either 'y' for accpet or 'n' for reject.</returns>
 		private string GetSectorWorkerInput(BaseCommand command)
 		{
-			Console.WriteLine($"{command.StringifyCommand()}{Environment.NewLine}Type 'y' for accept and 'n' for reject: ");
-			return Console.ReadLine();
+			Console.Write($"{command.StringifyCommand()}{Environment.NewLine}Type 'y' for accept and 'n' for reject: ");
+			Console.ForegroundColor = ConsoleColor.DarkGreen;
+			string input = Console.ReadLine();
+			Console.ForegroundColor = ConsoleColor.Gray;
+			return input;
 		}
 		#endregion
 	}

@@ -13,5 +13,9 @@ namespace Common.Model
 		public string Address { get; set; }
 		[JsonProperty("endpointName")]
 		public string EndpointName { get; set; }
+		[JsonProperty("sectorResponseAddress")]
+		public string SectorResponseAddress { get; set; }
+		[JsonProperty("sectorResponseEndpointName")]
+		public string SectorResponseEndpointName { get; set; }
 	}
 }

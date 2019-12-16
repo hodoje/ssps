@@ -28,7 +28,7 @@ namespace SectorService.ServiceHosts
 			_sectorServiceAddress = sectorConfig.Address;
 			_sectorServiceEndpointName = sectorConfig.EndpointName;
 			_binding = SetUpBinding();
-			Services.SectorService sectorService = new Services.SectorService(SectorConfig.SectorQueueSize, SectorConfig.SectorQueueTimeoutInSeconds);
+			Services.SectorService sectorService = new Services.SectorService(sectorType, SectorConfig.SectorQueueSize, SectorConfig.SectorQueueTimeoutInSeconds);
 			_sectorServiceServiceHost = new ServiceHost(sectorService);
 			_sectorServiceServiceHost.AddServiceEndpoint(typeof(ISectorService), _binding,
 				$"{_sectorServiceAddress}/{_sectorServiceEndpointName}");
@@ -42,13 +42,13 @@ namespace SectorService.ServiceHosts
 				{
 					try
 					{
-						Console.WriteLine("Check if bank alive...");
+						//Console.WriteLine("Check if bank alive...");
 						_bankALiveServiceProxy.Proxy.CheckIfBankAlive(_sectorType);
-						Console.WriteLine("Bank alive.");
+						//Console.WriteLine("Bank alive.");
 					}
 					catch (Exception e)
 					{
-						Console.WriteLine("Bank disconnected.");
+						//Console.WriteLine("Bank disconnected.");
 						_bankALiveServiceProxy = null;
 						TryConnectToBank();
 						return;
@@ -66,12 +66,12 @@ namespace SectorService.ServiceHosts
 			{
 				try
 				{
-					Console.WriteLine("Trying to connect to bank...");
+					//Console.WriteLine("Trying to connect to bank...");
 					_startupProxy = new WindowsClientProxy<IStartupConfirmationService>(
 						SectorConfig.StartupConfirmationServiceAddress, SectorConfig.StartupConfirmationServiceEndpointName);
 					_startupProxy.Proxy.ConfirmStartup(_sectorType);
 					isSectorConfirmed = true;
-					Console.WriteLine("Connected.");
+					//Console.WriteLine("Connected.");
 					_bankALiveServiceProxy = new WindowsClientProxy<IBankAliveService>(SectorConfig.BankAliveServiceAddress, SectorConfig.BankAliveServiceEndpointName);
 					CheckIfBankAlive();
 					break;
@@ -80,8 +80,8 @@ namespace SectorService.ServiceHosts
 				{
 					_startupProxy = null;
 					int sleep = 5;
-					Console.WriteLine("Bank not available.");
-					Console.WriteLine($"Trying again in {sleep} seconds.");
+					//Console.WriteLine("Bank not available.");
+					//Console.WriteLine($"Trying again in {sleep} seconds.");
 					isSectorConfirmed = false;
 					Thread.Sleep(sleep * 1000);
 				}
