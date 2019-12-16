@@ -27,7 +27,6 @@ namespace BankService.CommandingHost
 
 		public CommandingHost(string sectorType, IAudit auditService, CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, ConnectionInfo connectionInfo, IDatabaseManager<BaseCommand> databaseManager, string hostName)
 		{
-			// todo create Client for Sector with connecitonInfo
 			commandHandler = new CommandHandler.CommandHandler(sectorType, auditService, this, databaseManager, BankServiceConfig.SectorQueueSize);
 
 			this.auditService = auditService;
@@ -45,10 +44,16 @@ namespace BankService.CommandingHost
 			if (command != null)
 			{
 				command.State = CommandState.Executed;
+                command.Status = commandNotification.CommandStatus;
 				databaseManager.Update(command);
 
 				auditService.Log(command.ToString(), "Changed state to executed!");
 			}
+
+            if (command.Status == CommandNotificationStatus.Confirmed)
+            {
+                // enqueue on CommandExecutor
+            }
 
 			// Awake WorkerThread because there is enough command space in Commanding Handler.
 			sendingSynchronization.Set();
@@ -105,6 +110,7 @@ namespace BankService.CommandingHost
 
 				if (!commandHandler.SendCommandToSector(commandToSend))
 				{
+                    // If command handler couldn't sent the command, requeue the command.
 					commandingQueue.Enqueue(commandToSend);
 				}
 			}

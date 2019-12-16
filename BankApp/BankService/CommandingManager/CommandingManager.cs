@@ -49,9 +49,8 @@ namespace BankService.CommandingManager
 
 		static CommandingManager()
 		{
-			// TODO read from configuration
-			queueSize = 5;
-			timeoutPeriod = 60;
+			queueSize = BankServiceConfig.SectorQueueSize;
+            timeoutPeriod = BankServiceConfig.SectorQueueTimeoutInSeconds;
 		}
 
 		public CommandingManager(IAudit auditService, ConcurrentQueue<CommandNotification> responseQueue)
@@ -119,8 +118,9 @@ namespace BankService.CommandingManager
 
 		public void CreateDatabase()
 		{
-			dbContext.Database.CreateIfNotExists();
-			auditService.Log(logMessage: "New database created!", eventLogEntryType: System.Diagnostics.EventLogEntryType.Warning);
+			dbContext.Database.Create();
+            dbContext.Database.Connection.Open();
+            auditService.Log(logMessage: "New database created!", eventLogEntryType: System.Diagnostics.EventLogEntryType.Warning);
 		}
 
 		public void Dispose()

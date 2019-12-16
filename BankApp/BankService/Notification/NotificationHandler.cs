@@ -75,6 +75,11 @@ namespace BankService
 				string username;
 				IClientServiceCallback callback = notificationContainer.CommandNotificationReceived(notification, out username);
 
+                if (callback == null)
+                {
+                    continue;
+                }
+
 				if (SendNotificationToClient(callback, notification))
 				{
 					notificationContainer.CommandNotificationSent(notification.ID);
