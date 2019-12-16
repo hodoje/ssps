@@ -17,7 +17,7 @@ namespace Common.ServiceInterfaces
 		void Deposit(double amount);
 
 		[OperationContract]
-		void RequestLoan(double amount);
+		void RequestLoan(double amount, int months);
 
 		[OperationContract]
 		List<CommandNotification> GetPendingNotifications();

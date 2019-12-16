@@ -139,7 +139,7 @@ namespace BankService
 			notificationHandler.RegisterCommand(username, callback, commandId);
 		}
 
-		public void RequestLoan(double amount)
+		public void RequestLoan(double amount, int months)
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
 			if (!Thread.CurrentPrincipal.IsInRole("users"))
@@ -151,7 +151,7 @@ namespace BankService
 			auditService.Log(username, $"Authorized as user, requests loan of {amount}.", System.Diagnostics.EventLogEntryType.Information);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
-			RequestLoanCommand requestLoanCommand = new RequestLoanCommand(0, username, amount);
+			RequestLoanCommand requestLoanCommand = new RequestLoanCommand(0, username, amount, months);
 			long commandId = commandManager.EnqueueCommand(requestLoanCommand);
 
 			notificationHandler.RegisterCommand(username, callback, commandId);
