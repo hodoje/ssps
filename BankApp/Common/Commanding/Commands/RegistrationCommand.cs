@@ -41,5 +41,10 @@ namespace Common.Commanding
 		{
 			return base.GetHashCode();
 		}
+
+		public override string StringifyCommand()
+		{
+			return $"{Username} wants to register to the system."; 
+		}
 	}
 }

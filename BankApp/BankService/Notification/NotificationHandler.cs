@@ -45,6 +45,7 @@ namespace BankService
 		public void RegisterCommand(string username, IClientServiceCallback userCallback, long commandId)
 		{
 			notificationContainer.AddExpectingNotificationId(username, userCallback, commandId);
+			auditService.Log("NotificationHandler", $"Added expected notification(id={commandId}) in container.", System.Diagnostics.EventLogEntryType.Information);
 		}
 
 		public void Start()
@@ -69,6 +70,8 @@ namespace BankService
 					continue;
 				}
 
+				auditService.Log("NotificationHandler", $"Received notification with id: {notification.ID}");
+
 				string username;
 				IClientServiceCallback callback = notificationContainer.CommandNotificationReceived(notification, out username);
 
@@ -89,7 +92,7 @@ namespace BankService
 			try
 			{
 				callback.SendNotification(commandNotification);
-
+				auditService.Log(logMessage: $"Command notification sent to client(id={commandNotification.ID}).", eventLogEntryType: System.Diagnostics.EventLogEntryType.Information);
 				return true;
 			}
 			catch

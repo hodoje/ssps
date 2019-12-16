@@ -20,7 +20,8 @@ namespace Common.Commanding
 		/// <param name="commandId">Unique command ID.</param>
 		/// <param name="username">Username of user who requested loan.</param>
 		/// <param name="amount">Loan amount.</param>
-		public RequestLoanCommand(long commandId, string username, double amount) : base(commandId, username)
+		/// <param name="months">Months to return the loan.</param>
+		public RequestLoanCommand(long commandId, string username, double amount, int months) : base(commandId, username)
 		{
 			Amount = amount;
 		}
@@ -30,6 +31,12 @@ namespace Common.Commanding
 		/// </summary>
 		[DataMember]
 		public double Amount { get; private set; }
+
+		/// <summary>
+		/// Months to return the loan.
+		/// </summary>
+		[DataMember]
+		public int Months { get; set; }
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
@@ -47,6 +54,11 @@ namespace Common.Commanding
 		public override int GetHashCode()
 		{
 			return base.GetHashCode();
+		}
+
+		public override string StringifyCommand()
+		{
+			return $"{Username} requests a loan of {Amount}$ and return it in {Months} months.";
 		}
 	}
 }

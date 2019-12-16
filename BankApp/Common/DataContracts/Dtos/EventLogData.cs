@@ -26,17 +26,12 @@ namespace Common.DataContracts.Dtos
 				throw new ArgumentNullException(nameof(bankName));
 			}
 
-			if (string.IsNullOrWhiteSpace(accountName))
-			{
-				throw new ArgumentNullException(nameof(accountName));
-			}
-
 			if (string.IsNullOrWhiteSpace(logMessage))
 			{
 				throw new ArgumentNullException(nameof(logMessage));
 			}
 
-			if (Enum.IsDefined(typeof(EventLogEntryType), eventLogEntryType))
+			if (!Enum.IsDefined(typeof(EventLogEntryType), eventLogEntryType))
 			{
 				throw new InvalidEventLogTypeException();
 			}

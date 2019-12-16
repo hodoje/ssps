@@ -10,6 +10,11 @@ namespace AuditingService
 	{
 		static void Main(string[] args)
 		{
+			AuditServiceServiceHost auditHost = new AuditServiceServiceHost();
+			auditHost.OpenService();
+
+			Console.WriteLine("Audit service started...");
+			Console.ReadLine();
 		}
 	}
 }

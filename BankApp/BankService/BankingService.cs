@@ -14,6 +14,7 @@ using Common.CertificateManagement;
 using Common.Communication;
 using System.Security.Permissions;
 using Common.Model;
+using System.Security;
 
 namespace BankService
 {
@@ -28,12 +29,12 @@ namespace BankService
 
 		private ICommandingManager commandManager;
 		private INotificationHandler notificationHandler;
-		private IAudit auditService;
+		private IAudit auditService; 
 
 		private ConcurrentQueue<CommandNotification> responseQueue;
 		public BankingService()
 		{
-			connectionString = "TEST";
+			connectionString = "BankServiceDB";
 
 			InitializesObjects();
 
@@ -58,28 +59,45 @@ namespace BankService
 			commandManager.StartListeningForAlivePings();
 		}
 
-		[PrincipalPermission(SecurityAction.Demand, Role = "admins")]
 		public void CreateNewDatabase()
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+			if (!Thread.CurrentPrincipal.IsInRole("admins"))
+			{
+				auditService.Log(username, "Failed authorization on creating new database command", System.Diagnostics.EventLogEntryType.Warning);
+				throw new SecurityException("Access is denied.");
+			}
+
+			auditService.Log(username, "Authorized as admin, create data base access granted.", System.Diagnostics.EventLogEntryType.Warning);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			commandManager.CreateDatabase();
 		}
 
-		[PrincipalPermission(SecurityAction.Demand, Role = "admins")]
 		public void DeleteStaleCommands()
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+			if (!Thread.CurrentPrincipal.IsInRole("admins"))
+			{
+				auditService.Log(username, "Failed authorization on deleting commands which are in timeout period.", System.Diagnostics.EventLogEntryType.Warning);
+				throw new SecurityException("Access is denied.");
+			}
+			auditService.Log(username, "Authorized as admin, delete timeout command initiated.", System.Diagnostics.EventLogEntryType.Warning);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			commandManager.ClearStaleCommands();
 		}
 
-		[PrincipalPermission(SecurityAction.Demand, Role = "users")]
 		public void Deposit(double amount)
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+			if (!Thread.CurrentPrincipal.IsInRole("users"))
+			{
+				auditService.Log(username, "Failed authorization on requesting deposit.", System.Diagnostics.EventLogEntryType.Warning);
+				throw new SecurityException("Access is denied.");
+			}
+
+			auditService.Log(username, $"Authorized as user, {amount} requested.", System.Diagnostics.EventLogEntryType.Information);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			DepositCommand depositCommand = new DepositCommand(0, username, amount);
@@ -88,19 +106,31 @@ namespace BankService
 			notificationHandler.RegisterCommand(username, callback, commandId);
 		}
 
-		[PrincipalPermission(SecurityAction.Demand, Role = "users")]
 		public List<CommandNotification> GetPendingNotifications()
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+			if (!Thread.CurrentPrincipal.IsInRole("users"))
+			{
+				auditService.Log(username, "Failed authorization on requesting pending notifications.", System.Diagnostics.EventLogEntryType.Warning);
+				throw new SecurityException("Access is denied.");
+			}
+
+			auditService.Log(username, $"Authorized as user, asks for pending notifications.", System.Diagnostics.EventLogEntryType.Information);
 			List<CommandNotification> userNotifications = notificationHandler.GetUserNotifications(username);
 
 			return userNotifications;
 		}
 
-		[PrincipalPermission(SecurityAction.Demand, Role = "users")]
 		public void Register()
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+			if (!Thread.CurrentPrincipal.IsInRole("users"))
+			{
+				auditService.Log(username, "Failed authorization on register.", System.Diagnostics.EventLogEntryType.Warning);
+				throw new SecurityException("Access is denied.");
+			}
+
+			auditService.Log(username, $"Authorized as user, asks for registration.", System.Diagnostics.EventLogEntryType.Information);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			RegistrationCommand registrationCommand = new RegistrationCommand(0, username);
@@ -109,10 +139,16 @@ namespace BankService
 			notificationHandler.RegisterCommand(username, callback, commandId);
 		}
 
-		[PrincipalPermission(SecurityAction.Demand, Role = "users")]
 		public void RequestLoan(double amount)
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+			if (!Thread.CurrentPrincipal.IsInRole("users"))
+			{
+				auditService.Log(username, "Failed authorization on requesting loan.", System.Diagnostics.EventLogEntryType.Warning);
+				throw new SecurityException("Access is denied.");
+			}
+
+			auditService.Log(username, $"Authorized as user, requests loan of {amount}.", System.Diagnostics.EventLogEntryType.Information);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			RequestLoanCommand requestLoanCommand = new RequestLoanCommand(0, username, amount);
@@ -121,10 +157,16 @@ namespace BankService
 			notificationHandler.RegisterCommand(username, callback, commandId);
 		}
 
-		[PrincipalPermission(SecurityAction.Demand, Role = "users")]
 		public void Withdraw(double amount)
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+			if (!Thread.CurrentPrincipal.IsInRole("users"))
+			{
+				auditService.Log(username, "Failed authorization on requesting withdraw.", System.Diagnostics.EventLogEntryType.Warning);
+				throw new SecurityException("Access is denied.");
+			}
+
+			auditService.Log(username, $"Authorized as user, requests loan of {amount}.", System.Diagnostics.EventLogEntryType.Information);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			WithdrawCommand withdrawCommand = new WithdrawCommand(0, username, amount);

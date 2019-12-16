@@ -50,5 +50,10 @@ namespace Common.Commanding
 		{
 			return base.GetHashCode();
 		}
+
+		public override string StringifyCommand()
+		{
+			return $"{Username}: deposit requests with {Amount}$";
+		}
 	}
 }

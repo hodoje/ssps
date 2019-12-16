@@ -60,6 +60,8 @@ namespace Common.Commanding
 		/// </summary>
 		public bool TimedOut { get; set; }
 
+		public abstract string StringifyCommand();
+
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{

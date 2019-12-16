@@ -101,6 +101,11 @@ namespace BankService.CommandHandler
 		private void ChangeCommandState(long id, CommandState state)
 		{
 			BaseCommand command = databaseManager.Get(id);
+			if (command == null)
+			{
+				return;
+			}
+
 			command.State = state;
 
 			// log to audit : command changed state
