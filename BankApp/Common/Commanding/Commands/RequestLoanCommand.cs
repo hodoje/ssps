@@ -24,6 +24,7 @@ namespace Common.Commanding
 		public RequestLoanCommand(long commandId, string username, double amount, int months) : base(commandId, username)
 		{
 			Amount = amount;
+			Months = months;
 		}
 
 		/// <summary>
