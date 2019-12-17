@@ -101,6 +101,10 @@
     <Compile Include="Migrations\201912131657364_Notification.designer.cs">
       <DependentUpon>201912131657364_Notification.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201912172141527_AddedUserAndBankAccount.cs" />
+    <Compile Include="Migrations\201912172141527_AddedUserAndBankAccount.designer.cs">
+      <DependentUpon>201912172141527_AddedUserAndBankAccount.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Notification\INotificationContainer.cs" />
     <Compile Include="Notification\INotificationHandler.cs" />
@@ -131,6 +135,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201912131657364_Notification.resx">
       <DependentUpon>201912131657364_Notification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912172141527_AddedUserAndBankAccount.resx">
+      <DependentUpon>201912172141527_AddedUserAndBankAccount.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
