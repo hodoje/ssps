@@ -140,13 +140,13 @@ namespace SectorService
 				switch (command.Status)
 				{
 					case CommandNotificationStatus.Confirmed:
-						AcceptRequest(command.ID, "Request successfully processed.");
+						AcceptRequest(command.ID, command.StringifyCommand());
 						break;
 					case CommandNotificationStatus.Rejected:
-						RejectRequest(command.ID, "Request was rejected.");
+						RejectRequest(command.ID, command.StringifyCommand());
 						break;
 					case CommandNotificationStatus.None:
-						RejectRequest(command.ID, "Failed to process request.");
+						RejectRequest(command.ID, command.StringifyCommand());
 						break;
 					default:
 						RejectRequest(command.ID, "Invalid request.");

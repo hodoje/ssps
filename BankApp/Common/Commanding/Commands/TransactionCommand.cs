@@ -59,7 +59,15 @@ namespace Common.Commanding
 
 		public override string StringifyCommand()
 		{
-			return $"{Username}: deposit requests with {Amount}$";
+			switch (TransactionType)
+			{
+				case TransactionType.Deposit:
+					return $"{Username}: deposit request with {Amount}$";
+				case TransactionType.Withdraw:
+					return $"{Username}: withdraw request with {Amount}$";
+				default:
+					return "Undefined transaction request.";
+			}
 		}
 	}
 }

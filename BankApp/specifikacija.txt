@@ -1,4 +1,3 @@
 CommandHost mora detektovati pad sektora.
 Kreirati User i BankAccount modele. Jedan User, vise BankAccount-a. Jedan BankAccount, jedan User. Prilagoditi applikaciju tome.
 Komande se zapravo izvrsavaju i postoji stanje korisnickih racuna (ovo gore iznad).
-Proveriti months kod request loan.

@@ -59,7 +59,7 @@ namespace Common.Commanding
 
 		public override string StringifyCommand()
 		{
-			return $"{Username} requests a loan of {Amount}$ and return it in {Months} months.";
+			return $"{Username}: request a loan of {Amount}$ and return it in {Months} months.";
 		}
 	}
 }
