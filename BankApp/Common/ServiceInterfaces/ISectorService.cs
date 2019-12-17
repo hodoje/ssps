@@ -16,5 +16,11 @@ namespace Common.ServiceInterfaces
 		/// <param name="integrityCheck">Integrity check bytes.</param>
 		[OperationContract]
 		void SendRequest(BaseCommand command, byte[] integrityCheck);
+
+		/// <summary>
+		/// Method used for checking if the sector is still alive. Does nothing on its own.
+		/// </summary>
+		[OperationContract]
+		void CheckSectorAlive();
 	}
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SectorService.Services
 {
-	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Single)]
 	public class SectorService : ISectorService
 	{
 		private SectorManager _sectorManager;
@@ -17,6 +17,11 @@ namespace SectorService.Services
 		public SectorService(string sectorType, int sectorQueueSize, int sectorQueueTimeoutPeriodInSeconds)
 		{
 			_sectorManager = new SectorManager(sectorType, sectorQueueSize, sectorQueueTimeoutPeriodInSeconds);
+		}
+
+		public void CheckSectorAlive()
+		{
+			
 		}
 
 		public void SendRequest(BaseCommand command, byte[] integrityCheck)
