@@ -65,7 +65,6 @@ namespace BankService.CommandingManager
 
 		private static readonly int queueSize;
 		private static readonly int timeoutPeriod;
-		private static readonly string connectionString;
 		private readonly DbContext dbContext;
 		private ConcurrentQueue<CommandNotification> responseQueue;
 		// todo clear this and test if host gets disposed
@@ -75,6 +74,7 @@ namespace BankService.CommandingManager
 		private ServiceHost startupConfirmationHost;
 		private ServiceHost bankAliveServiceHost;
 		private CommandQueueResolver commandQueueResolver;
+		private CommandQueue commandExecutorQueue;
 
 		static CommandingManager()
 		{
@@ -82,9 +82,10 @@ namespace BankService.CommandingManager
             timeoutPeriod = BankServiceConfig.SectorQueueTimeoutInSeconds;
 		}
 
-		public CommandingManager(IAudit auditService, ConcurrentQueue<CommandNotification> responseQueue)
+		public CommandingManager(IAudit auditService, CommandQueue commandExecutorQueue, ConcurrentQueue<CommandNotification> responseQueue)
 		{
 			dbContext = ServiceLocator.GetObject<DbContext>();
+			this.commandExecutorQueue = commandExecutorQueue;
 			this.auditService = auditService;
 			this.responseQueue = responseQueue;
 
@@ -127,7 +128,7 @@ namespace BankService.CommandingManager
 		{
 			dbContext.Database.Create();
             dbContext.Database.Connection.Open();
-            auditService.Log(logMessage: "New database created!", eventLogEntryType: System.Diagnostics.EventLogEntryType.Warning);
+            auditService.Log(logMessage: "New BankCommandDB database created!", eventLogEntryType: System.Diagnostics.EventLogEntryType.Warning);
 		}
 
 		public void Dispose()

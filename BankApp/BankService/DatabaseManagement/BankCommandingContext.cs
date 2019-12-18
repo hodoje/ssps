@@ -1,18 +1,17 @@
 ﻿using Common.Commanding;
-using Common.Model;
 using System.Data.Entity;
 
 namespace BankService.DatabaseManagement
 {
-	public class BankContext : DbContext
+	public class BankCommandingContext : DbContext
 	{
-		public BankContext() : base("DefaultConnection")
+		public BankCommandingContext() : base("DefaultCommandingConnection")
 		{
-			Database.SetInitializer<BankContext>(null);
+			Database.SetInitializer<BankCommandingContext>(null);
 		}
-		public BankContext(string stringConnection) : base(stringConnection)
+		public BankCommandingContext(string stringConnection) : base(stringConnection)
 		{
-			Database.SetInitializer<BankContext>(null);
+			Database.SetInitializer<BankCommandingContext>(null);
 		}
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -24,7 +23,5 @@ namespace BankService.DatabaseManagement
 		public DbSet<BaseCommand> Commands { get; set; }
 		public DbSet<NotificationInformation> Notifications { get; set; }
 		public DbSet<CommandNotification> ReadyNotifications { get; set; }
-		public DbSet<User> Users { get; set; }
-		public DbSet<BankAccount> BankAccounts { get; set; }
 	}
 }

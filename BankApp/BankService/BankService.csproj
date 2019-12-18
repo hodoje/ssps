@@ -80,9 +80,10 @@
     <Compile Include="CommandingHost\ICommandingHost.cs" />
     <Compile Include="CommandingManager\CommandingManager.cs" />
     <Compile Include="CommandingManager\ICommandingManager.cs" />
-    <Compile Include="DatabaseManagement\BankContext.cs" />
+    <Compile Include="DatabaseManagement\BankCommandingContext.cs" />
     <Compile Include="DatabaseManagement\DatabaseManager.cs" />
     <Compile Include="DatabaseManagement\IDatabaseManager.cs" />
+    <Compile Include="DatabaseManagement\BankDomainContext.cs" />
     <Compile Include="DatabaseManagement\Repositories\IRepository.cs" />
     <Compile Include="DatabaseManagement\Repositories\Repository.cs" />
     <Compile Include="Migrations\201912121328350_Initial.cs" />
@@ -105,7 +106,20 @@
     <Compile Include="Migrations\201912172141527_AddedUserAndBankAccount.designer.cs">
       <DependentUpon>201912172141527_AddedUserAndBankAccount.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Migrations\201912180904090_DatabaseSeparation.cs" />
+    <Compile Include="Migrations\201912180904090_DatabaseSeparation.designer.cs">
+      <DependentUpon>201912180904090_DatabaseSeparation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\CommandingContext\201912180942468_InitialSepration.cs" />
+    <Compile Include="Migrations\CommandingContext\201912180942468_InitialSepration.designer.cs">
+      <DependentUpon>201912180942468_InitialSepration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\CommandingContext\CommandingConfiguration.cs" />
+    <Compile Include="Migrations\DomainContext\201912180941100_Initial.cs" />
+    <Compile Include="Migrations\DomainContext\201912180941100_Initial.designer.cs">
+      <DependentUpon>201912180941100_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\DomainContext\DomainConfiguration.cs" />
     <Compile Include="Notification\INotificationContainer.cs" />
     <Compile Include="Notification\INotificationHandler.cs" />
     <Compile Include="Notification\NotificationContainer.cs" />
@@ -138,6 +152,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201912172141527_AddedUserAndBankAccount.resx">
       <DependentUpon>201912172141527_AddedUserAndBankAccount.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912180904090_DatabaseSeparation.resx">
+      <DependentUpon>201912180904090_DatabaseSeparation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\CommandingContext\201912180942468_InitialSepration.resx">
+      <DependentUpon>201912180942468_InitialSepration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\DomainContext\201912180941100_Initial.resx">
+      <DependentUpon>201912180941100_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

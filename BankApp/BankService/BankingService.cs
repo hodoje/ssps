@@ -15,6 +15,7 @@ using Common.Communication;
 using System.Security.Permissions;
 using Common.Model;
 using System.Security;
+using BankService.CommandExecutor;
 
 namespace BankService
 {
@@ -24,18 +25,18 @@ namespace BankService
 	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
 	public class BankingService : IUserService, IAdminService
 	{
-		private readonly string connectionString;
+		private readonly string commandingConnectionString = "CommandingDB";
+		private readonly string bankDomainConnectionString = "BankServiceDB";
 		private object locker = new object();
 
+		private IAudit auditService; 
+		private ICommandExecutor commandExecutor;
 		private ICommandingManager commandManager;
 		private INotificationHandler notificationHandler;
-		private IAudit auditService; 
 
 		private ConcurrentQueue<CommandNotification> responseQueue;
 		public BankingService()
 		{
-			connectionString = "BankServiceDB";
-
 			InitializesObjects();
 
 			auditService = new AuditClientProxy(BankServiceConfig.AuditServiceAddress, BankServiceConfig.AuditServiceEndpointName);
@@ -43,7 +44,11 @@ namespace BankService
 			responseQueue = new ConcurrentQueue<CommandNotification>();
 			notificationHandler = new NotificationHandler(auditService, responseQueue, new NotificationContainer(ServiceLocator.GetService<IRepository<CommandNotification>>()));
 
-			commandManager = new CommandingManager.CommandingManager(auditService, responseQueue);
+			CommandQueue commandExecutorQueue = new CommandQueue(10, 0);
+
+			commandManager = new CommandingManager.CommandingManager(auditService, commandExecutorQueue, responseQueue);
+
+			commandExecutor = new CommandExecutor.CommandExecutor(auditService, commandExecutorQueue);
 
 			//FOR TESTING
 			//commandManager.CreateDatabase();
@@ -177,11 +182,14 @@ namespace BankService
 
 		private void InitializesObjects()
 		{
-			BankContext bankContext = new BankContext(connectionString);
-			SemaphoreSlim semaphore = new SemaphoreSlim(1);
-			ServiceLocator.RegisterObject<DbContext>(bankContext);
-			ServiceLocator.RegisterService<IRepository<BaseCommand>>(new Repository<BaseCommand>(bankContext, semaphore));
-			ServiceLocator.RegisterService<IRepository<CommandNotification>>(new Repository<CommandNotification>(bankContext, semaphore));
+			BankCommandingContext commandingContext = new BankCommandingContext(commandingConnectionString);
+			SemaphoreSlim commandingSemaphore = new SemaphoreSlim(1);
+			ServiceLocator.RegisterObject<DbContext>(commandingContext);
+			ServiceLocator.RegisterService<IRepository<BaseCommand>>(new Repository<BaseCommand>(commandingContext, commandingSemaphore));
+			ServiceLocator.RegisterService<IRepository<CommandNotification>>(new Repository<CommandNotification>(commandingContext, commandingSemaphore));
+
+			BankDomainContext domainContext = new BankDomainContext(bankDomainConnectionString);
+			ServiceLocator.RegisterObject<BankDomainContext>(domainContext);
 		}
 	}
 }

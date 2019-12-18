@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.Model
+﻿namespace Common.Model
 {
-	public class BankAccount
+	public class BankAccount : IdentifiedObject
 	{
-		public int Id { get; set; }
+		public BankAccount() : base() { }
+		public BankAccount(string accountNumber)
+		{
+
+		}
+
 		public string AccountNumber { get; set; }
 		public double Amount { get; set; }
 		public int UserId { get; set; }
