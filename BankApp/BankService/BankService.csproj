@@ -49,6 +49,10 @@
       <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MlkPwgen, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MlkPwgen.0.3.0\lib\net45\MlkPwgen.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -72,8 +76,8 @@
   <ItemGroup>
     <Compile Include="BankingService.cs" />
     <Compile Include="BankServiceConfig.cs" />
-    <Compile Include="CommandExecutor\CommandExecutor.cs" />
-    <Compile Include="CommandExecutor\ICommandExecutor.cs" />
+    <Compile Include="DomainLogic\CommandExecutor.cs" />
+    <Compile Include="DomainLogic\ICommandExecutor.cs" />
     <Compile Include="CommandHandler\CommandHandler.cs" />
     <Compile Include="CommandHandler\ICommandHandler.cs" />
     <Compile Include="CommandingHost\CommandingHost.cs" />
@@ -163,6 +167,7 @@
       <DependentUpon>201912180941100_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

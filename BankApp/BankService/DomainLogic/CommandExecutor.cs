@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System;
 using Common.Communication;
+using System.Collections.Generic;
 
 namespace BankService.CommandExecutor
 {
@@ -55,7 +56,12 @@ namespace BankService.CommandExecutor
                     continue;
                 }
 
-                // execute command
+				if (cancellationToken.IsCancellationRequested)
+				{
+					return;
+				}
+
+				ExecuteCommand(command);
             }
         }
 
@@ -65,6 +71,39 @@ namespace BankService.CommandExecutor
 			bankDbContext.Database.Connection.Open();
 
 			auditService.Log(logMessage: "New BankDomainDB database created!", eventLogEntryType: System.Diagnostics.EventLogEntryType.Warning);
+		}
+
+		private void ExecuteCommand(BaseCommand command)
+		{
+			Type commandType = command.GetType();
+
+			if (commandType == typeof(TransactionCommand))
+			{
+				Transaction(command);
+			}
+			else if (commandType == typeof(RegistrationCommand))
+			{
+				RequestNewCard(command);
+			}
+			else if (commandType == typeof(RequestLoanCommand))
+			{
+				RequestLoan(command);
+			}
+		}
+
+		private void Transaction(BaseCommand command)
+		{
+
+		}
+
+		private void RequestNewCard(BaseCommand command)
+		{
+
+		}
+
+		private void RequestLoan(BaseCommand command)
+		{
+
 		}
 	}
 }
