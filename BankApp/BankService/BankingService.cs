@@ -10,10 +10,7 @@ using BankService.DatabaseManagement.Repositories;
 using BankService.DatabaseManagement;
 using System.Data.Entity;
 using System.Threading;
-using Common.CertificateManagement;
 using Common.Communication;
-using System.Security.Permissions;
-using Common.Model;
 using System.Security;
 using BankService.CommandExecutor;
 
@@ -77,6 +74,7 @@ namespace BankService
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
 			commandManager.CreateDatabase();
+			commandExecutor.CreateDatabase();
 		}
 
 		public void DeleteStaleCommands()
