@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Client.Views"
              xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
              mc:Ignorable="d" 
-             Height="390" Width="1100">
+             Height="700" Width="1100">
     <UserControl.Resources>
         <!-- Custom Button Control Template Override-->
         <ControlTemplate x:Key="CustomButtonBaseControlTemplate" TargetType="{x:Type ButtonBase}">
@@ -327,6 +327,10 @@
 			<ColumnDefinition Width="*"/>
             <ColumnDefinition Width="350"/>
         </Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
 		<Border Grid.Column="0" BorderBrush="#383A41" BorderThickness="0 0 1 0">
 			<Grid Background="#232323">
 				<Label Content="Request a loan" Background="#2E2E2E" HorizontalAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="ForestGreen" VerticalAlignment="Top" Width="250" Height="49"/>
@@ -392,8 +396,30 @@
 			<Grid Background="#232323">
 				<Label Background="#2E2E2E" Content="Payment/Withdrawal" HorizontalAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="ForestGreen" VerticalAlignment="Top" Width="250" Height="49"/>
 				<Separator Background="#383A41" HorizontalAlignment="Left" Height="99" Margin="0" VerticalAlignment="Top" Width="250"/>
-				<Label Content="Amount:" Foreground="ForestGreen" HorizontalAlignment="Left" Margin="10,100,0,0" VerticalAlignment="Top"/>
-				<TextBox Padding="3 0 0 0" CaretBrush="White" Background="#494949" Foreground="White" BorderThickness="1" Height="20" Width="230" VerticalAlignment="Top" HorizontalAlignment="Left" Text="{Binding TransactionAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10,131,0,0">
+				<Label Content="Card:" Foreground="ForestGreen" HorizontalAlignment="Left" Margin="10,80,0,0" VerticalAlignment="Top"/>
+				<ComboBox Height="20" ItemsSource="{Binding TODO}" HorizontalAlignment="Left" SelectedItem="{Binding TODO, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="230" Style="{DynamicResource CustomComboBoxStyle}" Margin="10,117,0,0">
+					<ComboBox.ItemContainerStyle>
+						<Style TargetType="{x:Type ComboBoxItem}">
+							<Setter Property="Template">
+								<Setter.Value>
+									<ControlTemplate TargetType="{x:Type ComboBoxItem}">
+										<Border x:Name="myBorder" Padding="5 2 5 2">
+											<ContentPresenter />
+										</Border>
+										<ControlTemplate.Triggers>
+											<Trigger Property="IsMouseOver" Value="True">
+												<Setter Property="Background" TargetName="myBorder" Value="#232323" />
+												<Setter Property="BorderBrush" Value="Black"/>
+											</Trigger>
+										</ControlTemplate.Triggers>
+									</ControlTemplate>
+								</Setter.Value>
+							</Setter>
+						</Style>
+					</ComboBox.ItemContainerStyle>
+				</ComboBox>
+				<Label Content="Amount:" Foreground="ForestGreen" HorizontalAlignment="Left" Margin="10,140,0,0" VerticalAlignment="Top"/>
+				<TextBox Padding="3 0 0 0" CaretBrush="White" Background="#494949" Foreground="White" BorderThickness="1" Height="20" Width="230" VerticalAlignment="Top" HorizontalAlignment="Left" Text="{Binding TransactionAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10,171,0,0">
 					<TextBox.Style>
 						<Style TargetType="{x:Type TextBox}">
 							<Setter Property="Template">
@@ -419,8 +445,8 @@
 						</Style>
 					</TextBox.Style>
 				</TextBox>
-				<Label Content="Transaction Type:" Foreground="ForestGreen" HorizontalAlignment="Left" Margin="10,156,0,0" VerticalAlignment="Top"/>
-				<ComboBox Height="20" ItemsSource="{Binding TransactionTypes}" HorizontalAlignment="Left" SelectedItem="{Binding SelectedTransactionType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="230" Style="{DynamicResource CustomComboBoxStyle}" Margin="10,187,0,0">
+				<Label Content="Transaction Type:" Foreground="ForestGreen" HorizontalAlignment="Left" Margin="10,196,0,0" VerticalAlignment="Top"/>
+				<ComboBox Height="20" ItemsSource="{Binding TransactionTypes}" HorizontalAlignment="Left" SelectedItem="{Binding SelectedTransactionType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="230" Style="{DynamicResource CustomComboBoxStyle}" Margin="10,227,0,0">
 					<ComboBox.ItemContainerStyle>
 						<Style TargetType="{x:Type ComboBoxItem}">
 							<Setter Property="Template">
@@ -441,18 +467,66 @@
 						</Style>
 					</ComboBox.ItemContainerStyle>
 				</ComboBox>
-				<Button Command="{Binding ExecuteTransactionCommand}" BorderBrush="#232323" BorderThickness="1 1 1 1" Background="#2E2E2E" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Foreground="ForestGreen" FontSize="12" Content="Execute" Height="20" Width="230" Template="{DynamicResource CustomButtonBaseControlTemplate}" Margin="10,230,0,0"/>
+				<Button Command="{Binding ExecuteTransactionCommand}" BorderBrush="#232323" BorderThickness="1 1 1 1" Background="#2E2E2E" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Foreground="ForestGreen" FontSize="12" Content="Execute" Height="20" Width="230" Template="{DynamicResource CustomButtonBaseControlTemplate}" Margin="10,270,0,0"/>
 			</Grid>
 		</Border>
 		<Border Grid.Column="2" BorderBrush="#383A41" BorderThickness="0 0 1 0">
 			<Grid Background="#232323">
-				<Label Background="#2E2E2E" Content="Admin Panel" HorizontalAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="ForestGreen" VerticalAlignment="Top" Width="250" Height="49"/>
+				<Label Content="Credit cards" Background="#2E2E2E" HorizontalAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="ForestGreen" VerticalAlignment="Top" Width="250" Height="49"/>
 				<Separator Background="#383A41" HorizontalAlignment="Left" Height="99" Margin="0" VerticalAlignment="Top" Width="250"/>
-				<Button Command="{Binding CreateNewDatabaseCommand}" BorderBrush="#232323" BorderThickness="1 1 1 1" Background="#2E2E2E" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Foreground="ForestGreen" FontSize="12" Content="Create New Database" Height="20" Width="230" Template="{DynamicResource CustomButtonBaseControlTemplate}" Margin="10,131,0,0"/>
-				<Button Command="{Binding RemoveExpiredRequestsCommand}" BorderBrush="#232323" BorderThickness="1 1 1 1" Background="#2E2E2E" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Foreground="ForestGreen" FontSize="12" Content="Remove Expired Requests" Height="20" Width="230" Template="{DynamicResource CustomButtonBaseControlTemplate}" Margin="10,187,0,0"/>
+				<Label Content="Credit card number:" Foreground="ForestGreen" HorizontalAlignment="Left" Margin="10,80,0,0" VerticalAlignment="Top"/>
+				<ComboBox Height="20" ItemsSource="{Binding TODO}" HorizontalAlignment="Left" SelectedItem="{Binding TODO, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="230" Style="{DynamicResource CustomComboBoxStyle}" Margin="10,117,0,0">
+					<ComboBox.ItemContainerStyle>
+						<Style TargetType="{x:Type ComboBoxItem}">
+							<Setter Property="Template">
+								<Setter.Value>
+									<ControlTemplate TargetType="{x:Type ComboBoxItem}">
+										<Border x:Name="myBorder" Padding="5 2 5 2">
+											<ContentPresenter />
+										</Border>
+										<ControlTemplate.Triggers>
+											<Trigger Property="IsMouseOver" Value="True">
+												<Setter Property="Background" TargetName="myBorder" Value="#232323" />
+												<Setter Property="BorderBrush" Value="Black"/>
+											</Trigger>
+										</ControlTemplate.Triggers>
+									</ControlTemplate>
+								</Setter.Value>
+							</Setter>
+						</Style>
+					</ComboBox.ItemContainerStyle>
+				</ComboBox>
+				<Label Content="Current state:" Foreground="ForestGreen" HorizontalAlignment="Left" Margin="10,170,0,0" VerticalAlignment="Top"/>
+				<TextBox Padding="3 0 0 0" CaretBrush="White" Background="#494949" Foreground="White" BorderThickness="1" Height="20" Width="230" VerticalAlignment="Top" HorizontalAlignment="Left" Text="{Binding TODO, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10,201,0,0">
+					<TextBox.Style>
+						<Style TargetType="{x:Type TextBox}">
+							<Setter Property="Template">
+								<Setter.Value>
+									<ControlTemplate TargetType="{x:Type TextBoxBase}">
+										<Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+											<ScrollViewer x:Name="PART_ContentHost" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+										</Border>
+										<ControlTemplate.Triggers>
+											<Trigger Property="IsEnabled" Value="False">
+												<Setter Property="Opacity" TargetName="border" Value="0.56"/>
+											</Trigger>
+											<Trigger Property="IsMouseOver" Value="True">
+												<Setter Property="BorderBrush" TargetName="border" Value="#232323"/>
+											</Trigger>
+											<Trigger Property="IsKeyboardFocused" Value="True">
+												<Setter Property="BorderBrush" TargetName="border" Value="#FFACACAC"/>
+											</Trigger>
+										</ControlTemplate.Triggers>
+									</ControlTemplate>
+								</Setter.Value>
+							</Setter>
+						</Style>
+					</TextBox.Style>
+				</TextBox>
+				<Button Command="{Binding TODO}" BorderBrush="#232323" BorderThickness="1 1 1 1" Background="#2E2E2E" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Foreground="ForestGreen" FontSize="12" Content="Request new card" Height="20" Width="230" Template="{DynamicResource CustomButtonBaseControlTemplate}" Margin="10,270,0,0"/>
 			</Grid>
 		</Border>
-		<Border Grid.Column="3" BorderBrush="#383A41" BorderThickness="1 0 1 0">
+		<Border Grid.Column="3" Grid.RowSpan="2" BorderBrush="#383A41" BorderThickness="1 0 1 0">
 			<Grid Background="#333333">
 				<!--<Label BorderBrush="#494949" BorderThickness="1" Background="#2E2E2E" Content="Notifications" HorizontalAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="ForestGreen" VerticalAlignment="Top" Width="200" Height="49"/>-->
 				<Separator Background="#383A41" HorizontalAlignment="Left" Height="99" Margin="0" VerticalAlignment="Top" Width="200"/>
@@ -520,6 +594,14 @@
 						</GridView>
 					</ListView.View>
 				</ListView>
+			</Grid>
+		</Border>
+		<Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" BorderBrush="#383A41" BorderThickness="0 0 1 0">
+			<Grid Background="#232323">
+				<Label Background="#2E2E2E" Content="Admin Panel" HorizontalAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="ForestGreen" VerticalAlignment="Top" Width="750" Height="49"/>
+				<Separator Background="#383A41" HorizontalAlignment="Left" Height="99" Margin="0" VerticalAlignment="Top" Width="750"/>
+				<Button Command="{Binding CreateNewDatabaseCommand}" BorderBrush="#232323" BorderThickness="1 1 1 1" Background="#2E2E2E" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Foreground="ForestGreen" FontSize="12" Content="Create New Database" Height="20" Width="230" Template="{DynamicResource CustomButtonBaseControlTemplate}" Margin="250,131,0,0"/>
+				<Button Command="{Binding RemoveExpiredRequestsCommand}" BorderBrush="#232323" BorderThickness="1 1 1 1" Background="#2E2E2E" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Foreground="ForestGreen" FontSize="12" Content="Remove Expired Requests" Height="20" Width="230" Template="{DynamicResource CustomButtonBaseControlTemplate}" Margin="250,187,0,0"/>
 			</Grid>
 		</Border>
 	</Grid>
