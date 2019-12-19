@@ -43,6 +43,11 @@ namespace Common.Communication.AuthorizationPolicy
 			string username = StringFormatter.GetAttributeFromSubjetName(identities[0].Name, "CN");
 			string organizationalUnit = StringFormatter.GetAttributeFromSubjetName(identities[0].Name, "OU");
 
+			if (String.IsNullOrEmpty(username) || String.IsNullOrEmpty(organizationalUnit))
+			{
+				return false;
+			}
+
 			evaluationContext.Properties["Principal"] = new OUPrincipal(new GenericIdentity(username), organizationalUnit);
 			return true;
 		}
