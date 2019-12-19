@@ -14,7 +14,15 @@ namespace BankService.DatabaseManagement
 			Database.SetInitializer<BankCommandingContext>(null);
 		}
 
+		protected override void OnModelCreating(DbModelBuilder modelBuilder)
+		{
+			modelBuilder.Entity<User>()
+				.HasOptional<Loan>(x => x.Loan)
+				.WithRequired(x => x.User);
+		}
+
 		public DbSet<User> Users { get; set; }
 		public DbSet<BankAccount> BankAccounts { get; set; }
+		public DbSet<Loan> Loans { get; set; }
 	}
 }

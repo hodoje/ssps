@@ -16,5 +16,8 @@ namespace Common.Model
 
 		public string Username { get; set; }
 		public ICollection<BankAccount> Accounts { get; set; }
+
+		public long LoanId { get; set; }
+		public Loan Loan { get; set; }
 	}
 }

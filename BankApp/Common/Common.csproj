@@ -69,6 +69,7 @@
     <Compile Include="DataContracts\Exceptions\InvalidEventLogTypeException.cs" />
     <Compile Include="Model\BankAccount.cs" />
     <Compile Include="Model\IdentifiedObject.cs" />
+    <Compile Include="Model\Loan.cs" />
     <Compile Include="Model\SectorAdditionalConfig.cs" />
     <Compile Include="Model\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
