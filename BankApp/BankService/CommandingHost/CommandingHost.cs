@@ -20,6 +20,7 @@ namespace BankService.CommandingHost
 		private AutoResetEvent sendingSynchronization = new AutoResetEvent(false);
 
 		private CommandQueue commandingQueue;
+		private CommandQueue commandExecutionerQueue;
 		private ConcurrentQueue<CommandNotification> responseQueue;
 
 		private ICommandHandler commandHandler;
@@ -27,8 +28,9 @@ namespace BankService.CommandingHost
 
 		private IAudit auditService;
 
-		public CommandingHost(string sectorType, IAudit auditService, CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, IDatabaseManager<BaseCommand> databaseManager)
+		public CommandingHost(string sectorType, IAudit auditService, CommandQueue commandExecutionerQueue, CommandQueue commandingQueue, ConcurrentQueue<CommandNotification> responseQueue, IDatabaseManager<BaseCommand> databaseManager)
 		{
+			this.commandExecutionerQueue = commandExecutionerQueue;
 			this.databaseManager = databaseManager;
 			this.auditService = auditService;
 			this.responseQueue = responseQueue;
@@ -53,7 +55,7 @@ namespace BankService.CommandingHost
 
 				if (command.Status == CommandNotificationStatus.Confirmed)
 				{
-					// enqueue on CommandExecutor
+					commandExecutionerQueue.Enqueue(command);
 				}
 			}
 

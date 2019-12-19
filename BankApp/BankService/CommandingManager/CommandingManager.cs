@@ -217,7 +217,7 @@ namespace BankService.CommandingManager
 		public void OpenCommandHostForSector(string sectorType)
 		{
 			CommandQueue commandQueue = commandQueueResolver.ResolveQueueForSector(sectorType);
-			CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(sectorType, auditService, commandQueue, responseQueue, databaseManager);
+			CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(sectorType, auditService, commandExecutorQueue, commandQueue, responseQueue, databaseManager);
 			commandingHosts.Add(newHost);
 			newHost.Start();
 
