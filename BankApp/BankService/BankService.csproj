@@ -123,6 +123,10 @@
     <Compile Include="Migrations\DomainContext\201912180941100_Initial.designer.cs">
       <DependentUpon>201912180941100_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\DomainContext\201912191225186_Loan.cs" />
+    <Compile Include="Migrations\DomainContext\201912191225186_Loan.designer.cs">
+      <DependentUpon>201912191225186_Loan.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\DomainContext\DomainConfiguration.cs" />
     <Compile Include="Notification\INotificationContainer.cs" />
     <Compile Include="Notification\INotificationHandler.cs" />
@@ -165,6 +169,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\DomainContext\201912180941100_Initial.resx">
       <DependentUpon>201912180941100_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\DomainContext\201912191225186_Loan.resx">
+      <DependentUpon>201912191225186_Loan.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
