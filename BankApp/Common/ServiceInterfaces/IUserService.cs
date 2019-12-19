@@ -1,4 +1,5 @@
 ﻿using Common.Commanding;
+using Common.Model;
 using System.Collections.Generic;
 using System.ServiceModel;
 
@@ -18,6 +19,9 @@ namespace Common.ServiceInterfaces
 
 		[OperationContract]
 		void RequestLoan(double amount, int months);
+
+		[OperationContract]
+		List<BankAccount> GetMyBankAccounts();
 
 		[OperationContract]
 		List<CommandNotification> GetPendingNotifications();

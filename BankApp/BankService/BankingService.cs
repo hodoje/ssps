@@ -13,6 +13,8 @@ using System.Threading;
 using Common.Communication;
 using System.Security;
 using BankService.CommandExecutor;
+using Common.Model;
+using System;
 
 namespace BankService
 {
@@ -188,6 +190,18 @@ namespace BankService
 
 			BankDomainContext domainContext = new BankDomainContext(bankDomainConnectionString);
 			ServiceLocator.RegisterObject<BankDomainContext>(domainContext);
+		}
+
+		public List<BankAccount> GetMyBankAccounts()
+		{
+			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+			if (!Thread.CurrentPrincipal.IsInRole("users"))
+			{
+				auditService.Log(username, "Failed authorization on requesting bank accounts.", System.Diagnostics.EventLogEntryType.Warning);
+				throw new SecurityException("Access is denied.");
+			}
+
+			return commandExecutor.GetUsersAccount(username);
 		}
 	}
 }
