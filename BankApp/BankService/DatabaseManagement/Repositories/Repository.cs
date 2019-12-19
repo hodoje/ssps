@@ -95,5 +95,15 @@ namespace BankService.DatabaseManagement.Repositories
 
 			synchronization.Release();
 		}
+
+		public TEntity FindEntity(Expression<Func<TEntity, bool>> predicate)
+		{
+			if (dbContext.Database.Connection.State == System.Data.ConnectionState.Closed)
+			{
+				return default(TEntity);
+			}
+
+			return dbContext.Set<TEntity>().Where(predicate).FirstOrDefault();
+		}
 	}
 }

@@ -72,6 +72,19 @@ namespace BankService.DatabaseManagement
 			return foundEntities;
 		}
 
+		public T FindEntity(Expression<Func<T, bool>> predicate)
+		{
+			T foundEntity;
+
+			locker.EnterReadLock();
+
+			foundEntity = dataPersistence.FindEntity(predicate);
+
+			locker.ExitReadLock();
+
+			return foundEntity;
+		}
+
 		public T Get(long id)
 		{
 			T entity;

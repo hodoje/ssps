@@ -24,6 +24,13 @@ namespace BankService.DatabaseManagement.Repositories
 		IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
 
 		/// <summary>
+		/// Get all entities from database which satisfy expression.
+		/// </summary>
+		/// <param name="predicate">Comparison expression.</param>
+		/// <returns>Entities which satisfy comparison predicate.</returns>
+		TEntity FindEntity(Expression<Func<TEntity, bool>> predicate);
+
+		/// <summary>
 		/// Save entity to permanent storage.
 		/// </summary>
 		/// <param name="entity">Command to save.</param>
