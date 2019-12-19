@@ -28,6 +28,12 @@ namespace Common.Commanding
 		}
 
 		/// <summary>
+		/// Bank account id.
+		/// </summary>
+		[DataMember]
+		public long BankAccountId { get; private set; }
+
+		/// <summary>
 		/// Requested deposit amount.
 		/// </summary>
 		[DataMember]
