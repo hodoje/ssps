@@ -7,7 +7,7 @@
 			 xmlns:views="clr-namespace:Client.Views"
 			 xmlns:viewModels="clr-namespace:Client.ViewModels"
              mc:Ignorable="d" 
-             Height="390" Width="1100">
+             Height="700" Width="1100">
 	<UserControl.Resources>
 		<!-- Custom Button Control Template Override-->
 		<ControlTemplate x:Key="CustomButtonBaseControlTemplate" TargetType="{x:Type ButtonBase}">
