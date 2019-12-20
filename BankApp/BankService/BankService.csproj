@@ -127,6 +127,10 @@
     <Compile Include="Migrations\DomainContext\201912191225186_Loan.designer.cs">
       <DependentUpon>201912191225186_Loan.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\DomainContext\201912201514265_UpdatedBankAccountModel.cs" />
+    <Compile Include="Migrations\DomainContext\201912201514265_UpdatedBankAccountModel.designer.cs">
+      <DependentUpon>201912201514265_UpdatedBankAccountModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\DomainContext\DomainConfiguration.cs" />
     <Compile Include="Notification\INotificationContainer.cs" />
     <Compile Include="Notification\INotificationHandler.cs" />
@@ -172,6 +176,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\DomainContext\201912191225186_Loan.resx">
       <DependentUpon>201912191225186_Loan.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\DomainContext\201912201514265_UpdatedBankAccountModel.resx">
+      <DependentUpon>201912201514265_UpdatedBankAccountModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
