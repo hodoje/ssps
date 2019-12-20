@@ -43,7 +43,7 @@ namespace Common.Communication.AuthorizationPolicy
 			string username = StringFormatter.GetAttributeFromSubjetName(identities[0].Name, "CN");
 			string organizationalUnit = StringFormatter.GetAttributeFromSubjetName(identities[0].Name, "OU");
 
-			if (String.IsNullOrEmpty(username) || String.IsNullOrEmpty(organizationalUnit))
+			if (String.IsNullOrEmpty(username))
 			{
 				return false;
 			}
