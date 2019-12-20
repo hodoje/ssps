@@ -71,6 +71,12 @@ namespace BankService.CommandExecutor
 
 		public void CreateDatabase()
 		{
+			if (bankDbContext.Database.Exists())
+			{
+				bankDbContext.Database.Connection.Close();
+				bankDbContext.Database.Delete();
+			}
+
 			bankDbContext.Database.Create();
 			bankDbContext.Database.Connection.Open();
 
@@ -119,6 +125,7 @@ namespace BankService.CommandExecutor
 			User user = userDatabaseManager.FindEntity(x => x.Username == registrationCommand.Username);
 			if (user == null)
 			{
+				user = new User();
 				user.Username = command.Username;
 				userDatabaseManager.AddEntity(user);
 			}
@@ -126,8 +133,8 @@ namespace BankService.CommandExecutor
 			long accountId = long.Parse(PasswordGenerator.Generate(10, new HashSet<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }));
 			BankAccount newAccount = new BankAccount(accountId);
 
-			bankAccDatabaseManager.AddEntity(newAccount);
 			newAccount.User = user;
+			bankAccDatabaseManager.AddEntity(newAccount);
 			bankAccDatabaseManager.Update(newAccount);
 
 			auditService.Log("CommandExecutor", $"New card successfully created for user: {user.Username}.");
@@ -141,6 +148,7 @@ namespace BankService.CommandExecutor
 			User user = userDatabaseManager.FindEntity(x => x.Username == loanCommand.Username);
 			if (user == null)
 			{
+				user = new User();
 				user.Username = command.Username;
 				userDatabaseManager.AddEntity(user);
 			}

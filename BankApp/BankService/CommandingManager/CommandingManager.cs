@@ -130,6 +130,12 @@ namespace BankService.CommandingManager
 
 		public void CreateDatabase()
 		{
+			if (dbContext.Database.Exists())
+			{
+				dbContext.Database.Connection.Close();
+				dbContext.Database.Delete();
+			}
+
 			dbContext.Database.Create();
             dbContext.Database.Connection.Open();
             auditService.Log(logMessage: "New BankCommandDB database created!", eventLogEntryType: System.Diagnostics.EventLogEntryType.Warning);

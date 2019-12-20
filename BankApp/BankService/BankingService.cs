@@ -50,7 +50,9 @@ namespace BankService
 			commandExecutor = new CommandExecutor.CommandExecutor(auditService, commandExecutorQueue);
 
 			//FOR TESTING
-			//commandManager.CreateDatabase();
+			//TestCreateNewDatabase();
+
+			commandExecutor.Start();
 		}
 
 		public void StartListeningForSectorConnections()
@@ -75,6 +77,12 @@ namespace BankService
 			auditService.Log(username, "Authorized as admin, create data base access granted.", System.Diagnostics.EventLogEntryType.Warning);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
+			commandManager.CreateDatabase();
+			commandExecutor.CreateDatabase();
+		}
+
+		public void TestCreateNewDatabase()
+		{
 			commandManager.CreateDatabase();
 			commandExecutor.CreateDatabase();
 		}

@@ -7,13 +7,13 @@ namespace BankService.Migrations.CommandingContext
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.0")]
-    public sealed partial class InitialSepration : IMigrationMetadata
+    public sealed partial class InitialDatbaseSepration : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialSepration));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialDatbaseSepration));
         
         string IMigrationMetadata.Id
         {
-            get { return "201912180942468_InitialSepration"; }
+            get { return "201912201651249_InitialDatbaseSepration"; }
         }
         
         string IMigrationMetadata.Source

@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class InitialSepration : DbMigration
+    public partial class InitialDatbaseSepration : DbMigration
     {
         public override void Up()
         {
@@ -19,6 +19,7 @@
                         TimedOut = c.Boolean(nullable: false),
                         Amount = c.Double(),
                         Months = c.Int(),
+                        BankAccountId = c.Long(),
                         Amount1 = c.Double(),
                         TransactionType = c.Int(),
                         Discriminator = c.String(nullable: false, maxLength: 128),

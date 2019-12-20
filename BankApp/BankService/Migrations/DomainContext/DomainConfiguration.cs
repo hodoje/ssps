@@ -9,7 +9,6 @@
     {
         public DomainConfiguration()
         {
-            AutomaticMigrationsEnabled = false;
             MigrationsDirectory = @"Migrations\DomainContext";
         }
 

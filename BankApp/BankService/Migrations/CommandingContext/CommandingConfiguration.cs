@@ -9,7 +9,6 @@
     {
         public CommandingConfiguration()
         {
-            AutomaticMigrationsEnabled = false;
             MigrationsDirectory = @"Migrations\CommandingContext";
         }
 
