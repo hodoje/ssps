@@ -3,6 +3,7 @@ using Client.UICommands;
 using Common.CertificateManagement;
 using Common.Commanding;
 using Common.Communication;
+using Common.Model;
 using Common.ServiceInterfaces;
 using System;
 using System.Collections.Generic;
@@ -72,10 +73,12 @@ namespace Client.ViewModels
 		}
 		public ObservableCollection<TransactionType> TransactionTypes { get; set; }
 		public ObservableCollection<Notification> Notifications { get; set; }
+		public ObservableCollection<BankAccount> BankAccounts { get; set; }
 		public UIICommand RequestLoanCommand { get; set; }
 		public UIICommand ExecuteTransactionCommand { get; set; }
 		public UIICommand CreateNewDatabaseCommand { get; set; }
 		public UIICommand RemoveExpiredRequestsCommand { get; set; }
+		public UIICommand CreateNewBankAccountCommand { get; set; }
 		#endregion
 
 		#region Constructors
@@ -83,11 +86,13 @@ namespace Client.ViewModels
 		{
 			TransactionTypes = new ObservableCollection<TransactionType>(Enum.GetValues(typeof(TransactionType)).Cast<TransactionType>());
 			Notifications = new ObservableCollection<Notification>();
+			BankAccounts = new ObservableCollection<BankAccount>();
 
 			RequestLoanCommand = new UIICommand(OnRequestLoan, CanRequestLoan);
 			ExecuteTransactionCommand = new UIICommand(OnExecuteTransaction, CanExecuteTransaction);
 			CreateNewDatabaseCommand = new UIICommand(OnCreateNewDatabase);
 			RemoveExpiredRequestsCommand = new UIICommand(OnRemoveExpiredRequests);
+			CreateNewBankAccountCommand = new UIICommand(OnCreateNewBankAccount);
 
 			_userServiceCallbackObject = new BankServiceCallbackObject(HandleNotifications);
 
@@ -107,7 +112,8 @@ namespace Client.ViewModels
             if(StringFormatter.GetAttributeFromSubjetName(certificate.SubjectName.Name, "OU") == "users")
             {
                 AskServiceForNotifications();
-            }
+				GetAllBankAccounts();
+			}
 		}
 		#endregion
 
@@ -129,7 +135,7 @@ namespace Client.ViewModels
 			}
 			catch (SecurityAccessDeniedException securityAccess)
 			{
-				Notifications.Add(new Notification("Service has denied access since you have no permission for action.", CommandNotificationStatus.Rejected));
+				Notifications.Add(new Notification($"{SelectedTransactionType} transaction action denied. You have no permission for this action.", CommandNotificationStatus.Rejected));
 			}
 			catch (Exception e)
 			{
@@ -157,7 +163,7 @@ namespace Client.ViewModels
 			}
 			catch (SecurityAccessDeniedException securityAccess)
 			{
-				Notifications.Add(new Notification("Service has denied access since you have no permission for action.", CommandNotificationStatus.Rejected));
+				Notifications.Add(new Notification($"Request loan action denied. You have no permission for this action.", CommandNotificationStatus.Rejected));
 			}
 			catch (Exception e)
 			{
@@ -176,21 +182,17 @@ namespace Client.ViewModels
 		{
 			return LoanAmount > 0 && LoanDuration > 0;
 		}
-		#endregion
 
-		private void AskServiceForNotifications()
+		private void OnCreateNewBankAccount()
 		{
 			try
 			{
-				List<CommandNotification> notifications = _userServiceProxy.Proxy.GetPendingNotifications();
-				foreach (CommandNotification notification in notifications)
-				{
-					Notifications.Add(new Notification(notification.Information, notification.CommandStatus));
-				}
+				_userServiceProxy.Proxy.Register();
+				GetAllBankAccounts();
 			}
 			catch (SecurityAccessDeniedException securityAccess)
 			{
-				Notifications.Add(new Notification("Service has denied access since you have no permission for action.", CommandNotificationStatus.Rejected));
+				Notifications.Add(new Notification($"Create new bank account action denied. You have no permission for this action.", CommandNotificationStatus.Rejected));
 			}
 			catch (Exception e)
 			{
@@ -198,13 +200,11 @@ namespace Client.ViewModels
 				{
 					Notifications.Add(new Notification("User service unavailable.", CommandNotificationStatus.Rejected));
 				}
+				else
+				{
+					Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
+				}
 			}
-		}
-
-		private void HandleNotifications(CommandNotification commandNotification)
-		{
-			Notification notification = new Notification(commandNotification.Information, commandNotification.CommandStatus);
-			Notifications.Add(notification);
 		}
 
 		private void OnRemoveExpiredRequests()
@@ -215,7 +215,7 @@ namespace Client.ViewModels
 			}
 			catch (SecurityAccessDeniedException securityAccess)
 			{
-				Notifications.Add(new Notification("Service has denied access since you have no permission for action.", CommandNotificationStatus.Rejected));
+				Notifications.Add(new Notification($"Remove expired requests action denied. You have no permission for this action.", CommandNotificationStatus.Rejected));
 			}
 			catch (Exception e)
 			{
@@ -238,7 +238,7 @@ namespace Client.ViewModels
 			}
 			catch (SecurityAccessDeniedException securityAccess)
 			{
-				Notifications.Add(new Notification("Service has denied access since you have no permission for action.", CommandNotificationStatus.Rejected));
+				Notifications.Add(new Notification($"Create new database action denied. You have no permission for this action.", CommandNotificationStatus.Rejected));
 			}
 			catch (Exception e)
 			{
@@ -251,6 +251,65 @@ namespace Client.ViewModels
 					Notifications.Add(new Notification(e.Message, CommandNotificationStatus.Rejected));
 				}
 			}
+		}
+		#endregion
+
+		private void GetAllBankAccounts()
+		{
+			try
+			{
+				List<BankAccount> bankAccounts = _userServiceProxy.Proxy.GetMyBankAccounts();
+
+				if(BankAccounts.Count > 0)
+				{
+					BankAccounts.Clear();
+				}
+
+				foreach(var ba in bankAccounts)
+				{
+					BankAccounts.Add(ba);
+				}
+			}
+			catch (SecurityAccessDeniedException securityAccess)
+			{
+				Notifications.Add(new Notification($"Get my bank accounts action denied. You have no permission for this action.", CommandNotificationStatus.Rejected));
+			}
+			catch (Exception e)
+			{
+				if (_userServiceProxy == null)
+				{
+					Notifications.Add(new Notification("Unable to get your bank accounts since user service unavailable.", CommandNotificationStatus.Rejected));
+				}
+			}
+		}
+
+		private void AskServiceForNotifications()
+		{
+			try
+			{
+				List<CommandNotification> notifications = _userServiceProxy.Proxy.GetPendingNotifications();
+				foreach (CommandNotification notification in notifications)
+				{
+					Notifications.Add(new Notification(notification.Information, notification.CommandStatus));
+				}
+			}
+			catch (SecurityAccessDeniedException securityAccess)
+			{
+				Notifications.Add(new Notification($"Get my notification action denied. You have no permission for this action.", CommandNotificationStatus.Rejected));
+			}
+			catch (Exception e)
+			{
+				if (_userServiceProxy == null)
+				{
+					Notifications.Add(new Notification("User service unavailable.", CommandNotificationStatus.Rejected));
+				}
+			}
+		}
+
+		private void HandleNotifications(CommandNotification commandNotification)
+		{
+			Notification notification = new Notification(commandNotification.Information, commandNotification.CommandStatus);
+			Notifications.Add(notification);
 		}
 
 		private X509Certificate2 GetCertificateFromStorage(string cltCertCN)
