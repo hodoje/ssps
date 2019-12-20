@@ -20,7 +20,8 @@ namespace BankService.CommandHandler
 		private object locker;
 		private readonly int sectorSize;
 		private Dictionary<long, BaseCommand> commandsSent;
-		private WindowsClientProxy<ISectorService> sectoreServiceProxy;
+		private WindowsClientProxy<ISectorService> sectorServiceProxy;
+		private ServiceHost sectorResponseServiceHost;
 		private IAudit auditService;
 		private INotificationHost notificationHost;
 
@@ -35,9 +36,9 @@ namespace BankService.CommandHandler
 			this.sectorSize = sectorQueueSize;
 
 			ConnectionInfo ci = BankServiceConfig.Connections[sectorType];
-			sectoreServiceProxy = new WindowsClientProxy<ISectorService>(ci.Address, ci.EndpointName);
+			sectorServiceProxy = new WindowsClientProxy<ISectorService>(ci.Address, ci.EndpointName);
 
-			ServiceHost sectorResponseServiceHost = new ServiceHost(this);
+			sectorResponseServiceHost = new ServiceHost(this);
 			sectorResponseServiceHost.AddServiceEndpoint(
 				typeof(ISectorResponseService), 
 				SetUpBindingForSectoreResponse(), 
@@ -113,7 +114,7 @@ namespace BankService.CommandHandler
 			{
 				// Send command to sector
 				// TODO: DO INTEGRITY CHECK
-				sectoreServiceProxy.Proxy.SendRequest(command, new byte[1]);
+				sectorServiceProxy.Proxy.SendRequest(command, new byte[1]);
 				return true;
 			}
 			catch
@@ -154,6 +155,12 @@ namespace BankService.CommandHandler
 			binding.Security.Transport.ProtectionLevel = ProtectionLevel.Sign;
 			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
 			return binding;
+		}
+
+		public void Dispose()
+		{
+			sectorServiceProxy.Dispose();
+			sectorResponseServiceHost.Close();
 		}
 	}
 }

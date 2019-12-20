@@ -1,11 +1,12 @@
 ﻿using Common.Commanding;
+using System;
 
 namespace BankService.CommandHandler
 {
 	/// <summary>
 	/// Interface exposes methods used by unit which is used for command sending and notification receiving.
 	/// </summary>
-	public interface ICommandHandler
+	public interface ICommandHandler : IDisposable
 	{
 		/// <summary>
 		/// Indicates if there is space to add new command to handler.

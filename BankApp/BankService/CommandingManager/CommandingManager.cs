@@ -12,6 +12,8 @@ using Common.ServiceInterfaces;
 using System.Linq;
 using System.ServiceModel;
 using System.Net.Security;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace BankService.CommandingManager
 {
@@ -67,8 +69,8 @@ namespace BankService.CommandingManager
 		private static readonly int timeoutPeriod;
 		private readonly DbContext dbContext;
 		private ConcurrentQueue<CommandNotification> responseQueue;
-		// todo clear this and test if host gets disposed
-		private List<ICommandingHost> commandingHosts;
+		// Key is the Sector type name
+		private Dictionary<string, ICommandingHost> commandingHosts;
 		private IAudit auditService;
 		private IDatabaseManager<BaseCommand> databaseManager;
 		private ServiceHost startupConfirmationHost;
@@ -93,9 +95,11 @@ namespace BankService.CommandingManager
 
 			InitialDatabaseLoading();
 
-			commandingHosts = new List<ICommandingHost>(1);
+			commandingHosts = new Dictionary<string, ICommandingHost>();
 
 			EnqueueNotSentCommands();
+
+			PeriodicallyCheckSectorsAlive();
 		}
 
 		private void EnqueueNotSentCommands()
@@ -135,7 +139,7 @@ namespace BankService.CommandingManager
 		{
 			((IDisposable)databaseManager).Dispose();
 
-			foreach (ICommandingHost commandingHost in commandingHosts)
+			foreach (ICommandingHost commandingHost in commandingHosts.Values)
 			{
 				((IDisposable)commandingHost).Dispose();
 			}
@@ -214,11 +218,52 @@ namespace BankService.CommandingManager
 			}
 		}
 
+		private void PeriodicallyCheckSectorsAlive()
+		{
+			Task.Run(() =>
+			{
+				while (true)
+				{
+					if(commandingHosts.Count > 0)
+					{
+						Dictionary<string, ICommandingHost> aliveSectors = new Dictionary<string, ICommandingHost>();
+
+						foreach (var sectorHostPair in commandingHosts)
+						{
+							ConnectionInfo ci = BankServiceConfig.Connections[sectorHostPair.Key];
+							using (var sectorServiceProxy = new WindowsClientProxy<ISectorService>(ci.Address, ci.EndpointName))
+							{
+								try
+								{
+									sectorServiceProxy.Proxy.CheckSectorAlive();
+									aliveSectors.Add(sectorHostPair.Key, sectorHostPair.Value);
+								}
+								catch (Exception e)
+								{
+									sectorHostPair.Value.Dispose();
+									Console.WriteLine($"Sector: {sectorHostPair.Key.ToUpper()} disconnected.");
+									auditService.Log("CommandManager", $"Sector: {sectorHostPair.Key.ToUpper()} disconnected.", System.Diagnostics.EventLogEntryType.Information);
+								}
+							}
+						}
+
+						commandingHosts.Clear();
+						foreach (var sectorHostPair in aliveSectors)
+						{
+							commandingHosts.Add(sectorHostPair.Key, sectorHostPair.Value);
+						}
+					}
+
+					Thread.Sleep(2000);
+				}
+			});
+		}
+
 		public void OpenCommandHostForSector(string sectorType)
 		{
 			CommandQueue commandQueue = commandQueueResolver.ResolveQueueForSector(sectorType);
 			CommandingHost.CommandingHost newHost = new CommandingHost.CommandingHost(sectorType, auditService, commandExecutorQueue, commandQueue, responseQueue, databaseManager);
-			commandingHosts.Add(newHost);
+			commandingHosts.Add(sectorType, newHost);
 			newHost.Start();
 
 			auditService.Log($"[CommandingHost({sectorType.ToUpper()})]", "Initialized.");

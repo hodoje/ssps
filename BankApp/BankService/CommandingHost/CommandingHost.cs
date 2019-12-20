@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace BankService.CommandingHost
 {
-	public class CommandingHost : ICommandingHost, INotificationHost, IDisposable
+	public class CommandingHost : ICommandingHost, INotificationHost
 	{
 		private string sectorType;
 
@@ -66,7 +66,7 @@ namespace BankService.CommandingHost
 		public void Dispose()
 		{
 			Stop();
-			commandingQueue.Dispose();
+			commandHandler.Dispose();
 		}
 
 		public void Start()

@@ -1,12 +1,13 @@
 ﻿using BankService.DatabaseManagement;
 using Common.Commanding;
+using System;
 
 namespace BankService.CommandingHost
 {
 	/// <summary>
 	/// Interface used for unit which has logic for sending commands and propagating responses to client.
 	/// </summary>
-	public interface ICommandingHost
+	public interface ICommandingHost : IDisposable
 	{
 		/// <summary>
 		/// Commanding host starts getting commands from queue to execute and send them to command handler.
