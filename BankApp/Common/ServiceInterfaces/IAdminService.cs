@@ -1,4 +1,5 @@
-﻿using System.ServiceModel;
+﻿using Common.Commanding;
+using System.ServiceModel;
 
 namespace Common.ServiceInterfaces
 {
@@ -9,12 +10,12 @@ namespace Common.ServiceInterfaces
 		/// Initializes new database.
 		/// </summary>
 		[OperationContract]
-		void CreateNewDatabase();
+		CommandNotification CreateNewDatabase();
 
 		/// <summary>
 		/// Deletes stale commands.
 		/// </summary>
 		[OperationContract]
-		void DeleteStaleCommands();
+		CommandNotification DeleteStaleCommands();
 	}
 }

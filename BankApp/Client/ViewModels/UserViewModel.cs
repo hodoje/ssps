@@ -211,7 +211,8 @@ namespace Client.ViewModels
 		{
 			try
 			{
-				_adminServiceProxy.Proxy.DeleteStaleCommands();
+				CommandNotification cn = _adminServiceProxy.Proxy.DeleteStaleCommands();
+				Notifications.Add(new Notification(cn.Information, cn.CommandStatus));
 			}
 			catch (SecurityAccessDeniedException securityAccess)
 			{
@@ -234,7 +235,9 @@ namespace Client.ViewModels
 		{
 			try
 			{
-				_adminServiceProxy.Proxy.CreateNewDatabase();
+				// TODO: get notification, cuz admin operations are synchronous
+				CommandNotification cn = _adminServiceProxy.Proxy.CreateNewDatabase();
+				Notifications.Add(new Notification(cn.Information, cn.CommandStatus));
 			}
 			catch (SecurityAccessDeniedException securityAccess)
 			{

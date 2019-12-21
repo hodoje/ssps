@@ -65,7 +65,7 @@ namespace BankService
 			commandManager.StartListeningForAlivePings();
 		}
 
-		public void CreateNewDatabase()
+		public CommandNotification CreateNewDatabase()
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
 			if (!Thread.CurrentPrincipal.IsInRole("admins"))
@@ -77,8 +77,20 @@ namespace BankService
 			auditService.Log(username, "Authorized as admin, create data base access granted.", System.Diagnostics.EventLogEntryType.Warning);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
-			commandManager.CreateDatabase();
-			commandExecutor.CreateDatabase();
+			try
+			{
+				commandManager.CreateDatabase();
+				commandExecutor.CreateDatabase();
+				CommandNotification cn = new CommandNotification(-1, CommandNotificationStatus.Confirmed);
+				cn.Information = "Create new database.";
+				return cn;
+			}
+			catch(Exception e)
+			{
+				CommandNotification cn = new CommandNotification(-1, CommandNotificationStatus.Rejected);
+				cn.Information = "Create new database.";
+				return cn;
+			}
 		}
 
 		public void TestCreateNewDatabase()
@@ -87,7 +99,7 @@ namespace BankService
 			commandExecutor.CreateDatabase();
 		}
 
-		public void DeleteStaleCommands()
+		public CommandNotification DeleteStaleCommands()
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
 			if (!Thread.CurrentPrincipal.IsInRole("admins"))
@@ -98,7 +110,20 @@ namespace BankService
 			auditService.Log(username, "Authorized as admin, delete timeout command initiated.", System.Diagnostics.EventLogEntryType.Warning);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
-			commandManager.ClearStaleCommands();
+			try
+			{
+				commandManager.ClearStaleCommands();
+				CommandNotification cn = new CommandNotification(-1, CommandNotificationStatus.Confirmed);
+				cn.Information = "Remove expired commands.";
+				return cn;
+
+			}
+			catch(Exception e)
+			{
+				CommandNotification cn = new CommandNotification(-1, CommandNotificationStatus.Rejected);
+				cn.Information = "Remove expired commands.";
+				return cn;
+			}			
 		}
 
 		public void Deposit(double amount)
