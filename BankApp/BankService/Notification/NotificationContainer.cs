@@ -21,6 +21,7 @@ namespace BankService.Notification
 		public void AddExpectingNotificationId(string username, IClientServiceCallback userCallback, long commandId)
 		{
 			CommandNotification notification = new CommandNotification(commandId);
+			notification.Username = username;
 			NotificationInformation userNotificationInfo = pendingUserNotifications.GetOrAdd(username, (x) => { return new NotificationInformation(username, userCallback); });
 			userNotificationInfo.PendingNotifications.TryAdd(commandId, notification);
 

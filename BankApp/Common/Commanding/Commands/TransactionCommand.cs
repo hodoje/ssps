@@ -22,9 +22,11 @@ namespace Common.Commanding
 		/// <param name="commandId">Unique command ID.</param>
 		/// <param name="username">Username of user who requested deposit.</param>
 		/// <param name="amount">Deposit amount.</param>
-		public TransactionCommand(long commandId, string username, double amount, TransactionType transactionType) : base(commandId, username)
+		public TransactionCommand(long commandId, string username, double amount, TransactionType transactionType, long bankAccountId) : base(commandId, username)
 		{
 			Amount = amount;
+			BankAccountId = bankAccountId;
+			TransactionType = transactionType;
 		}
 
 		/// <summary>

@@ -106,6 +106,8 @@ namespace BankService.CommandExecutor
 			TransactionCommand transactionCommand = command as TransactionCommand;
 
 			BankAccount bankAccount = bankAccDatabaseManager.Get(transactionCommand.BankAccountId);
+			User user = userDatabaseManager.Find(u => u.Accounts.FirstOrDefault(ba => ba.ID == bankAccount.ID) != null).FirstOrDefault();
+			bankAccount.User = user;
 			if (bankAccount == null)
 			{
 				auditService.Log(transactionCommand.Username, "Requested transaction on bank account which is non existent!", System.Diagnostics.EventLogEntryType.Warning);

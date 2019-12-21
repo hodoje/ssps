@@ -126,7 +126,7 @@ namespace BankService
 			}			
 		}
 
-		public void Deposit(double amount)
+		public void Deposit(double amount, long bankAccountId)
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
 			if (!Thread.CurrentPrincipal.IsInRole("users"))
@@ -138,7 +138,7 @@ namespace BankService
 			auditService.Log(username, $"Authorized as user, {amount} requested.", System.Diagnostics.EventLogEntryType.Information);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
-			TransactionCommand depositCommand = new TransactionCommand(0, username, amount, TransactionType.Deposit);
+			TransactionCommand depositCommand = new TransactionCommand(0, username, amount, TransactionType.Deposit, bankAccountId);
 			long commandId = commandManager.EnqueueCommand(depositCommand);
 
 			notificationHandler.RegisterCommand(username, callback, commandId);
@@ -195,7 +195,7 @@ namespace BankService
 			notificationHandler.RegisterCommand(username, callback, commandId);
 		}
 
-		public void Withdraw(double amount)
+		public void Withdraw(double amount, long bankAccountId)
 		{
 			string username = StringFormatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
 			if (!Thread.CurrentPrincipal.IsInRole("users"))
@@ -207,7 +207,7 @@ namespace BankService
 			auditService.Log(username, $"Authorized as user, requests loan of {amount}.", System.Diagnostics.EventLogEntryType.Information);
 			IClientServiceCallback callback = OperationContext.Current.GetCallbackChannel<IClientServiceCallback>();
 
-			TransactionCommand withdrawCommand = new TransactionCommand(0, username, amount, TransactionType.Withdraw);
+			TransactionCommand withdrawCommand = new TransactionCommand(0, username, amount, TransactionType.Withdraw, bankAccountId);
 			long commandId = commandManager.EnqueueCommand(withdrawCommand);
 
 			notificationHandler.RegisterCommand(username, callback, commandId);

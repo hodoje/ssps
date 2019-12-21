@@ -12,10 +12,10 @@ namespace Common.ServiceInterfaces
 		void Register();
 
 		[OperationContract]
-		void Withdraw(double amount);
+		void Withdraw(double amount, long bankAccountId);
 
 		[OperationContract]
-		void Deposit(double amount);
+		void Deposit(double amount, long bankAccountId);
 
 		[OperationContract]
 		void RequestLoan(double amount, int months);

@@ -69,12 +69,23 @@ namespace SectorService.ServiceHosts
 					//Console.WriteLine("Trying to connect to bank...");
 					_startupProxy = new WindowsClientProxy<IStartupConfirmationService>(
 						SectorConfig.StartupConfirmationServiceAddress, SectorConfig.StartupConfirmationServiceEndpointName);
-					_startupProxy.Proxy.ConfirmStartup(_sectorType);
-					isSectorConfirmed = true;
-					//Console.WriteLine("Connected.");
-					_bankALiveServiceProxy = new WindowsClientProxy<IBankAliveService>(SectorConfig.BankAliveServiceAddress, SectorConfig.BankAliveServiceEndpointName);
-					CheckIfBankAlive();
-					break;
+					try
+					{
+						_startupProxy.Proxy.ConfirmStartup(_sectorType);
+						isSectorConfirmed = true;
+						//Console.WriteLine("Connected.");
+						_bankALiveServiceProxy = new WindowsClientProxy<IBankAliveService>(SectorConfig.BankAliveServiceAddress, SectorConfig.BankAliveServiceEndpointName);
+						CheckIfBankAlive();
+						break;
+					}
+					catch(Exception e)
+					{
+						_startupProxy = null;
+						int sleep = 5;
+						//Console.WriteLine("Bank not available.");
+						//Console.WriteLine($"Trying again in {sleep} seconds.");
+						isSectorConfirmed = false;
+					}
 				}
 				catch (Exception e)
 				{

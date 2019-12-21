@@ -1,3 +1,3 @@
-CommandHost mora detektovati pad sektora.
-Kreirati User i BankAccount modele. Jedan User, vise BankAccount-a. Jedan BankAccount, jedan User. Prilagoditi applikaciju tome.
-Komande se zapravo izvrsavaju i postoji stanje korisnickih racuna (ovo gore iznad).
+Kada klijent ucita notifikacije one imaju status None umesto Confirmed ili Rejected.
+Odraditi integrity check.
+Onaj concurrency bug kod azuriranja - nije prioritet jer nije uvek.

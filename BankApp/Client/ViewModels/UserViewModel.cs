@@ -108,9 +108,9 @@ namespace Client.ViewModels
 
 			_userServiceCallbackObject = new BankServiceCallbackObject(HandleNotifications);
 
-			//string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
+			string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
 			//TEST
-			string username = "user1";
+			//string username = "user1";
 			X509Certificate2 certificate;
 			certificate = GetCertificateFromStorage(username);
 			if (certificate == null)
@@ -138,10 +138,10 @@ namespace Client.ViewModels
 				switch (SelectedTransactionType)
 				{
 					case TransactionType.Payment:
-						_userServiceProxy.Proxy.Deposit(TransactionAmount);
+						_userServiceProxy.Proxy.Deposit(TransactionAmount, SelectedBankAccount.ID);
 						break;
 					case TransactionType.Withdrawal:
-						_userServiceProxy.Proxy.Withdraw(TransactionAmount);
+						_userServiceProxy.Proxy.Withdraw(TransactionAmount, SelectedBankAccount.ID);
 						break;
 				}
 			}
