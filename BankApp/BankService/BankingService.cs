@@ -234,7 +234,10 @@ namespace BankService
 				throw new SecurityException("Access is denied.");
 			}
 
-			return commandExecutor.GetUsersAccount(username);
+			List<BankAccount> bankAccounts = commandExecutor.GetUsersAccount(username);
+			bankAccounts.ForEach(x => x.User = null);
+
+			return bankAccounts;
 		}
 	}
 }
