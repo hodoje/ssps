@@ -26,6 +26,7 @@ namespace Client.ViewModels
 		private int _loanDuration = 0;
 		private double _transactionAmount;
 		private TransactionType _selectedTransactionType;
+		private BankAccount _selectedBankAccount;
 		private CertificateClientProxy<IUserService> _userServiceProxy;
 		private CertificateClientProxy<IAdminService> _adminServiceProxy;
 		public BankServiceCallbackObject _userServiceCallbackObject;
@@ -71,6 +72,17 @@ namespace Client.ViewModels
 				ExecuteTransactionCommand.RaiseCanExecuteChanged();
 			}
 		}
+
+		public BankAccount SelectedBankAccount
+		{
+			get { return _selectedBankAccount; }
+			set
+			{
+				SetField(ref _selectedBankAccount, value);
+				ExecuteTransactionCommand.RaiseCanExecuteChanged();
+			}
+		}
+
 		public ObservableCollection<TransactionType> TransactionTypes { get; set; }
 		public ObservableCollection<Notification> Notifications { get; set; }
 		public ObservableCollection<BankAccount> BankAccounts { get; set; }
@@ -152,7 +164,7 @@ namespace Client.ViewModels
 
 		private bool CanExecuteTransaction()
 		{
-			return TransactionAmount > 0;
+			return TransactionAmount > 0 && SelectedBankAccount != null;
 		}
 
 		private void OnRequestLoan()
@@ -188,7 +200,6 @@ namespace Client.ViewModels
 			try
 			{
 				_userServiceProxy.Proxy.Register();
-				GetAllBankAccounts();
 			}
 			catch (SecurityAccessDeniedException securityAccess)
 			{
@@ -235,7 +246,6 @@ namespace Client.ViewModels
 		{
 			try
 			{
-				// TODO: get notification, cuz admin operations are synchronous
 				CommandNotification cn = _adminServiceProxy.Proxy.CreateNewDatabase();
 				Notifications.Add(new Notification(cn.Information, cn.CommandStatus));
 			}

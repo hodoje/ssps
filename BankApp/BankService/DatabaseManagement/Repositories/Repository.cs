@@ -14,6 +14,26 @@ namespace BankService.DatabaseManagement.Repositories
 		private readonly SemaphoreSlim synchronization;
 		protected readonly DbContext dbContext;
 
+		private bool TryOpenConnectionIfClosed()
+		{
+			if(dbContext.Database.Connection.State != System.Data.ConnectionState.Open)
+			{
+				try
+				{
+					dbContext.Database.Connection.Open();
+					return true;
+				}
+				catch(Exception e)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
+
 		public Repository(DbContext dbContext, SemaphoreSlim synchronization)
 		{
 			this.dbContext = dbContext;
@@ -22,7 +42,7 @@ namespace BankService.DatabaseManagement.Repositories
 
 		public void AddEntity(TEntity entity)
 		{
-			if (dbContext.Database.Connection.State == System.Data.ConnectionState.Closed)
+			if (!TryOpenConnectionIfClosed())
 			{
 				return;
 			}
@@ -37,7 +57,7 @@ namespace BankService.DatabaseManagement.Repositories
 
 		public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
 		{
-			if (dbContext.Database.Connection.State == System.Data.ConnectionState.Closed)
+			if (!TryOpenConnectionIfClosed())
 			{
 				return new List<TEntity>(0);
 			}
@@ -47,7 +67,7 @@ namespace BankService.DatabaseManagement.Repositories
 
 		public TEntity Get(long id)
 		{
-			if (dbContext.Database.Connection.State == System.Data.ConnectionState.Closed)
+			if (!TryOpenConnectionIfClosed())
 			{
 				return null;
 			}
@@ -57,7 +77,7 @@ namespace BankService.DatabaseManagement.Repositories
 
 		public List<TEntity> ReadAllEntities()
 		{
-			if (dbContext.Database.Connection.State == System.Data.ConnectionState.Closed)
+			if (!TryOpenConnectionIfClosed())
 			{
 				return new List<TEntity>(0);
 			}
@@ -67,7 +87,7 @@ namespace BankService.DatabaseManagement.Repositories
 
 		public void RemoveEntity(long entityId)
 		{
-			if (dbContext.Database.Connection.State == System.Data.ConnectionState.Closed)
+			if (!TryOpenConnectionIfClosed())
 			{
 				return;
 			}
@@ -82,7 +102,7 @@ namespace BankService.DatabaseManagement.Repositories
 
 		public void Update(TEntity entity)
 		{
-			if (dbContext.Database.Connection.State == System.Data.ConnectionState.Closed)
+			if (!TryOpenConnectionIfClosed())
 			{
 				return;
 			}
@@ -98,7 +118,7 @@ namespace BankService.DatabaseManagement.Repositories
 
 		public TEntity FindEntity(Expression<Func<TEntity, bool>> predicate)
 		{
-			if (dbContext.Database.Connection.State == System.Data.ConnectionState.Closed)
+			if (!TryOpenConnectionIfClosed())
 			{
 				return default(TEntity);
 			}

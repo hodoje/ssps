@@ -397,7 +397,7 @@
                 <Label Background="#2E2E2E" Content="Payment/Withdrawal" HorizontalAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="ForestGreen" VerticalAlignment="Top" Width="250" Height="49"/>
                 <Separator Background="#383A41" HorizontalAlignment="Left" Height="99" Margin="0" VerticalAlignment="Top" Width="250"/>
                 <Label Content="Card:" Foreground="ForestGreen" HorizontalAlignment="Left" Margin="10,86,0,0" VerticalAlignment="Top"/>
-                <ComboBox Height="20" ItemsSource="{Binding TODO}" HorizontalAlignment="Left" SelectedItem="{Binding TODO, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="229" Style="{DynamicResource CustomComboBoxStyle}" Margin="10,117,0,0">
+				<ComboBox Height="20" ItemsSource="{Binding BankAccounts}" HorizontalAlignment="Left" SelectedItem="{Binding SelectedBankAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="229" Style="{DynamicResource CustomComboBoxStyle}" Margin="10,117,0,0">
                     <ComboBox.ItemContainerStyle>
                         <Style TargetType="{x:Type ComboBoxItem}">
                             <Setter Property="Template">
