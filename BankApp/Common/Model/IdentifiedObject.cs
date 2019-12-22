@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 
@@ -18,6 +19,7 @@ namespace Common.Model
 		}
 
 		[DataMember]
+		//[DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
 		public long ID { get; private set; }
 
 		public override int GetHashCode()

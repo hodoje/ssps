@@ -28,6 +28,9 @@ namespace BankService
 		private readonly string bankDomainConnectionString = "BankServiceDB";
 		private object locker = new object();
 
+		private BankCommandingContext commandingContext;
+		private BankDomainContext domainContext;
+
 		private IAudit auditService; 
 		private ICommandExecutor commandExecutor;
 		private ICommandingManager commandManager;
@@ -37,8 +40,10 @@ namespace BankService
 		public BankingService()
 		{
 			InitializesObjects();
-
 			auditService = new AuditClientProxy(BankServiceConfig.AuditServiceAddress, BankServiceConfig.AuditServiceEndpointName);
+
+			//FOR TESTING
+			TestCreateNewDatabase();
 
 			responseQueue = new ConcurrentQueue<CommandNotification>();
 			notificationHandler = new NotificationHandler(auditService, responseQueue, new NotificationContainer(ServiceLocator.GetService<IRepository<CommandNotification>>()));
@@ -49,8 +54,7 @@ namespace BankService
 
 			commandExecutor = new CommandExecutor.CommandExecutor(auditService, commandExecutorQueue);
 
-			//FOR TESTING
-			//TestCreateNewDatabase();
+			
 
 			commandExecutor.Start();
 		}
@@ -88,15 +92,32 @@ namespace BankService
 			catch(Exception e)
 			{
 				CommandNotification cn = new CommandNotification(-1, CommandNotificationStatus.Rejected);
-				cn.Information = "Create new database.";
+				cn.Information = "Couldn't create new database\n Reason: " + e.Message +".";
 				return cn;
 			}
 		}
 
 		public void TestCreateNewDatabase()
 		{
-			commandManager.CreateDatabase();
-			commandExecutor.CreateDatabase();
+			if (commandingContext.Database.Exists())
+			{
+				commandingContext.Database.Connection.Close();
+				commandingContext.Database.Delete();
+			}
+
+			commandingContext.Database.Create();
+			commandingContext.Database.Connection.Open();
+			auditService.Log(logMessage: "New BankCommandDB database created!", eventLogEntryType: System.Diagnostics.EventLogEntryType.Warning);
+
+			if (domainContext.Database.Exists())
+			{
+				domainContext.Database.Connection.Close();
+				domainContext.Database.Delete();
+			}
+
+			domainContext.Database.Create();
+			domainContext.Database.Connection.Open();
+			auditService.Log(logMessage: "New BankDomainDB database created!", eventLogEntryType: System.Diagnostics.EventLogEntryType.Warning);
 		}
 
 		public CommandNotification DeleteStaleCommands()
@@ -215,13 +236,13 @@ namespace BankService
 
 		private void InitializesObjects()
 		{
-			BankCommandingContext commandingContext = new BankCommandingContext(commandingConnectionString);
+			commandingContext = new BankCommandingContext(commandingConnectionString);
 			SemaphoreSlim commandingSemaphore = new SemaphoreSlim(1);
 			ServiceLocator.RegisterObject<DbContext>(commandingContext);
 			ServiceLocator.RegisterService<IRepository<BaseCommand>>(new Repository<BaseCommand>(commandingContext, commandingSemaphore));
 			ServiceLocator.RegisterService<IRepository<CommandNotification>>(new Repository<CommandNotification>(commandingContext, commandingSemaphore));
 
-			BankDomainContext domainContext = new BankDomainContext(bankDomainConnectionString);
+			domainContext = new BankDomainContext(bankDomainConnectionString);
 			ServiceLocator.RegisterObject<BankDomainContext>(domainContext);
 		}
 

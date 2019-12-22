@@ -15,7 +15,7 @@
                         AccountNumber = c.String(),
                         Amount = c.Double(nullable: false),
                         UserId = c.Int(nullable: false),
-                        User_ID = c.Long(),
+                        User_ID = c.Long(nullable: false),
                     })
                 .PrimaryKey(t => t.ID)
                 .ForeignKey("dbo.Users", t => t.User_ID)

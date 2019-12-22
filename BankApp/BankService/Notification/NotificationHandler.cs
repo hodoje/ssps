@@ -39,7 +39,7 @@ namespace BankService
 		{
 			List<CommandNotification> notifications = notificationContainer.GetCommandNotificationsForUser(username);
 
-			return notifications?? new List<CommandNotification>();
+			return notifications?? new List<CommandNotification>(0);
 		}
 
 		public void RegisterCommand(string username, IClientServiceCallback userCallback, long commandId)

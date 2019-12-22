@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System;
 using Common.Communication;
 using MlkPwgen;
+using System.Data.Entity;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -124,7 +125,7 @@ namespace BankService.CommandExecutor
 		{
 			RegistrationCommand registrationCommand = command as RegistrationCommand;
 
-			User user = userDatabaseManager.FindEntity(x => x.Username == registrationCommand.Username);
+			User user = userDatabaseManager.FindEntity(x => x.Username == command.Username);
 			if (user == null)
 			{
 				user = new User();
@@ -135,9 +136,9 @@ namespace BankService.CommandExecutor
 			long accountId = long.Parse(PasswordGenerator.Generate(10, new HashSet<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }));
 			BankAccount newAccount = new BankAccount(accountId);
 
-			newAccount.User = user;
+			newAccount.UserId = user.ID;
 			bankAccDatabaseManager.AddEntity(newAccount);
-			bankAccDatabaseManager.Update(newAccount);
+			//bankAccDatabaseManager.Update(newAccount);
 
 			auditService.Log("CommandExecutor", $"New card successfully created for user: {user.Username}.");
 

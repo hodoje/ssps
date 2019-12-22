@@ -131,6 +131,14 @@
     <Compile Include="Migrations\DomainContext\201912201514265_UpdatedBankAccountModel.designer.cs">
       <DependentUpon>201912201514265_UpdatedBankAccountModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\DomainContext\201912221823231_DatabaseGeneratedID.cs" />
+    <Compile Include="Migrations\DomainContext\201912221823231_DatabaseGeneratedID.designer.cs">
+      <DependentUpon>201912221823231_DatabaseGeneratedID.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\DomainContext\201912222023429_TestMigration.cs" />
+    <Compile Include="Migrations\DomainContext\201912222023429_TestMigration.designer.cs">
+      <DependentUpon>201912222023429_TestMigration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\DomainContext\DomainConfiguration.cs" />
     <Compile Include="Notification\INotificationContainer.cs" />
     <Compile Include="Notification\INotificationHandler.cs" />
@@ -179,6 +187,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\DomainContext\201912201514265_UpdatedBankAccountModel.resx">
       <DependentUpon>201912201514265_UpdatedBankAccountModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\DomainContext\201912221823231_DatabaseGeneratedID.resx">
+      <DependentUpon>201912221823231_DatabaseGeneratedID.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\DomainContext\201912222023429_TestMigration.resx">
+      <DependentUpon>201912222023429_TestMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

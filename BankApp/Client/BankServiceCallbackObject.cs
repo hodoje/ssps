@@ -12,15 +12,21 @@ namespace Client
 	public class BankServiceCallbackObject : IClientServiceCallback
 	{
 		private Action<CommandNotification> _callback;
+		private Action getBankAccounts;
 
-		public BankServiceCallbackObject(Action<CommandNotification> callback)
+		public BankServiceCallbackObject(Action<CommandNotification> callback, Action getBankAccounts)
 		{
 			_callback = callback;
+			this.getBankAccounts = getBankAccounts;
 		}
 
 		public void SendNotification(CommandNotification commandNotification)
 		{
 			_callback(commandNotification);
+			if (commandNotification.CommandStatus == CommandNotificationStatus.Confirmed)
+			{
+				getBankAccounts?.Invoke();
+			}
 		}
 	}
 }

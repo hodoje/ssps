@@ -26,6 +26,7 @@ namespace BankService.DatabaseManagement.Repositories
 				catch(Exception e)
 				{
 					return false;
+					//throw new ObjectDisposedException("Database connection was not opened!", e);
 				}
 			}
 			else
@@ -51,7 +52,6 @@ namespace BankService.DatabaseManagement.Repositories
 
 			dbContext.Set<TEntity>().Add(entity);
 			dbContext.SaveChanges();
-
 			synchronization.Release();
 		}
 

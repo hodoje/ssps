@@ -38,6 +38,7 @@ namespace BankService.Notification
 				{
 					notification.NotificationState = NotificationState.Received;
                     notification.Information = receivedCommandNotification.Information;
+					notification.CommandStatus = receivedCommandNotification.CommandStatus;
 					CommandNotification dbNotification = dataPersister.Get(notification.ID);
 					if (dbNotification != null)
 					{
@@ -91,8 +92,19 @@ namespace BankService.Notification
 		public List<CommandNotification> GetCommandNotificationsForUser(string username)
 		{
 			NotificationInformation userNotification;
-			pendingUserNotifications.TryRemove(username, out userNotification);
-			List<CommandNotification> userNotifications = userNotification?.ReadyNotifications.Values.ToList();
+			List<CommandNotification> userNotifications = new List<CommandNotification>(0);
+			if (pendingUserNotifications.TryRemove(username, out userNotification))
+			{
+
+				userNotifications = userNotification?.ReadyNotifications.Values.ToList();
+				foreach (CommandNotification commandNotification in userNotifications)
+				{
+					CommandNotification dbNotification = dataPersister.Get(commandNotification.ID);
+					dbNotification.NotificationState = NotificationState.Sent;
+
+					dataPersister.Update(dbNotification);
+				}
+			}
 
 			return userNotifications;
 		}
