@@ -38,8 +38,14 @@ namespace BankService.Notification
 				{
 					notification.NotificationState = NotificationState.Received;
                     notification.Information = receivedCommandNotification.Information;
-
-					dataPersister.Update(notification);
+					CommandNotification dbNotification = dataPersister.Get(notification.ID);
+					if (dbNotification != null)
+					{
+						dbNotification.NotificationState = notification.NotificationState;
+						dbNotification.Information = notification.Information;
+						dbNotification.CommandStatus = receivedCommandNotification.CommandStatus;
+						dataPersister.Update(notification);
+					}
 
 					notificationinfo.ReadyNotifications.TryAdd(notification.ID, notification);
 
