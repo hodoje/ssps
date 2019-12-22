@@ -37,10 +37,7 @@ namespace Common.Communication
 		{
 			get
 			{
-				if(_proxy == null)
-				{
-					_proxy = _channelFactory.CreateChannel();
-				}
+				_proxy = _channelFactory.CreateChannel();
 				return _proxy;
 			}			
 		}
