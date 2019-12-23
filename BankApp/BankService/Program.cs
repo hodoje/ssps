@@ -18,8 +18,8 @@ namespace BankService
 	{
 		static void Main(string[] args)
 		{
-			//string srvCertCN = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
-			string srvCertCN = "bankservice";
+			string srvCertCN = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
+			//string srvCertCN = "bankservice";
 			string address = $"{BankServiceConfig.BankServiceAddress}/{BankServiceConfig.UserServiceEndpointName}";
 			BankingService bankingService = new BankingService();
 

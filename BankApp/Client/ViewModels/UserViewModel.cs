@@ -110,9 +110,9 @@ namespace Client.ViewModels
 
 			_userServiceCallbackObject = new BankServiceCallbackObject(HandleNotifications, GetAllBankAccounts);
 
-			//string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
+			string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
 			//TEST
-			string username = "user1";
+			//string username = "user1";
 			X509Certificate2 certificate;
 			certificate = GetCertificateFromStorage(username);
 			if (certificate == null)

@@ -43,7 +43,7 @@ namespace BankService
 			auditService = new AuditClientProxy(BankServiceConfig.AuditServiceAddress, BankServiceConfig.AuditServiceEndpointName);
 
 			//FOR TESTING
-			//TestCreateNewDatabase();
+			TestCreateNewDatabase();
 
 			responseQueue = new ConcurrentQueue<CommandNotification>();
 			notificationHandler = new NotificationHandler(auditService, responseQueue, new NotificationContainer(ServiceLocator.GetService<IRepository<CommandNotification>>()));
@@ -83,8 +83,7 @@ namespace BankService
 
 			try
 			{
-				commandManager.CreateDatabase();
-				commandExecutor.CreateDatabase();
+				TestCreateNewDatabase();
 				CommandNotification cn = new CommandNotification(-1, CommandNotificationStatus.Confirmed);
 				cn.Information = "Create new database.";
 				return cn;
