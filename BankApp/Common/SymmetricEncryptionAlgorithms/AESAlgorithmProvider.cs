@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -52,7 +53,29 @@ namespace Common.SymmetricEncryptionAlgorithms
 
 			ICryptoTransform aesEncrypt = aesCrypto.CreateEncryptor();
 
-			encryptedData = initialVector.Concat(aesEncrypt.TransformFinalBlock(rawData, 0, rawData.Length)).ToArray();
+			encryptedData = BitConverter.GetBytes(initialVector.Length).Concat(initialVector.Concat(aesEncrypt.TransformFinalBlock(rawData, 0, rawData.Length - (rawData.Length % encryptionInfo.Key.Length)))).ToArray();
+
+			return encryptedData;
+		}
+
+		public byte[] EncryptWithIV(EncryptionInformation encryptionInfo, byte[] rawData, byte[] IV)
+		{
+			byte[] encryptedData;
+			AesCryptoServiceProvider aesCrypto = new AesCryptoServiceProvider()
+			{
+				Key = ASCIIEncoding.ASCII.GetBytes(encryptionInfo.Key),
+				Mode = encryptionInfo.CipherMode,
+				Padding = PaddingMode.None,
+			};
+
+			if (encryptionInfo.CipherMode == CipherMode.CBC)
+			{
+				aesCrypto.IV = IV;
+			}
+
+			ICryptoTransform aesEncrypt = aesCrypto.CreateEncryptor();
+
+			encryptedData = BitConverter.GetBytes(IV.Length).Concat(IV.Concat(aesEncrypt.TransformFinalBlock(rawData, 0, rawData.Length - (rawData.Length % encryptionInfo.Key.Length)))).ToArray();
 
 			return encryptedData;
 		}

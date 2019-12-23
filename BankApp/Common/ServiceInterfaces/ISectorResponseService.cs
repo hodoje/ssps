@@ -20,7 +20,7 @@ namespace Common.ServiceInterfaces
 		/// <param name="commandId">ID of accepted command.</param>
 		/// <returns></returns>
 		[OperationContract]
-		void Accept(long commandId, string information);
+		void Accept(long commandId, string information, byte[] integrityCheck);
 
 		/// <summary>
 		/// Returns a reject response to bank service.
@@ -29,6 +29,6 @@ namespace Common.ServiceInterfaces
 		/// <param name="reason">Reason why the command was rejected.</param>
 		/// <returns></returns>
 		[OperationContract]
-		void Reject(long commandId, string reason);
+		void Reject(long commandId, string reason, byte[] integrityCheck);
 	}
 }

@@ -7,6 +7,7 @@ namespace Common.Commanding
 	/// Command used to represent deposit request initiated by user.
 	/// </summary>
 	[DataContract]
+	[Serializable]
 	public class TransactionCommand : BaseCommand
 	{
 		/// <summary>

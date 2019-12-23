@@ -7,6 +7,7 @@ namespace Common.Commanding
 	/// Command used to represent loan request initiated by user.
 	/// </summary>
 	[DataContract]
+	[Serializable]
 	public class RequestLoanCommand : BaseCommand
 	{
 		public RequestLoanCommand()

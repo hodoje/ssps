@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 namespace Common.Model
 {
 	[DataContract]
+	[Serializable]
 	public class IdentifiedObject
 	{
 		public IdentifiedObject()

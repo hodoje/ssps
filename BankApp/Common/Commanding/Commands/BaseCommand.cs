@@ -11,6 +11,7 @@ namespace Common.Commanding
 	[KnownType(typeof(TransactionCommand))]
 	[KnownType(typeof(RequestLoanCommand))]
 	[KnownType(typeof(RegistrationCommand))]
+	[Serializable]
 	public abstract class BaseCommand : IdentifiedObject
 	{
 		public BaseCommand()

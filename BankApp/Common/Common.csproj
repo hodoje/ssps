@@ -62,6 +62,7 @@
     <Compile Include="Communication\AuthorizationPolicy\OUAuthorizationPolicy.cs" />
     <Compile Include="Communication\CertificateClientProxy.cs" />
     <Compile Include="Communication\Audit\AuditClientProxy.cs" />
+    <Compile Include="Communication\ObjectSerializer.cs" />
     <Compile Include="Communication\StringFormatter.cs" />
     <Compile Include="Communication\WindowsClientProxy.cs" />
     <Compile Include="DataContracts\Dtos\EventLogData.cs" />

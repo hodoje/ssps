@@ -8,6 +8,8 @@ using Common.Communication;
 using Common.ServiceInterfaces;
 using System.ServiceModel;
 using System.Net.Security;
+using Common.SymmetricEncryptionAlgorithms;
+using System.Text;
 
 namespace BankService.CommandHandler
 {
@@ -24,6 +26,8 @@ namespace BankService.CommandHandler
 		private ServiceHost sectorResponseServiceHost;
 		private IAudit auditService;
 		private INotificationHost notificationHost;
+		private ISymmetricAlgorithmProvider symmetricAlgorithm;
+		private EncryptionInformation encryptionInfo;
 
 		/// <summary>
 		/// Initializes new instance of <see cref="CommandHandler"/> class. 
@@ -34,6 +38,14 @@ namespace BankService.CommandHandler
 			this.auditService = auditService;
 			this.notificationHost = notificationHost;
 			this.sectorSize = sectorQueueSize;
+
+			encryptionInfo = new EncryptionInformation()
+			{
+				Key = " ?$&>?e?`d??[??????M<$H??????",
+				CipherMode = System.Security.Cryptography.CipherMode.CBC
+			};
+
+			symmetricAlgorithm = new AESAlgorithmProvider();
 
 			ConnectionInfo ci = BankServiceConfig.Connections[sectorType];
 			sectorServiceProxy = new WindowsClientProxy<ISectorService>(ci.Address, ci.EndpointName);
@@ -113,29 +125,56 @@ namespace BankService.CommandHandler
 			try
 			{
 				// Send command to sector
-				// TODO: DO INTEGRITY CHECK
-				sectorServiceProxy.Proxy.SendRequest(command, new byte[1]);
+				byte[] encrypted = symmetricAlgorithm.Encrypt(encryptionInfo, ObjectSerializer.ObjectToByteArray(command));
+
+				sectorServiceProxy.Proxy.SendRequest(command, encrypted);
 				return true;
 			}
-			catch
+			catch (Exception e)
 			{
 				return false;
 			}
 		}
 
 		#region ISectoreResponse
-		public void Accept(long commandId, string information)
+		public void Accept(long commandId, string information, byte[] integrityCheck)
 		{
-			CommandNotification cn = new CommandNotification(commandId, CommandNotificationStatus.Confirmed);
-			cn.Information = information;     
-			CommandNotificationReceived(cn);
+			byte[] rawData = BitConverter.GetBytes(commandId).Concat(Encoding.ASCII.GetBytes(information)).ToArray();
+
+			byte[] IV = new byte[16];
+			Buffer.BlockCopy(integrityCheck, 4, IV, 0, 16);
+
+			byte[] checkData = symmetricAlgorithm.EncryptWithIV(encryptionInfo, rawData, IV);
+			if (integrityCheck.SequenceEqual(checkData))
+			{
+				CommandNotification cn = new CommandNotification(commandId, CommandNotificationStatus.Confirmed);
+				cn.Information = information;
+				CommandNotificationReceived(cn);
+			}
+			else
+			{
+				commandsSent.Remove(commandId);
+			}
 		}
 
-		public void Reject(long commandId, string reason)
+		public void Reject(long commandId, string reason, byte[] integrityCheck)
 		{
-			CommandNotification cn = new CommandNotification(commandId, CommandNotificationStatus.Rejected);
-			cn.Information = reason;
-			CommandNotificationReceived(cn);
+			byte[] rawData = BitConverter.GetBytes(commandId).Concat(Encoding.ASCII.GetBytes(reason)).ToArray();
+
+			byte[] IV = new byte[16];
+			Buffer.BlockCopy(integrityCheck, 4, IV, 0, 16);
+
+			byte[] checkData = symmetricAlgorithm.EncryptWithIV(encryptionInfo, rawData, IV);
+			if (integrityCheck.SequenceEqual(checkData))
+			{
+				CommandNotification cn = new CommandNotification(commandId, CommandNotificationStatus.Rejected);
+				cn.Information = reason;
+				CommandNotificationReceived(cn);
+			}
+			else
+			{
+				commandsSent.Remove(commandId);
+			}
 		}
 		#endregion
 

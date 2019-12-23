@@ -1,7 +1,11 @@
 ﻿using Common.Commanding;
 using Common.Communication;
 using Common.ServiceInterfaces;
+using Common.SymmetricEncryptionAlgorithms;
 using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SectorService
@@ -17,6 +21,8 @@ namespace SectorService
 		private WindowsClientProxy<ISectorResponseService> _responseProxy;
 		private Task _processorTask;
 		private Task _responderTask;
+		private ISymmetricAlgorithmProvider symmetricAlgorithm;
+		private EncryptionInformation encryptionInfo;
 		#endregion
 
 		#region Properties
@@ -28,6 +34,13 @@ namespace SectorService
 		/// </summary>
 		public SectorManager(string sectorType, int sectorQueueSize, int sectorQueueTimeoutPeriodInSeconds)
 		{
+			encryptionInfo = new EncryptionInformation()
+			{
+				Key = " ?$&>?e?`d??[??????M<$H??????",
+				CipherMode = System.Security.Cryptography.CipherMode.CBC
+			};
+
+			symmetricAlgorithm = new AESAlgorithmProvider();
 			_requestQueue = new CommandQueue(sectorQueueSize, sectorQueueTimeoutPeriodInSeconds);
 			_responseQueue = new CommandQueue(sectorQueueSize, sectorQueueTimeoutPeriodInSeconds);
 			_responseProxy = new WindowsClientProxy<ISectorResponseService>(
@@ -58,7 +71,9 @@ namespace SectorService
 		{
 			try
 			{
-				_responseProxy.Proxy.Accept(commandId, information);
+				byte[] rawData = BitConverter.GetBytes(commandId).Concat(Encoding.ASCII.GetBytes(information)).ToArray();
+
+				_responseProxy.Proxy.Accept(commandId, information, symmetricAlgorithm.Encrypt(encryptionInfo, rawData));
 			}
 			catch(Exception e)
 			{
@@ -75,7 +90,9 @@ namespace SectorService
 		{
 			try
 			{
-				_responseProxy.Proxy.Reject(commandId, reason);
+				byte[] rawData = BitConverter.GetBytes(commandId).Concat(Encoding.ASCII.GetBytes(reason)).ToArray();
+
+				_responseProxy.Proxy.Reject(commandId, reason, symmetricAlgorithm.Encrypt(encryptionInfo, rawData));
 			}
 			catch(Exception e)
 			{

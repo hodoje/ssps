@@ -7,6 +7,7 @@ namespace Common.Commanding
 	/// Command used by users to register to banking system.
 	/// </summary>
 	[DataContract]
+	[Serializable]
 	public class RegistrationCommand : BaseCommand
 	{
 		public RegistrationCommand()

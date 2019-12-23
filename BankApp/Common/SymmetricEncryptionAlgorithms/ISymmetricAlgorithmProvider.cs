@@ -38,5 +38,7 @@ namespace Common.SymmetricEncryptionAlgorithms
 		/// <param name="encryptedData">Encrypted bytes.</param>
 		/// <returns>Decrypted data.</returns>
 		byte[] Decrypt(EncryptionInformation decryptionInfo, byte[] encryptedData);
+
+		byte[] EncryptWithIV(EncryptionInformation encryptionInfo, byte[] rawData, byte[] IV);
 	}
 }
