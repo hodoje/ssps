@@ -12,10 +12,11 @@ namespace Common.Model
 		public User(string username) : base()
 		{
 			Username = username;
+			Accounts = new HashSet<BankAccount>();
 		}
 
 		public string Username { get; set; }
-		public ICollection<BankAccount> Accounts { get; set; }
+		public virtual ICollection<BankAccount> Accounts { get; set; }
 
 		public long LoanId { get; set; }
 		public Loan Loan { get; set; }

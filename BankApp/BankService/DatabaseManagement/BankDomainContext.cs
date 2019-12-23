@@ -19,6 +19,8 @@ namespace BankService.DatabaseManagement
 			modelBuilder.Entity<User>()
 				.HasOptional<Loan>(x => x.Loan)
 				.WithRequired(x => x.User);
+			modelBuilder.Entity<BankAccount>()
+				.HasOptional(ba => ba.User);
 		}
 
 		public DbSet<User> Users { get; set; }

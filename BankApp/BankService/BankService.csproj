@@ -139,6 +139,14 @@
     <Compile Include="Migrations\DomainContext\201912222023429_TestMigration.designer.cs">
       <DependentUpon>201912222023429_TestMigration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\DomainContext\201912230813292_UserIsNullable.cs" />
+    <Compile Include="Migrations\DomainContext\201912230813292_UserIsNullable.designer.cs">
+      <DependentUpon>201912230813292_UserIsNullable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\DomainContext\201912230912403_AddedUsernameToBankAccount.cs" />
+    <Compile Include="Migrations\DomainContext\201912230912403_AddedUsernameToBankAccount.designer.cs">
+      <DependentUpon>201912230912403_AddedUsernameToBankAccount.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\DomainContext\DomainConfiguration.cs" />
     <Compile Include="Notification\INotificationContainer.cs" />
     <Compile Include="Notification\INotificationHandler.cs" />
@@ -193,6 +201,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\DomainContext\201912222023429_TestMigration.resx">
       <DependentUpon>201912222023429_TestMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\DomainContext\201912230813292_UserIsNullable.resx">
+      <DependentUpon>201912230813292_UserIsNullable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\DomainContext\201912230912403_AddedUsernameToBankAccount.resx">
+      <DependentUpon>201912230912403_AddedUsernameToBankAccount.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
