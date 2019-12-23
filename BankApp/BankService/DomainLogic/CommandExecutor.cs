@@ -135,10 +135,9 @@ namespace BankService.CommandExecutor
 
 			long accountId = long.Parse(PasswordGenerator.Generate(10, new HashSet<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }));
 			BankAccount newAccount = new BankAccount(accountId);
-
-			newAccount.UserId = user.ID;
+			//newAccount.UserId = user.ID;
+			newAccount.Username = user.Username;
 			bankAccDatabaseManager.AddEntity(newAccount);
-			//bankAccDatabaseManager.Update(newAccount);
 
 			auditService.Log("CommandExecutor", $"New card successfully created for user: {user.Username}.");
 
@@ -169,7 +168,7 @@ namespace BankService.CommandExecutor
 				return new List<BankAccount>(0);
 			}
 
-			return bankAccDatabaseManager.Find(x => x.UserId == user.ID).ToList();
+			return bankAccDatabaseManager.Find(x => x.Username == user.Username).ToList();
 		}
 	}
 }

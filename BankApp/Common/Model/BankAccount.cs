@@ -10,7 +10,8 @@
 
 		public long AccountName { get; set; }
 		public double Amount { get; set; }
-		public long UserId { get; set; }
+		public string Username { get; set; }
+		public long? UserId { get; set; }
 		public User User { get; set; }
 
 		public override string ToString()

@@ -127,9 +127,9 @@ namespace Client.ViewModels
             {
                 AskServiceForNotifications();
 				//GetAllBankAccounts();
+				getBankAccountsTask = new Task(GetAllBankAccounts);
+				getBankAccountsTask.Start();
 			}
-			getBankAccountsTask = new Task(GetAllBankAccounts);
-			getBankAccountsTask.Start();
 		}
 		#endregion
 
