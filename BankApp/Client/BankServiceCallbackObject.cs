@@ -17,16 +17,16 @@ namespace Client
 		public BankServiceCallbackObject(Action<CommandNotification> callback, Action getBankAccounts)
 		{
 			_callback = callback;
-			this.getBankAccounts = getBankAccounts;
+			//this.getBankAccounts = getBankAccounts;
 		}
 
 		public void SendNotification(CommandNotification commandNotification)
 		{
 			_callback(commandNotification);
-			if (commandNotification.CommandStatus == CommandNotificationStatus.Confirmed)
-			{
-				getBankAccounts?.Invoke();
-			}
+			//if (commandNotification.CommandStatus == CommandNotificationStatus.Confirmed)
+			//{
+			//	getBankAccounts?.Invoke();
+			//}
 		}
 	}
 }

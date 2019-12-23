@@ -43,7 +43,7 @@ namespace BankService
 			auditService = new AuditClientProxy(BankServiceConfig.AuditServiceAddress, BankServiceConfig.AuditServiceEndpointName);
 
 			//FOR TESTING
-			TestCreateNewDatabase();
+			//TestCreateNewDatabase();
 
 			responseQueue = new ConcurrentQueue<CommandNotification>();
 			notificationHandler = new NotificationHandler(auditService, responseQueue, new NotificationContainer(ServiceLocator.GetService<IRepository<CommandNotification>>()));

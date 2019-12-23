@@ -90,8 +90,9 @@ namespace BankService.CommandingHost
 			Console.WriteLine($"[CommandingHost({sectorType.ToUpper()})] started...");
 			while (!cancellationToken.IsCancellationRequested)
 			{
+				Console.WriteLine("Worker thread working...");
 				BaseCommand commandToSend = commandingQueue.Dequeue();
-
+				Console.WriteLine("Processing command...");
 				// Queue might be in disposing procedure.
 				if (commandToSend == null)
 				{

@@ -233,8 +233,13 @@ namespace BankService.CommandingManager
 					if(commandingHosts.Count > 0)
 					{
 						Dictionary<string, ICommandingHost> aliveSectors = new Dictionary<string, ICommandingHost>();
+						Dictionary<string, ICommandingHost> copy = new Dictionary<string, ICommandingHost>();
+						foreach(var pair in commandingHosts)
+						{
+							copy.Add(pair.Key, pair.Value);
+						}
 
-						foreach (var sectorHostPair in commandingHosts)
+						foreach (var sectorHostPair in copy)
 						{
 							ConnectionInfo ci = BankServiceConfig.Connections[sectorHostPair.Key];
 							using (var sectorServiceProxy = new WindowsClientProxy<ISectorService>(ci.Address, ci.EndpointName))
@@ -260,7 +265,7 @@ namespace BankService.CommandingManager
 						}
 					}
 
-					Thread.Sleep(2000);
+					Thread.Sleep(1000);
 				}
 			});
 		}
