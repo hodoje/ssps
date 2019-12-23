@@ -16,6 +16,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace Client.ViewModels
 {
@@ -91,6 +92,7 @@ namespace Client.ViewModels
 		public UIICommand CreateNewDatabaseCommand { get; set; }
 		public UIICommand RemoveExpiredRequestsCommand { get; set; }
 		public UIICommand CreateNewBankAccountCommand { get; set; }
+		private Task getBankAccountsTask;
 		#endregion
 
 		#region Constructors
@@ -124,8 +126,10 @@ namespace Client.ViewModels
             if(StringFormatter.GetAttributeFromSubjetName(certificate.SubjectName.Name, "OU") == "users")
             {
                 AskServiceForNotifications();
-				GetAllBankAccounts();
+				//GetAllBankAccounts();
 			}
+			getBankAccountsTask = new Task(GetAllBankAccounts);
+			getBankAccountsTask.Start();
 		}
 		#endregion
 
@@ -269,30 +273,42 @@ namespace Client.ViewModels
 
 		private void GetAllBankAccounts()
 		{
-			try
+			while (true)
 			{
-				List<BankAccount> bankAccounts = _userServiceProxy.Proxy.GetMyBankAccounts();
+				try
+				{
+					List<BankAccount> bankAccounts = _userServiceProxy.Proxy.GetMyBankAccounts();
+					Console.WriteLine("Polling bank accounts for current user.");
 
-				if(BankAccounts.Count > 0)
-				{
-					BankAccounts.Clear();
-				}
+					App.Current.Dispatcher.BeginInvoke((Action)delegate
+					{
+						if (BankAccounts.Count > 0)
+						{
+							BankAccounts.Clear();
+						}
 
-				foreach(var ba in bankAccounts)
-				{
-					BankAccounts.Add(ba);
+						foreach (var ba in bankAccounts)
+						{
+							BankAccounts.Add(ba);
+						}
+					});
 				}
-			}
-			catch (SecurityAccessDeniedException securityAccess)
-			{
-				Notifications.Add(new Notification($"Get my bank accounts action denied. You have no permission for this action.", CommandNotificationStatus.Rejected));
-			}
-			catch (Exception e)
-			{
-				if (_userServiceProxy == null)
+				catch (SecurityAccessDeniedException securityAccess)
 				{
-					Notifications.Add(new Notification("Unable to get your bank accounts since user service unavailable.", CommandNotificationStatus.Rejected));
+					Notifications.Add(new Notification($"Get my bank accounts action denied. You have no permission for this action.", CommandNotificationStatus.Rejected));
 				}
+				catch (Exception e)
+				{
+					if (_userServiceProxy == null)
+					{
+						Notifications.Add(new Notification("Unable to get your bank accounts since user service unavailable.", CommandNotificationStatus.Rejected));
+					}
+					else
+					{
+						continue;
+					}					
+				}
+				Thread.Sleep(5000);
 			}
 		}
 

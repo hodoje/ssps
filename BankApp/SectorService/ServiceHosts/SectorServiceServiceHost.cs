@@ -90,7 +90,7 @@ namespace SectorService.ServiceHosts
 				catch (Exception e)
 				{
 					_startupProxy = null;
-					int sleep = 5;
+					int sleep = 1;
 					//Console.WriteLine("Bank not available.");
 					//Console.WriteLine($"Trying again in {sleep} seconds.");
 					isSectorConfirmed = false;
