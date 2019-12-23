@@ -119,6 +119,9 @@ namespace CertMakerTesting
 				var privatePath = @".\certs\" + $"{subjectName}.pfx";
 				var publicPath = @".\certs\" + $"{subjectName}.cer";
 
+				File.Create(privatePath);
+				File.Create(publicPath);
+
 				File.WriteAllBytes(privatePath, privateCert);
 				File.WriteAllBytes(publicPath, publicCert);
 			}
@@ -144,8 +147,15 @@ namespace CertMakerTesting
 
 			// Populate subject name
 			var subName = $"CN={subjectName}";//OU={organizationalUnit}";
-			List<DerObjectIdentifier> tempIdentifier = new List<DerObjectIdentifier>() { X509Name.CN, X509Name.OU };
-			List<string> tempValues = new List<string>() { subjectName, organizationalUnit };
+			List<DerObjectIdentifier> tempIdentifier = new List<DerObjectIdentifier>() { X509Name.CN };
+			List<string> tempValues = new List<string>() { subjectName };
+
+			if (!String.IsNullOrEmpty(organizationalUnit))
+			{
+				tempIdentifier.Add(X509Name.OU);
+				tempValues.Add(organizationalUnit);
+			}
+
 			X509Name subjectDN = new X509Name(tempIdentifier, tempValues);
 			var temp = subjectDN.GetValueList();
 			generator.SetSubjectDN(subjectDN);
@@ -220,9 +230,10 @@ namespace CertMakerTesting
 		static void Main(string[] args)
         {
 			AsymmetricKeyParameter caPrivateKey = null;
-			Org.BouncyCastle.X509.X509Certificate caCertificate = GenerateCACertificate("bankservice", "123", ref caPrivateKey);
-			GenerateClientCertificate("user1", "users", "321", "bankservice", caPrivateKey, caCertificate);
-			GenerateClientCertificate("admin1", "admins", "222", "bankservice", caPrivateKey, caCertificate);
+			Org.BouncyCastle.X509.X509Certificate caCertificate = GenerateCACertificate("CA", "123", ref caPrivateKey);
+			GenerateClientCertificate("bankservice", "", "123", "CA", caPrivateKey, caCertificate);
+			GenerateClientCertificate("user1", "users", "123", "CA", caPrivateKey, caCertificate);
+			GenerateClientCertificate("admin1", "admins", "123", "CA", caPrivateKey, caCertificate);
         }
     }
 }

@@ -11,13 +11,8 @@ using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.X509;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RuntimeSigning
 {
@@ -36,21 +31,21 @@ namespace RuntimeSigning
 			store.Open(OpenFlags.ReadWrite);
 			Console.WriteLine("Certificate store opened...");
 			Console.WriteLine();
-			Console.WriteLine("Searching for CA(bankservice) certificate...");
+			Console.WriteLine("Searching for CA certificate...");
 			Console.WriteLine();
-			X509Certificate2Collection collection = store.Certificates.Find(X509FindType.FindBySubjectName, "bankservice", true);
+			X509Certificate2Collection collection = store.Certificates.Find(X509FindType.FindBySubjectName, "CA", true);
 			store.Close();
 			Console.WriteLine("Certificate store closed...");
 			Console.WriteLine();
 			if (collection.Count == 0)
 			{
-				Console.WriteLine("There is no CA(bankservice) certificate installed!");
+				Console.WriteLine("There is no CA certificate installed!");
 				
 				return;
 			}
 			else
 			{
-				Console.WriteLine("CA(bankservice) certificate found!");
+				Console.WriteLine("CA certificate found!");
 				Console.WriteLine();
 				X509Certificate2 caCertificate = collection[0];
 
