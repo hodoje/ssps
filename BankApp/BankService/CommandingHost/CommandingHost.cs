@@ -101,11 +101,11 @@ namespace BankService.CommandingHost
 
 				auditService.Log("CommandingHost", $"Dequeued {commandToSend.GetType().Name}(id = {commandToSend.ID}) command.");
 
-				if (!commandHandler.HasAvailableSpace())
-				{
-					// If there is not enough space on host (sector is full) wait for response to be received.
-					sendingSynchronization.WaitOne();
-				}
+				//if (!commandHandler.HasAvailableSpace())
+				//{
+				//	// If there is not enough space on host (sector is full) wait for response to be received.
+				//	sendingSynchronization.WaitOne();
+				//}
 
 				if (cancellationToken.IsCancellationRequested)
 				{
@@ -116,6 +116,7 @@ namespace BankService.CommandingHost
 				if (commandHandler.SendCommandToSector(commandToSend))
 				{
 					ChangeCommandState(commandToSend.ID, CommandState.Sent);
+					sendingSynchronization.WaitOne();
 				}
 				// command not sent
 				else

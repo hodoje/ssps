@@ -1,4 +1,5 @@
-﻿using Common.Commanding;
+﻿using BankService.Notification;
+using Common.Commanding;
 using Common.Model;
 using Common.ServiceInterfaces;
 using System.Collections.Concurrent;
@@ -13,6 +14,7 @@ namespace BankService
 		void RegisterCommand(string username, IClientServiceCallback userCallback, long commandId);
 		void Start();
 		void Stop();
+		void ResetNotificationContainer(INotificationContainer notificationContainer);
 	}
 
 	public class NotificationInformation : IdentifiedObject

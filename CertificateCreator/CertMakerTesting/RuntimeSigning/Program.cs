@@ -25,6 +25,8 @@ namespace RuntimeSigning
 		{
 			Console.Write("Username: ");
 			string username = Console.ReadLine();
+			Console.WriteLine("Organizational unit: ");
+			string organizationalUnit = Console.ReadLine();
 			X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
 			Console.WriteLine("Opening certificate store...");
 			Console.WriteLine();
@@ -49,9 +51,9 @@ namespace RuntimeSigning
 				Console.WriteLine();
 				X509Certificate2 caCertificate = collection[0];
 
-				Console.WriteLine($"Creating certificate for {username}...");
+				Console.WriteLine($"Creating certificate for {username} with organizational unit: \"{ organizationalUnit}\"...");
 				Console.WriteLine();
-				CreateSignedCertificate(username, caCertificate);
+				CreateSignedCertificate(username, organizationalUnit, caCertificate);
 				Console.WriteLine($"Pfx and cer created for {username}...");
 			}
 
@@ -59,7 +61,7 @@ namespace RuntimeSigning
 			Console.ReadLine();
 		}
 
-		static void CreateSignedCertificate(string username, X509Certificate2 caCertificate)
+		static void CreateSignedCertificate(string username, string organizationalUnit, X509Certificate2 caCertificate)
 		{
 			// Create ne certificate generator, 
 			X509V3CertificateGenerator generator = new X509V3CertificateGenerator();
@@ -75,7 +77,7 @@ namespace RuntimeSigning
 
 			// Populate subject name
 			List<DerObjectIdentifier> tempIdentifier = new List<DerObjectIdentifier>() { X509Name.CN, X509Name.OU };
-			List<string> tempValues = new List<string>() { username, "users" };
+			List<string> tempValues = new List<string>() { username, organizationalUnit };
 			X509Name subjectDN = new X509Name(tempIdentifier, tempValues);
 			generator.SetSubjectDN(subjectDN);
 

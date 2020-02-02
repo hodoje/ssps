@@ -76,6 +76,7 @@ namespace BankService
 		private static NetTcpBinding CreateCertificateBinding()
 		{
 			NetTcpBinding binding = new NetTcpBinding();
+			binding.CloseTimeout = binding.OpenTimeout = binding.ReceiveTimeout = binding.SendTimeout = new TimeSpan(1, 0, 0, 0);
 			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 			binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
 			return binding;

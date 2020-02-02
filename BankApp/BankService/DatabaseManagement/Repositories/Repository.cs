@@ -38,7 +38,7 @@ namespace BankService.DatabaseManagement.Repositories
 		public Repository(DbContext dbContext, SemaphoreSlim synchronization)
 		{
 			this.dbContext = dbContext;
-			this.dbContext.ChangeTracker.DetectChanges();
+			//this.dbContext.ChangeTracker.DetectChanges();
 			this.synchronization = synchronization;
 		}
 

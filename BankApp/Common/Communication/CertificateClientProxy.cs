@@ -60,6 +60,7 @@ namespace Common.Communication
 		private static NetTcpBinding SetUpBinding()
 		{
 			var binding = new NetTcpBinding(SecurityMode.Transport);
+			binding.CloseTimeout = binding.OpenTimeout = binding.ReceiveTimeout = binding.SendTimeout = new TimeSpan(1, 0, 0, 0);
 			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 			binding.Security.Transport.ProtectionLevel = ProtectionLevel.EncryptAndSign;
 

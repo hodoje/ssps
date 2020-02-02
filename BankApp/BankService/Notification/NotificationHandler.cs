@@ -105,5 +105,10 @@ namespace BankService
 				return false;
 			}
 		}
+
+		public void ResetNotificationContainer(INotificationContainer notificationContainer)
+		{
+			this.notificationContainer = notificationContainer;
+		}
 	}
 }

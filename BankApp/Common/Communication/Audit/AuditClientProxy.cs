@@ -50,5 +50,13 @@ namespace Common.Communication
 			}
 			catch { }
 		}
+
+		private static NetTcpBinding CreateNewBinding()
+		{
+			var binding = new NetTcpBinding();
+			binding.CloseTimeout = binding.OpenTimeout = binding.ReceiveTimeout = binding.SendTimeout = new TimeSpan(1, 0, 0, 0);
+
+			return binding;
+		}
 	}
 }

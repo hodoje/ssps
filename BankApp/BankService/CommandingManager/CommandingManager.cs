@@ -190,6 +190,7 @@ namespace BankService.CommandingManager
 		{
 			bankAliveServiceHost = new ServiceHost(this);
 			var binding = new NetTcpBinding();
+			binding.CloseTimeout = binding.OpenTimeout = binding.ReceiveTimeout = binding.SendTimeout = new TimeSpan(1, 0, 0, 0);
 			binding.Security.Mode = SecurityMode.Transport;
 			binding.Security.Transport.ProtectionLevel = ProtectionLevel.Sign;
 			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
@@ -209,6 +210,7 @@ namespace BankService.CommandingManager
 		{
 			startupConfirmationHost = new ServiceHost(this);
 			var binding = new NetTcpBinding();
+			binding.CloseTimeout = binding.OpenTimeout = binding.ReceiveTimeout = binding.SendTimeout = new TimeSpan(1, 0, 0, 0);
 			binding.Security.Mode = SecurityMode.Transport;
 			binding.Security.Transport.ProtectionLevel = ProtectionLevel.Sign;
 			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;

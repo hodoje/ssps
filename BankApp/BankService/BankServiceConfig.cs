@@ -35,9 +35,11 @@ namespace BankService
 		public const string StartupConfirmationServiceEndpointNameConfigName = "StartupConfirmationServiceEndpointName";
 		public const string BankAliveServiceAddressConfigName = "BankAliveServiceAddress";
 		public const string BankAliveServiceEndpointConfigName = "BankAliveServiceEndpointName";
+		//public const string EncryptionKey = "EncryptionKey";
 
 		static BankServiceConfig()
 		{
+			//EncryptionKeyValue = ConfigurationManager.AppSettings[EncryptionKey];
 			BankAliveServiceAddress = ConfigurationManager.AppSettings[BankAliveServiceAddressConfigName];
 			BankAliveServiceEndpointName = ConfigurationManager.AppSettings[BankAliveServiceEndpointConfigName];
 			BankServiceAddress = ConfigurationManager.AppSettings[BankServiceAddressConfigName];
@@ -107,5 +109,6 @@ namespace BankService
 		public static string AdminServiceEndpointName { get; }
 		public static string BankAliveServiceAddress { get; }
 		public static string BankAliveServiceEndpointName { get; }
+		//public static string EncryptionKeyValue { get; set; }
 	}
 }

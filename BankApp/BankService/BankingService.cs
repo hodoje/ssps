@@ -43,7 +43,7 @@ namespace BankService
 			auditService = new AuditClientProxy(BankServiceConfig.AuditServiceAddress, BankServiceConfig.AuditServiceEndpointName);
 
 			//FOR TESTING
-			TestCreateNewDatabase();
+			//TestCreateNewDatabase();
 
 			responseQueue = new ConcurrentQueue<CommandNotification>();
 			notificationHandler = new NotificationHandler(auditService, responseQueue, new NotificationContainer(ServiceLocator.GetService<IRepository<CommandNotification>>()));
@@ -83,7 +83,7 @@ namespace BankService
 
 			try
 			{
-				TestCreateNewDatabase();
+				InternalCreateNewDatabase();
 				CommandNotification cn = new CommandNotification(-1, CommandNotificationStatus.Confirmed);
 				cn.Information = "Create new database.";
 				return cn;
@@ -96,7 +96,7 @@ namespace BankService
 			}
 		}
 
-		public void TestCreateNewDatabase()
+		public void InternalCreateNewDatabase()
 		{
 			if (commandingContext.Database.Exists())
 			{
@@ -117,6 +117,8 @@ namespace BankService
 			domainContext.Database.Create();
 			domainContext.Database.Connection.Open();
 			auditService.Log(logMessage: "New BankDomainDB database created!", eventLogEntryType: System.Diagnostics.EventLogEntryType.Warning);
+
+			notificationHandler.ResetNotificationContainer(new NotificationContainer(ServiceLocator.GetService<IRepository<CommandNotification>>()));
 		}
 
 		public CommandNotification DeleteStaleCommands()

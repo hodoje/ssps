@@ -112,7 +112,7 @@ namespace Client.ViewModels
 
 			string username = StringFormatter.ParseName(WindowsIdentity.GetCurrent().Name);
 			//TEST
-			//string username = "user1";
+			//string username = "admin1";
 			X509Certificate2 certificate;
 			certificate = GetCertificateFromStorage(username);
 			if (certificate == null)

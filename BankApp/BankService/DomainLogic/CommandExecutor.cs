@@ -70,16 +70,20 @@ namespace BankService.CommandExecutor
             }
         }
 
+		public void ResetAllManagers()
+		{
+			SemaphoreSlim dbSynchronazation = new SemaphoreSlim(1);
+			bankDbContext = ServiceLocator.GetObject<BankDomainContext>();
+			userDatabaseManager = new DatabaseManager<User>(new Repository<User>(bankDbContext, dbSynchronazation));
+			loanDatabaseManager = new DatabaseManager<Loan>(new Repository<Loan>(bankDbContext, dbSynchronazation));
+			bankAccDatabaseManager = new DatabaseManager<BankAccount>(new Repository<BankAccount>(bankDbContext, dbSynchronazation));
+		}
+
 		public void CreateDatabase()
 		{
-			if (bankDbContext.Database.Exists())
-			{
-				bankDbContext.Database.Connection.Close();
-				bankDbContext.Database.Delete();
-			}
-
-			bankDbContext.Database.Create();
-			bankDbContext.Database.Connection.Open();
+			bankDbContext.Database.ExecuteSqlCommand("delete from BankAccounts");
+			bankDbContext.Database.ExecuteSqlCommand("delete from Loans");
+			bankDbContext.Database.ExecuteSqlCommand("delete from Users");
 
 			auditService.Log(logMessage: "New BankDomainDB database created!", eventLogEntryType: System.Diagnostics.EventLogEntryType.Warning);
 		}

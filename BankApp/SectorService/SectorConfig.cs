@@ -25,9 +25,11 @@ namespace SectorService
 		public const string SectorsConfigName = "Sectors";
 		public const string BankAliveServiceAddressConfigName = "BankAliveServiceAddress";
 		public const string BankAliveServiceEndpointConfigName = "BankAliveServiceEndpointName";
+		//public const string EncryptionKey = "EncryptionKey";
 
 		static SectorConfig()
 		{
+			//EncryptionKeyValue = ConfigurationManager.AppSettings[EncryptionKey];
 			BankAliveServiceAddress = ConfigurationManager.AppSettings[BankAliveServiceAddressConfigName];
 			BankAliveServiceEndpointName = ConfigurationManager.AppSettings[BankAliveServiceEndpointConfigName];
 			try
@@ -73,5 +75,6 @@ namespace SectorService
 		public static Dictionary<string, SectorAdditionalConfig> SectorsConfigs { get; }
 		public static string BankAliveServiceAddress { get; }
 		public static string BankAliveServiceEndpointName { get; }
+		//public static string EncryptionKeyValue { get; set; }
 	}
 }
