@@ -1,2 +1,0 @@
-Odraditi integrity check.
-Onaj concurrency bug kod azuriranja - nije prioritet jer nije uvek.
